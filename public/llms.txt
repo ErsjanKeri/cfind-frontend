@@ -1,0 +1,27 @@
+# Company Finder Platform
+
+## About
+Company Finder is the premier marketplace for buying and selling businesses in Albania. We connect business owners with verified investors through trusted agents.
+
+## Core Features
+- **Verified Listings**: All businesses are vetted by professional agents.
+- **Blind Listings**: Sensitive details (real name, exact location) are hidden until inquiry approval.
+- **Agent-Driven**: Transactions are managed by experienced innovative real estate agents.
+- **Dual Currency**: Prices displayed in EUR and LEK.
+
+## Routes
+- /listings: Browse all active business listings.
+- /how-it-works: Guide for buyers and sellers.
+- /list-your-business: Form for sellers to submit their business.
+- /agents: Directory of verified agents.
+
+## Data Structure
+Listings contain:
+- Public Title (EN/SQ)
+- Public Description
+- Financials (Revenue, Profit, Asking Price)
+- Location (City, Area)
+- Operational Details (Employees, Years in Operation)
+
+## Contact
+For inquiries, users must register and contact agents via WhatsApp, Phone, or Email.

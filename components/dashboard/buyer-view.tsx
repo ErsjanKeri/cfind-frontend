@@ -1,0 +1,248 @@
+"use client"
+
+import { useState } from "react"
+import Link from "next/link"
+import { useUser } from "@/lib/hooks/useAuth"
+import { useBuyerLeads, useSavedListings } from "@/lib/hooks/useLeads"
+import { useBuyerDemands, useUpdateDemandStatus, useDeleteDemand } from "@/lib/hooks/useDemands"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { EmptyState } from "@/components/ui/empty-state"
+import { MessageCircle, Heart, ArrowRight, Phone, Mail, Loader2, Plus, Tag } from "lucide-react"
+import { DemandCard } from "@/components/demand-card"
+import { DemandDialog } from "@/components/demand-dialog"
+import { toast } from "sonner"
+
+export function BuyerView() {
+    const { user } = useUser() // Fetch user via JWT cookie
+    const [showDemandDialog, setShowDemandDialog] = useState(false)
+
+    // React Query hooks - automatically fetch and cache data
+    const { data: savedListings = [], isLoading: isLoadingSaved } = useSavedListings()
+    const { data: contactHistory = [], isLoading: isLoadingContacts } = useBuyerLeads(user?.id)
+    const { data: demands = [], isLoading: isLoadingDemands, refetch: refetchDemands } = useBuyerDemands(user?.id)
+
+    // Mutation hooks for demand operations
+    const updateDemandStatus = useUpdateDemandStatus()
+    const deleteDemand = useDeleteDemand()
+
+    // Combined loading state
+    const isLoading = isLoadingSaved || isLoadingContacts || isLoadingDemands
+
+    const handleMarkFulfilled = async (demandId: string) => {
+        try {
+            await updateDemandStatus.mutateAsync({ id: demandId, status: "fulfilled" })
+            toast.success("Demand marked as fulfilled")
+        } catch (error: any) {
+            toast.error(error.message || "Failed to update demand")
+        }
+    }
+
+    const handleCloseDemand = async (demandId: string) => {
+        try {
+            await updateDemandStatus.mutateAsync({ id: demandId, status: "closed" })
+            toast.success("Demand closed")
+        } catch (error: any) {
+            toast.error(error.message || "Failed to close demand")
+        }
+    }
+
+    const handleDeleteDemand = async (demandId: string) => {
+        try {
+            await deleteDemand.mutateAsync(demandId)
+            toast.success("Demand deleted")
+        } catch (error: any) {
+            toast.error(error.message || "Failed to delete demand")
+        }
+    }
+
+    // Calculate demand stats
+    const activeDemands = demands.filter(d => d.status === "active").length
+    const assignedDemands = demands.filter(d => d.status === "assigned").length
+    const fulfilledDemands = demands.filter(d => d.status === "fulfilled").length
+
+    if (isLoading) {
+        return (
+            <div className="h-40 flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        )
+    }
+
+    return (
+        <div className="space-y-8">
+            {/* Stats Overview */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <Card>
+                    <CardContent className="p-4 text-center">
+                        <p className="text-3xl font-bold text-foreground">{savedListings.length}</p>
+                        <p className="text-sm text-muted-foreground">Saved Listings</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardContent className="p-4 text-center">
+                        <p className="text-3xl font-bold text-foreground">{contactHistory.length}</p>
+                        <p className="text-sm text-muted-foreground">Contacts Made</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardContent className="p-4 text-center">
+                        <p className="text-3xl font-bold text-foreground">{demands.length}</p>
+                        <p className="text-sm text-muted-foreground">My Demands</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardContent className="p-4 text-center">
+                        <p className="text-3xl font-bold text-foreground">
+                            {user?.created_at ? new Date(user.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "N/A"}
+                        </p>
+                        <p className="text-sm text-muted-foreground">Member Since</p>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Main Actions */}
+            <div className="grid gap-6 sm:grid-cols-2">
+                <Link href="/profile/saved">
+                    <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
+                        <CardContent className="p-6">
+                            <Heart className="h-8 w-8 text-primary mb-3" />
+                            <h3 className="font-semibold text-foreground">Saved Listings</h3>
+                            <p className="text-sm text-muted-foreground mt-1">View and manage your saved business listings</p>
+                            <div className="mt-4 flex items-center text-sm text-primary">
+                                {savedListings.length} saved
+                                <ArrowRight className="ml-2 h-4 w-4" />
+                            </div>
+                        </CardContent>
+                    </Card>
+                </Link>
+
+                <Link href="/profile/contacts">
+                    <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
+                        <CardContent className="p-6">
+                            <MessageCircle className="h-8 w-8 text-primary mb-3" />
+                            <h3 className="font-semibold text-foreground">Contact History</h3>
+                            <p className="text-sm text-muted-foreground mt-1">Review agents you've contacted</p>
+                            <div className="mt-4 flex items-center text-sm text-primary">
+                                {contactHistory.length} contacts
+                                <ArrowRight className="ml-2 h-4 w-4" />
+                            </div>
+                        </CardContent>
+                    </Card>
+                </Link>
+            </div>
+
+            {/* My Demands Section */}
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                    <div>
+                        <CardTitle className="flex items-center gap-2">
+                            <Tag className="h-5 w-5" />
+                            My Demands
+                        </CardTitle>
+                        <CardDescription>Manage your business demands and see which agents have claimed them</CardDescription>
+                    </div>
+                    <Button onClick={() => setShowDemandDialog(true)}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Post New Demand
+                    </Button>
+                </CardHeader>
+                <CardContent>
+                    {demands.length > 0 ? (
+                        <div className="space-y-6">
+                            {/* Demand Stats */}
+                            <div className="flex gap-4 text-sm">
+                                <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700">
+                                    {activeDemands} Active
+                                </span>
+                                <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700">
+                                    {assignedDemands} Agent Assigned
+                                </span>
+                                <span className="px-3 py-1 rounded-full bg-purple-50 text-purple-700">
+                                    {fulfilledDemands} Fulfilled
+                                </span>
+                            </div>
+
+                            {/* Demands Grid */}
+                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                {demands.map((demand) => (
+                                    <DemandCard
+                                        key={demand.id}
+                                        demand={demand}
+                                        variant="buyer"
+                                        onMarkFulfilled={() => handleMarkFulfilled(demand.id)}
+                                        onClose={() => handleCloseDemand(demand.id)}
+                                        onDelete={() => handleDeleteDemand(demand.id)}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <EmptyState
+                            icon={Tag}
+                            title="No demands posted yet"
+                            description="Post a demand to let agents know what you're looking for"
+                            size="sm"
+                            action={{
+                                label: "Post New Demand",
+                                onClick: () => setShowDemandDialog(true),
+                                variant: "default"
+                            }}
+                        />
+                    )}
+                </CardContent>
+            </Card>
+
+            {/* Demand Dialog */}
+            <DemandDialog
+                open={showDemandDialog}
+                onOpenChange={setShowDemandDialog}
+                onSuccess={() => refetchDemands()}
+            />
+
+            {/* Recent Activity */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Recent Contacts</CardTitle>
+                    <CardDescription>Your recent agent communications</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {contactHistory.length > 0 ? (
+                        <div className="space-y-4">
+                            {contactHistory.slice(0, 5).map((contact) => (
+                                <div key={contact.id} className="flex items-center justify-between p-4 rounded-lg bg-muted">
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                            {contact.interaction_type === "whatsapp" && <MessageCircle className="h-5 w-5 text-[#25D366]" />}
+                                            {contact.interaction_type === "phone" && <Phone className="h-5 w-5 text-primary" />}
+                                            {contact.interaction_type === "email" && <Mail className="h-5 w-5 text-primary" />}
+                                        </div>
+                                        <div>
+                                            <p className="font-medium">{contact.listing?.public_title_en || "Listing"}</p>
+                                            <p className="text-sm text-muted-foreground">
+                                                Contacted via {contact.interaction_type}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <span className="text-sm text-muted-foreground">{new Date(contact.created_at).toLocaleDateString()}</span>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <EmptyState
+                            icon={MessageCircle}
+                            title="No contact history yet"
+                            description=""
+                            size="sm"
+                            action={{
+                                label: "Browse Listings",
+                                onClick: () => window.location.href = "/listings",
+                                variant: "default"
+                            }}
+                        />
+                    )}
+                </CardContent>
+            </Card>
+        </div>
+    )
+}
