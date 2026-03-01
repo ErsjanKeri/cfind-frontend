@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useAuth, useUser } from "@/lib/hooks/useAuth"
 import { useUpdateProfile } from "@/lib/hooks/useUser"
+import { useRole } from "@/lib/hooks/useRole"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
@@ -21,7 +22,7 @@ import { Loader2, Settings } from "lucide-react"
 import { AdminView } from "@/components/dashboard/admin-view"
 import { AgentView } from "@/components/dashboard/agent-view"
 import { BuyerView } from "@/components/dashboard/buyer-view"
-import { ImageUpload } from "@/components/ui/image-upload"
+import { ImageUpload } from "@/components/shared/image-upload"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { getInitials } from "@/lib/utils"
@@ -30,6 +31,7 @@ import { toast } from "sonner"
 export default function ProfilePage() {
   const router = useRouter()
   const { user, isLoading } = useUser() // Simple: fetch user via JWT cookie
+  const { isAdmin, isAgent, isBuyer } = useRole()
   const updateProfile = useUpdateProfile()
   const [showImageUpload, setShowImageUpload] = useState(false)
 
@@ -58,18 +60,14 @@ export default function ProfilePage() {
     return null
   }
 
-  const isAdmin = user?.role === "admin"
-  const isAgent = user?.role === "agent"
-  const isBuyer = user?.role === "buyer"
-
   const handleImageUpdate = async (urls: string[]) => {
     if (urls.length > 0) {
       try {
         await updateProfile.mutateAsync({ image: urls[0] })
         toast.success("Profile photo updated successfully!")
         setShowImageUpload(false)
-      } catch (error: any) {
-        toast.error(error.message || "Failed to update profile photo")
+      } catch (error: unknown) {
+        toast.error(error instanceof Error ? error.message : "An unexpected error occurred")
       }
     }
   }
@@ -120,9 +118,7 @@ export default function ProfilePage() {
               <h1 className="text-2xl font-bold text-foreground">{user?.name || 'User'}</h1>
               <p className="text-muted-foreground">{user?.email}</p>
               <Badge className="mt-2 bg-primary/10 text-primary">
-                {user?.role === 'admin' ? "Admin" :
-                  user?.role === 'agent' ? "Agent" :
-                    "Buyer"}
+                {isAdmin ? "Admin" : isAgent ? "Agent" : "Buyer"}
               </Badge>
             </div>
             <Button variant="outline" asChild>

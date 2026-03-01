@@ -22,8 +22,8 @@ export function RejectAgentDialog({
     try {
       await rejectAgent.mutateAsync({ agentId, reason: rejectionReason })
       return { success: true }
-    } catch (error: any) {
-      return { success: false, error: error.message }
+    } catch (error: unknown) {
+      return { success: false, error: error instanceof Error ? error.message : "An unexpected error occurred" }
     }
   }
 

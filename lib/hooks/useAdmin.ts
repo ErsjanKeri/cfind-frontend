@@ -7,7 +7,7 @@
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import type { UserRole } from '@/lib/api/types';
+import type { UserRole, CreateAgentRequest, CreateBuyerRequest } from '@/lib/api/types';
 
 // ============================================================================
 // QUERY HOOKS (READ Operations)
@@ -91,8 +91,8 @@ export function useToggleEmailVerification() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId }: { userId: string; emailVerified: boolean }) =>
-      api.admin.toggleEmailVerification(userId),
+    mutationFn: ({ userId, emailVerified }: { userId: string; emailVerified: boolean }) =>
+      api.admin.toggleEmailVerification(userId, emailVerified),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
     },
@@ -122,7 +122,7 @@ export function useCreateAgent() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: any) => api.admin.createAgent(data),
+    mutationFn: (data: CreateAgentRequest) => api.admin.createAgent(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       queryClient.invalidateQueries({ queryKey: ['adminStats'] });
@@ -137,7 +137,7 @@ export function useCreateBuyer() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: any) => api.admin.createBuyer(data),
+    mutationFn: (data: CreateBuyerRequest) => api.admin.createBuyer(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       queryClient.invalidateQueries({ queryKey: ['adminStats'] });

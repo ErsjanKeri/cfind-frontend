@@ -10,7 +10,7 @@
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import type { ListingFilters } from '@/lib/api/types';
+import type { ListingFilters, CreateListingRequest } from '@/lib/api/types';
 
 // ============================================================================
 // QUERY HOOKS (READ Operations)
@@ -73,7 +73,7 @@ export function useCreateListing() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: any) => api.listings.createListing(data),
+    mutationFn: (data: Record<string, unknown>) => api.listings.createListing(data as unknown as CreateListingRequest),
     onSuccess: () => {
       // Invalidate listings queries to show new listing
       queryClient.invalidateQueries({ queryKey: ['listings'] });
@@ -97,8 +97,8 @@ export function useUpdateListing() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<any> }) =>
-      api.listings.updateListing(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) =>
+      api.listings.updateListing(id, data as Partial<CreateListingRequest>),
     onSuccess: (_, variables) => {
       // Invalidate specific listing and all listings queries
       queryClient.invalidateQueries({ queryKey: ['listing', variables.id] });

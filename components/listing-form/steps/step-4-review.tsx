@@ -3,10 +3,11 @@
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Lock, Globe, DollarSign } from "lucide-react"
+import type { ListingFormData } from "@/lib/api/types"
 
 interface Step4Props {
-    data: any
-    updateData: (field: string, value: any) => void
+    data: ListingFormData
+    updateData: (field: string, value: string | number | boolean | string[]) => void
     onSubmit: () => void
     isSubmitting: boolean
     displayROI: string
@@ -22,10 +23,8 @@ export function Step4Review({ data, updateData, onSubmit, isSubmitting, displayR
                         <Lock className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm font-medium">Hidden Information</span>
                     </div>
-                    <p className="font-semibold">{data.realBusinessName}</p>
-                    <p className="text-sm text-muted-foreground">
-                        {data.realStreet}, {data.realCity}
-                    </p>
+                    <p className="font-semibold">{data.real_business_name}</p>
+                    <p className="text-sm text-muted-foreground">{data.real_location_address}</p>
                 </div>
 
                 <div className="p-4 rounded-lg bg-muted">
@@ -33,11 +32,11 @@ export function Step4Review({ data, updateData, onSubmit, isSubmitting, displayR
                         <Globe className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm font-medium">Public Information</span>
                     </div>
-                    <p className="font-semibold">{data.publicTitle}</p>
+                    <p className="font-semibold">{data.public_title_en}</p>
                     <p className="text-sm text-muted-foreground">
-                        {data.publicArea}, {data.publicCity}
+                        {data.public_location_area}, {data.public_location_city_en}
                     </p>
-                    <p className="text-sm text-muted-foreground mt-2">{data.publicDescription}</p>
+                    <p className="text-sm text-muted-foreground mt-2">{data.public_description_en}</p>
                 </div>
 
                 <div className="p-4 rounded-lg bg-muted">
@@ -48,18 +47,12 @@ export function Step4Review({ data, updateData, onSubmit, isSubmitting, displayR
                     <div className="grid grid-cols-2 gap-4 mt-2">
                         <div>
                             <p className="text-xs text-muted-foreground">Asking Price</p>
-                            <p className="font-semibold">€{Number(data.askingPrice || 0).toLocaleString()}</p>
+                            <p className="font-semibold">€{Number(data.asking_price_eur || 0).toLocaleString()}</p>
                         </div>
                         <div>
-                            <p className="text-xs text-muted-foreground">Annual Revenue</p>
-                            <p className="font-semibold">€{Number(data.annualRevenue || 0).toLocaleString()}</p>
+                            <p className="text-xs text-muted-foreground">Monthly Revenue</p>
+                            <p className="font-semibold">€{Number(data.monthly_revenue_eur || 0).toLocaleString()}</p>
                         </div>
-                        {data.monthlyProfit && (
-                            <div>
-                                <p className="text-xs text-muted-foreground">Monthly Profit</p>
-                                <p className="font-semibold">€{Number(data.monthlyProfit).toLocaleString()}</p>
-                            </div>
-                        )}
                         {displayROI !== "N/A" && (
                             <div>
                                 <p className="text-xs text-muted-foreground">Calculated ROI</p>
@@ -74,8 +67,8 @@ export function Step4Review({ data, updateData, onSubmit, isSubmitting, displayR
             <div className="flex items-start gap-3 p-4 rounded-lg border border-border bg-muted/30">
                 <Checkbox
                     id="verification"
-                    checked={data.isPhysicallyVerified}
-                    onCheckedChange={(checked) => updateData("isPhysicallyVerified", checked)}
+                    checked={data.is_physically_verified}
+                    onCheckedChange={(checked) => updateData("is_physically_verified", checked)}
                     className="mt-1"
                 />
                 <div className="space-y-1">
@@ -89,7 +82,7 @@ export function Step4Review({ data, updateData, onSubmit, isSubmitting, displayR
             </div>
 
             <div className="flex justify-end">
-                <Button onClick={onSubmit} disabled={isSubmitting || !data.isPhysicallyVerified}>
+                <Button onClick={onSubmit} disabled={isSubmitting || !data.is_physically_verified}>
                     {isSubmitting ? "Submitting..." : "Submit Listing"}
                 </Button>
             </div>

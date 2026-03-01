@@ -17,7 +17,7 @@ import { api } from '@/lib/api';
 import { USER_QUERY_KEY } from '@/lib/hooks/queries/useUserQuery';
 
 interface AuthContextType {
-  login: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -28,8 +28,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
 
   // Simple login - backend sets JWT cookie
-  const login = async (email: string, password: string, rememberMe = false) => {
-    await api.auth.login({ email, password, remember_me: rememberMe });
+  const login = async (email: string, password: string) => {
+    await api.auth.login({ email, password });
     // That's it! JWT cookie is set by backend
   };
 
@@ -43,7 +43,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await api.auth.logout();
     } catch (error) {
       // Ignore errors - user is logging out anyway
-      console.error('Logout error:', error);
     }
 
     router.push('/login');

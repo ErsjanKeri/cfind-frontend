@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mail, Phone, MapPin, MessageCircle, Clock, CheckCircle } from "lucide-react"
+import { SUPPORT_EMAIL } from "@/lib/constants"
 
 export default function ContactPage() {
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -47,8 +48,8 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">Email</h3>
-                    <p className="text-sm text-muted-foreground mt-1">info@companyfinder.al</p>
-                    <p className="text-sm text-muted-foreground">support@companyfinder.al</p>
+                    <p className="text-sm text-muted-foreground mt-1">{SUPPORT_EMAIL}</p>
+                    <p className="text-sm text-muted-foreground">{SUPPORT_EMAIL}</p>
                   </div>
                 </CardContent>
               </Card>

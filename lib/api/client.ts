@@ -60,11 +60,6 @@ apiClient.interceptors.request.use(
       }
     }
 
-    // Log request in development
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`);
-    }
-
     return config;
   },
   (error) => {
@@ -151,11 +146,6 @@ apiClient.interceptors.response.use(
 
         return Promise.reject(refreshError);
       }
-    }
-
-    // Log error in development (only if not 401 - too noisy)
-    if (process.env.NODE_ENV === 'development' && error.response?.status !== 401) {
-      console.error('[API Error]', error.response?.data || error.message);
     }
 
     return Promise.reject(error);

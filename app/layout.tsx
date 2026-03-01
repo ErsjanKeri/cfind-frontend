@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Providers } from "@/components/providers"
-import { CookieConsent } from "@/components/cookie-consent"
+import { CookieConsent } from "@/components/shared/cookie-consent"
 import "./globals.css"
 
 const _geist = Geist({ subsets: ["latin"] })

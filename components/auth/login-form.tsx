@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Checkbox } from "@/components/ui/checkbox"
 import { AlertCircle, Mail, Lock } from "lucide-react"
 import Link from "next/link"
 import { toast } from "@/components/ui/use-toast"
@@ -24,7 +23,6 @@ export function LoginForm({ showResendVerification = false }: LoginFormProps) {
     // Form state
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-    const [rememberMe, setRememberMe] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
@@ -41,14 +39,14 @@ export function LoginForm({ showResendVerification = false }: LoginFormProps) {
         setIsLoading(true)
 
         try {
-            await login(email, password, rememberMe)
+            await login(email, password)
             toast({
                 title: "Success",
                 description: "Logged in successfully!",
             })
             router.push("/profile")
-        } catch (err: any) {
-            const errorMsg = err.message || "Login failed"
+        } catch (err: unknown) {
+            const errorMsg = err instanceof Error ? err.message : "An unexpected error occurred"
             setError(errorMsg)
         } finally {
             setIsLoading(false)
@@ -74,10 +72,10 @@ export function LoginForm({ showResendVerification = false }: LoginFormProps) {
                 title: "Success",
                 description: "Verification email sent! Please check your inbox.",
             })
-        } catch (err: any) {
+        } catch (err: unknown) {
             toast({
                 title: "Error",
-                description: err.message || "Failed to resend verification email",
+                description: err instanceof Error ? err.message : "An unexpected error occurred",
                 variant: "destructive",
             })
         } finally {
@@ -171,21 +169,6 @@ export function LoginForm({ showResendVerification = false }: LoginFormProps) {
                         minLength={6}
                     />
                 </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-                <Checkbox
-                    id="remember"
-                    checked={rememberMe}
-                    onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                    disabled={isLoading}
-                />
-                <label
-                    htmlFor="remember"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                    Remember me for 30 days
-                </label>
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>

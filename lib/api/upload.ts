@@ -34,8 +34,6 @@ export const uploadApi = {
     category: 'avatar' | 'listing' | 'document'
   ): Promise<string> {
     try {
-      console.log('[Upload] Starting direct backend upload');
-
       // Map category to S3 folder
       const folderMap: Record<string, string> = {
         avatar: 'profiles',
@@ -47,13 +45,6 @@ export const uploadApi = {
       // Create FormData for multipart upload (file only, folder is query param)
       const formData = new FormData();
       formData.append('file', file);
-
-      console.log('[Upload] Uploading file...', {
-        filename: file instanceof File ? file.name : 'blob',
-        size: file.size,
-        type: file.type,
-        folder,
-      });
 
       // Send to backend - backend handles S3 upload
       // Note: folder is sent as query parameter, not in FormData
@@ -79,11 +70,8 @@ export const uploadApi = {
         throw new Error('Backend did not return file URL');
       }
 
-      console.log('[Upload] Upload successful!', fileUrl);
-
       return fileUrl;
     } catch (error) {
-      console.error('[Upload] Upload failed:', error);
       throw new Error(getErrorMessage(error));
     }
   },

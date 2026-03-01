@@ -7,11 +7,13 @@ import { useBuyerLeads, useSavedListings } from "@/lib/hooks/useLeads"
 import { useBuyerDemands, useUpdateDemandStatus, useDeleteDemand } from "@/lib/hooks/useDemands"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { EmptyState } from "@/components/ui/empty-state"
-import { MessageCircle, Heart, ArrowRight, Phone, Mail, Loader2, Plus, Tag } from "lucide-react"
-import { DemandCard } from "@/components/demand-card"
-import { DemandDialog } from "@/components/demand-dialog"
+import { EmptyState } from "@/components/shared/empty-state"
+import { MessageCircle, Heart, ArrowRight, Phone, Mail, Loader2, Plus, Tag, Calendar } from "lucide-react"
+import { DemandCard } from "@/components/demands/demand-card"
+import { DemandDialog } from "@/components/demands/demand-dialog"
+import { StatCard } from "@/components/shared/stat-card"
 import { toast } from "sonner"
+import { getDemandStatusBadge } from "@/lib/badge-utils"
 
 export function BuyerView() {
     const { user } = useUser() // Fetch user via JWT cookie
@@ -33,8 +35,8 @@ export function BuyerView() {
         try {
             await updateDemandStatus.mutateAsync({ id: demandId, status: "fulfilled" })
             toast.success("Demand marked as fulfilled")
-        } catch (error: any) {
-            toast.error(error.message || "Failed to update demand")
+        } catch (error: unknown) {
+            toast.error(error instanceof Error ? error.message : "An unexpected error occurred")
         }
     }
 
@@ -42,8 +44,8 @@ export function BuyerView() {
         try {
             await updateDemandStatus.mutateAsync({ id: demandId, status: "closed" })
             toast.success("Demand closed")
-        } catch (error: any) {
-            toast.error(error.message || "Failed to close demand")
+        } catch (error: unknown) {
+            toast.error(error instanceof Error ? error.message : "An unexpected error occurred")
         }
     }
 
@@ -51,8 +53,8 @@ export function BuyerView() {
         try {
             await deleteDemand.mutateAsync(demandId)
             toast.success("Demand deleted")
-        } catch (error: any) {
-            toast.error(error.message || "Failed to delete demand")
+        } catch (error: unknown) {
+            toast.error(error instanceof Error ? error.message : "An unexpected error occurred")
         }
     }
 
@@ -73,32 +75,30 @@ export function BuyerView() {
         <div className="space-y-8">
             {/* Stats Overview */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <Card>
-                    <CardContent className="p-4 text-center">
-                        <p className="text-3xl font-bold text-foreground">{savedListings.length}</p>
-                        <p className="text-sm text-muted-foreground">Saved Listings</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardContent className="p-4 text-center">
-                        <p className="text-3xl font-bold text-foreground">{contactHistory.length}</p>
-                        <p className="text-sm text-muted-foreground">Contacts Made</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardContent className="p-4 text-center">
-                        <p className="text-3xl font-bold text-foreground">{demands.length}</p>
-                        <p className="text-sm text-muted-foreground">My Demands</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardContent className="p-4 text-center">
-                        <p className="text-3xl font-bold text-foreground">
-                            {user?.created_at ? new Date(user.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "N/A"}
-                        </p>
-                        <p className="text-sm text-muted-foreground">Member Since</p>
-                    </CardContent>
-                </Card>
+                <StatCard
+                    icon={Heart}
+                    label="Saved Listings"
+                    value={savedListings.length}
+                    variant="purple"
+                />
+                <StatCard
+                    icon={MessageCircle}
+                    label="Contacts Made"
+                    value={contactHistory.length}
+                    variant="blue"
+                />
+                <StatCard
+                    icon={Tag}
+                    label="My Demands"
+                    value={demands.length}
+                    variant="green"
+                />
+                <StatCard
+                    icon={Calendar}
+                    label="Member Since"
+                    value={user?.created_at ? new Date(user.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "N/A"}
+                    variant="amber"
+                />
             </div>
 
             {/* Main Actions */}
@@ -152,14 +152,14 @@ export function BuyerView() {
                         <div className="space-y-6">
                             {/* Demand Stats */}
                             <div className="flex gap-4 text-sm">
-                                <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700">
-                                    {activeDemands} Active
+                                <span className={`px-3 py-1 rounded-full ${getDemandStatusBadge("active").className}`}>
+                                    {activeDemands} {getDemandStatusBadge("active").label}
                                 </span>
-                                <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700">
-                                    {assignedDemands} Agent Assigned
+                                <span className={`px-3 py-1 rounded-full ${getDemandStatusBadge("assigned").className}`}>
+                                    {assignedDemands} {getDemandStatusBadge("assigned").label}
                                 </span>
-                                <span className="px-3 py-1 rounded-full bg-purple-50 text-purple-700">
-                                    {fulfilledDemands} Fulfilled
+                                <span className={`px-3 py-1 rounded-full ${getDemandStatusBadge("fulfilled").className}`}>
+                                    {fulfilledDemands} {getDemandStatusBadge("fulfilled").label}
                                 </span>
                             </div>
 
@@ -218,7 +218,7 @@ export function BuyerView() {
                                             {contact.interaction_type === "email" && <Mail className="h-5 w-5 text-primary" />}
                                         </div>
                                         <div>
-                                            <p className="font-medium">{contact.listing?.public_title_en || "Listing"}</p>
+                                            <p className="font-medium">{contact.listing_title}</p>
                                             <p className="text-sm text-muted-foreground">
                                                 Contacted via {contact.interaction_type}
                                             </p>

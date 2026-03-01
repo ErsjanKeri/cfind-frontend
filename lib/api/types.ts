@@ -40,8 +40,13 @@ export interface AgentProfile {
   id_document_url: string | null;
   verification_status: 'pending' | 'approved' | 'rejected';
   rejection_reason: string | null;
+  rejected_at: string | null;
+  rejected_by: string | null;
+  submitted_at: string | null;
   verified_at: string | null;
   credit_balance: number;
+  listings_count: number;
+  deals_completed: number;
 }
 
 // BuyerProfile interface REMOVED
@@ -49,10 +54,15 @@ export interface AgentProfile {
 
 export interface UserWithProfile extends User {
   agent_profile?: AgentProfile;
+
+  // Flat fields returned by admin /users endpoint (matches backend UserListItem)
+  verification_status?: 'pending' | 'approved' | 'rejected' | null;
+  credit_balance?: number | null;
 }
 
 // Auth requests/responses
 export interface RegisterRequest {
+  name: string;
   email: string;
   password: string;
   role: 'buyer' | 'agent';
@@ -61,19 +71,23 @@ export interface RegisterRequest {
   company_name?: string;
   // Agent-specific
   license_number?: string;
+  whatsapp?: string;
+  bio_en?: string;
+  // Agent document uploads (File objects for multipart/form-data)
+  license_document?: File;
+  company_document?: File;
+  id_document?: File;
 }
 
 export interface RegisterResponse {
-  user_id: string;
-  email: string;
-  role: UserRole;
+  success: boolean;
   message: string;
+  user_id: string;
 }
 
 export interface LoginRequest {
   email: string;
   password: string;
-  remember_me?: boolean;
 }
 
 export interface LoginResponse {
@@ -101,8 +115,12 @@ export type ListingCategory =
   | 'hotel'
   | 'retail'
   | 'service'
+  | 'services'
   | 'manufacturing'
   | 'technology'
+  | 'healthcare'
+  | 'education'
+  | 'real-estate'
   | 'other';
 
 export interface ListingImage {
@@ -130,9 +148,7 @@ export interface Listing {
 
   // Pricing
   asking_price_eur: number;
-  asking_price_lek: number;
   monthly_revenue_eur: number | null;
-  monthly_revenue_lek: number | null;
   roi: number | null;
 
   // Meta
@@ -162,20 +178,49 @@ export interface Listing {
 }
 
 export interface CreateListingRequest {
+  // Required fields
+  real_business_name: string;
+  real_location_address: string;
   public_title_en: string;
   public_description_en: string;
-  category: ListingCategory;
+  category: string;
   public_location_city_en: string;
-  public_location_area?: string;
   asking_price_eur: number;
-  monthly_revenue_eur?: number;
-  real_business_name?: string;
-  real_location_address?: string;
+  images: { url: string; order: number }[];
+
+  // Optional fields
+  public_location_area?: string;
+  real_location_lat?: number;
+  real_location_lng?: number;
   real_description_en?: string;
+  monthly_revenue_eur?: number;
   employee_count?: number;
   years_in_operation?: number;
-  image_urls: string[];
+
+  // Admin-only fields
+  agent_id?: string;
+  status?: 'draft' | 'active' | 'sold' | 'inactive';
 }
+
+export interface ListingFormData {
+  agent_id: string;
+  real_business_name: string;
+  real_location_address: string;
+  real_description_en: string;
+  category: string;
+  public_title_en: string;
+  public_description_en: string;
+  public_location_area: string;
+  public_location_city_en: string;
+  images: string[];
+  asking_price_eur: string | number;
+  monthly_revenue_eur: string | number;
+  employee_count: string | number;
+  years_in_operation: string | number;
+  is_physically_verified: boolean;
+}
+
+export type ListingFormErrors = Partial<Record<keyof ListingFormData, string>>
 
 export interface ListingsResponse {
   success: boolean;
@@ -192,14 +237,38 @@ export interface ListingsResponse {
 
 export type InteractionType = 'whatsapp' | 'phone' | 'email';
 
-export interface Lead {
+// Buyer's perspective - shows agent info
+export interface BuyerLead {
   id: string;
-  buyer_id: string;
   listing_id: string;
+  listing_title: string;
+  listing_asking_price_eur: number;
+  agent_id: string;
+  agent_name: string;
+  agent_agency: string | null;
+  agent_email: string;
+  agent_phone: string | null;
+  agent_whatsapp: string | null;
   interaction_type: InteractionType;
   created_at: string;
-  listing?: Listing;
 }
+
+// Agent's perspective - shows buyer info
+export interface AgentLead {
+  id: string;
+  listing_id: string;
+  listing_title: string;
+  listing_asking_price_eur: number;
+  buyer_id: string;
+  buyer_name: string;
+  buyer_email: string;
+  buyer_company: string | null;
+  interaction_type: InteractionType;
+  created_at: string;
+}
+
+// Generic Lead type (union)
+export type Lead = BuyerLead | AgentLead;
 
 export interface CreateLeadRequest {
   listing_id: string;
@@ -227,8 +296,6 @@ export interface BuyerDemand {
 
   budget_min_eur: number;
   budget_max_eur: number;
-  budget_min_lek: number;
-  budget_max_lek: number;
 
   status: DemandStatus;
   demand_type: DemandType;
@@ -251,8 +318,6 @@ export interface CreateDemandRequest {
   preferred_area?: string;
   budget_min_eur: number;
   budget_max_eur: number;
-  budget_min_lek: number;
-  budget_max_lek: number;
   demand_type: DemandType;
 }
 
@@ -265,7 +330,6 @@ export interface CreditPackage {
   name: string;
   credits: number;
   price_eur: number;
-  price_lek: number;
   is_popular: boolean;
   savings: string | null;
   is_active: boolean;
@@ -289,13 +353,15 @@ export interface CreditTransaction {
   amount: number;
   type: 'purchase' | 'usage' | 'refund' | 'bonus' | 'adjustment';
   description: string;
+  listing_id: string | null;
+  promotion_id: string | null;
+  payment_reference: string | null;
   created_at: string;
 }
 
 export interface PromotionHistory {
   id: string;
   listing_id: string;
-  agent_id: string;
   tier: PromotionTier;
   credit_cost: number;
   start_date: string;
@@ -316,15 +382,49 @@ export interface PurchaseCreditsRequest {
 // ADMIN TYPES
 // ============================================================================
 
+export interface CreateAgentRequest {
+  name: string;
+  email: string;
+  password: string;
+  company_name: string;
+  license_number: string;
+  phone: string;
+  whatsapp_number?: string;
+  verification_status?: 'pending' | 'approved' | 'rejected';
+  email_verified?: boolean;
+}
+
+export interface CreateBuyerRequest {
+  name: string;
+  email: string;
+  password: string;
+  company_name?: string;
+}
+
 export interface AdminStats {
   total_users: number;
-  total_agents: number;
   total_buyers: number;
+  total_agents: number;
+  total_admins: number;
+
+  agents_pending: number;
+  agents_approved: number;
+  agents_rejected: number;
+
   total_listings: number;
   active_listings: number;
-  pending_agent_verifications: number;
-  total_revenue_eur: number;
-  total_revenue_lek: number;
+  draft_listings: number;
+  sold_listings: number;
+  inactive_listings: number;
+
+  total_leads: number;
+  total_demands: number;
+  active_demands: number;
+  assigned_demands: number;
+  fulfilled_demands: number;
+
+  active_promotions: number;
+  total_credit_transactions: number;
 }
 
 // ============================================================================

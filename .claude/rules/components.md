@@ -184,18 +184,18 @@ Show appropriate alerts based on `verificationStatus`:
 
 ## Currency Display
 
-Use currency from localStorage:
+Use the `useCurrency()` hook from `@/lib/contexts/currency-context`:
 ```typescript
-const [currency, setCurrency] = useState<Currency>("EUR")
+import { useCurrency } from "@/lib/contexts/currency-context"
+import { formatCurrency } from "@/lib/currency"
 
-useEffect(() => {
-  const saved = localStorage.getItem("currency") as Currency
-  if (saved) setCurrency(saved)
-}, [])
+const { currency } = useCurrency()
 
 // Display
-{formatCurrency(listing.askingPrice, currency)}
+{formatCurrency(listing.asking_price_eur, currency)}
 ```
+
+The header uses `setCurrency` from the same hook to toggle between EUR and ALL.
 
 ## Language
 

@@ -1,13 +1,16 @@
 /**
  * Utility functions for consistent badge styling across the application
  */
+import { ShieldCheck, Clock, XCircle, type LucideIcon } from "lucide-react"
 
 export type ListingStatus = "active" | "draft" | "sold" | "inactive" | "rejected"
 export type VerificationStatus = "approved" | "pending" | "rejected"
+export type DemandStatus = "active" | "assigned" | "fulfilled" | "closed"
 
 interface BadgeConfig {
   className: string
   label?: string
+  icon?: LucideIcon
 }
 
 /**
@@ -48,14 +51,44 @@ export function getVerificationStatusBadge(status: VerificationStatus): BadgeCon
     approved: {
       className: "bg-green-100 text-green-700 hover:bg-green-100 gap-1",
       label: "Verified",
+      icon: ShieldCheck,
     },
     pending: {
       className: "bg-amber-100 text-amber-700 hover:bg-amber-100 gap-1",
       label: "Pending Verification",
+      icon: Clock,
     },
     rejected: {
       className: "bg-red-100 text-red-700 hover:bg-red-100 gap-1",
       label: "Rejected",
+      icon: XCircle,
+    },
+  }
+
+  return configs[status] || { className: "bg-muted text-muted-foreground", label: status }
+}
+
+/**
+ * Get consistent badge styling for demand statuses.
+ * Replaces the inline statusColors maps in demand-card.tsx and buyer-view.tsx.
+ */
+export function getDemandStatusBadge(status: DemandStatus): BadgeConfig {
+  const configs: Record<DemandStatus, BadgeConfig> = {
+    active: {
+      className: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      label: "Active",
+    },
+    assigned: {
+      className: "bg-blue-50 text-blue-700 border-blue-200",
+      label: "Assigned",
+    },
+    fulfilled: {
+      className: "bg-purple-50 text-purple-700 border-purple-200",
+      label: "Fulfilled",
+    },
+    closed: {
+      className: "bg-gray-50 text-gray-700 border-gray-200",
+      label: "Closed",
     },
   }
 

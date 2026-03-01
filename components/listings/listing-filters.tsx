@@ -22,9 +22,9 @@ import {
     SheetFooter,
 } from "@/components/ui/sheet"
 import { Search, MapPin, SlidersHorizontal, X } from "lucide-react"
-import { businessCategories, albanianCities } from "@/lib/constants"
-import { formatCurrency, type Currency } from "@/lib/currency"
-import { useState, useEffect } from "react"
+import { businessCategories, albanianCities, getCategoryLabel, MAX_LISTING_PRICE } from "@/lib/constants"
+import { formatCurrency } from "@/lib/currency"
+import { useState } from "react"
 
 interface ListingFiltersProps {
     filters: {
@@ -49,18 +49,12 @@ interface ListingFiltersProps {
 
 export function ListingFilters({ filters, setters }: ListingFiltersProps) {
     const [isFilterOpen, setIsFilterOpen] = useState(false)
-    const [currency, setCurrency] = useState<Currency>("EUR")
-
-    useEffect(() => {
-        const saved = localStorage.getItem("currency") as Currency
-        if (saved) setCurrency(saved)
-    }, [])
 
     const activeFiltersList = []
     if (filters.category) {
         activeFiltersList.push({
             key: "category",
-            label: businessCategories.find((c) => c.value === filters.category)?.label || filters.category,
+            label: getCategoryLabel(filters.category),
             onRemove: () => setters.setCategory(""),
         })
     }
@@ -71,11 +65,11 @@ export function ListingFilters({ filters, setters }: ListingFiltersProps) {
             onRemove: () => setters.setCity(""),
         })
     }
-    if (filters.priceRange[0] > 0 || filters.priceRange[1] < 2000000) {
+    if (filters.priceRange[0] > 0 || filters.priceRange[1] < MAX_LISTING_PRICE) {
         activeFiltersList.push({
             key: "price",
-            label: `${formatCurrency(filters.priceRange[0], currency)} - ${formatCurrency(filters.priceRange[1], currency)}`,
-            onRemove: () => setters.setPriceRange([0, 2000000]),
+            label: `${formatCurrency(filters.priceRange[0], "EUR")} - ${formatCurrency(filters.priceRange[1], "EUR")}`,
+            onRemove: () => setters.setPriceRange([0, MAX_LISTING_PRICE]),
         })
     }
     if (filters.minRoi > 0) {
@@ -86,7 +80,7 @@ export function ListingFilters({ filters, setters }: ListingFiltersProps) {
         })
     }
 
-    const advancedFiltersCount = (filters.priceRange[0] > 0 || filters.priceRange[1] < 2000000 ? 1 : 0) + (filters.minRoi > 0 ? 1 : 0)
+    const advancedFiltersCount = (filters.priceRange[0] > 0 || filters.priceRange[1] < MAX_LISTING_PRICE ? 1 : 0) + (filters.minRoi > 0 ? 1 : 0)
 
     return (
         <div className="flex flex-col gap-5">
@@ -170,19 +164,19 @@ export function ListingFilters({ filters, setters }: ListingFiltersProps) {
                                             value={filters.priceRange}
                                             onValueChange={(v) => setters.setPriceRange(v as [number, number])}
                                             min={0}
-                                            max={2000000}
+                                            max={MAX_LISTING_PRICE}
                                             step={50000}
                                             className="mb-4"
                                         />
                                         <div className="flex items-center justify-between gap-4">
                                             <div className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-center">
                                                 <span className="text-xs text-muted-foreground block">Min</span>
-                                                <span className="text-sm font-medium">{formatCurrency(filters.priceRange[0], currency)}</span>
+                                                <span className="text-sm font-medium">{formatCurrency(filters.priceRange[0], "EUR")}</span>
                                             </div>
                                             <div className="text-muted-foreground">—</div>
                                             <div className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-center">
                                                 <span className="text-xs text-muted-foreground block">Max</span>
-                                                <span className="text-sm font-medium">{formatCurrency(filters.priceRange[1], currency)}</span>
+                                                <span className="text-sm font-medium">{formatCurrency(filters.priceRange[1], "EUR")}</span>
                                             </div>
                                         </div>
                                     </div>

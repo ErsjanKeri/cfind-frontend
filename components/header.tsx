@@ -1,10 +1,10 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { usePathname } from "next/navigation"
 import { useAuth, useUser } from "@/lib/hooks/useAuth"
-import type { Currency } from "@/lib/currency"
+import { useRole } from "@/lib/hooks/useRole"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -15,38 +15,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Building2, LogOut, Menu, X, LayoutDashboard, Settings, Globe, Coins, Heart, Plus } from "lucide-react"
-import type { AgentProfile } from "@/lib/api/types"
-import { DemandDialog } from "@/components/demand-dialog"
+import { Building2, LogOut, Menu, X, LayoutDashboard, Settings, Heart, Plus } from "lucide-react"
+import { DemandDialog } from "@/components/demands/demand-dialog"
+import { getInitials } from "@/lib/utils"
 
 export function Header() {
   const { logout } = useAuth() // Auth actions only
   const { user, isLoading } = useUser() // User data via JWT cookie
+  const { isBuyer } = useRole()
   const isAuthenticated = !!user // Derived from user data
-  const [currency, setCurrency] = useState<Currency>("EUR")
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showDemandDialog, setShowDemandDialog] = useState(false)
   const pathname = usePathname()
-
-  // Load currency preference and persist changes
-  useEffect(() => {
-    const saved = localStorage.getItem("currency") as Currency
-    if (saved) setCurrency(saved)
-  }, [])
-
-  const handleCurrencyChange = (newCurrency: Currency) => {
-    setCurrency(newCurrency)
-    localStorage.setItem("currency", newCurrency)
-  }
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2)
-  }
 
   const getRoleBadge = () => {
     if (!user) return null
@@ -114,15 +94,8 @@ export function Header() {
             >
               How It Works
             </Link>
-            <Link
-              href="/agents"
-              className={`text-sm font-medium transition-colors hover:text-primary ${isActive("/agents") ? "text-primary" : "text-muted-foreground"
-                }`}
-            >
-              Our Agents
-            </Link>
             {/* Buyer CTA - Post Demand */}
-            {isAuthenticated && user?.role === "buyer" && (
+            {isAuthenticated && isBuyer && (
               <Button
                 size="sm"
                 onClick={() => setShowDemandDialog(true)}
@@ -136,25 +109,6 @@ export function Header() {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-1">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-9 px-2 gap-1 text-muted-foreground">
-                  <Coins className="h-4 w-4" />
-                  <span className="text-xs font-medium" suppressHydrationWarning>{currency}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-32">
-                <DropdownMenuLabel className="text-xs">Currency</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => handleCurrencyChange("EUR")} className={currency === "EUR" ? "bg-muted" : ""}>
-                  <span className="mr-2">€</span> EUR
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleCurrencyChange("ALL")} className={currency === "ALL" ? "bg-muted" : ""}>
-                  <span className="mr-2">L</span> ALL
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
             {isLoading ? (
               // Show skeleton while loading auth state
               <div className="h-9 w-24 bg-muted animate-pulse rounded-md" />
@@ -250,11 +204,6 @@ export function Header() {
                   How It Works
                 </Button>
               </Link>
-              <Link href="/agents" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="ghost" className="w-full justify-start text-muted-foreground">
-                  Our Agents
-                </Button>
-              </Link>
               {!isAuthenticated && (
                 <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="ghost" className="w-full justify-start text-muted-foreground">
@@ -263,7 +212,7 @@ export function Header() {
                 </Link>
               )}
               {/* Mobile Buyer CTA */}
-              {isAuthenticated && user?.role === "buyer" && (
+              {isAuthenticated && isBuyer && (
                 <Button
                   className="w-full mt-2"
                   onClick={() => {

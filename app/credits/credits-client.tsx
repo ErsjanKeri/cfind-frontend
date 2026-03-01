@@ -52,8 +52,8 @@ export function CreditsPageClient({
             if (result.new_balance !== undefined) {
                 setBalance(result.new_balance)
             }
-        } catch (error: any) {
-            toast.error(error.message || "Failed to process purchase")
+        } catch (error: unknown) {
+            toast.error(error instanceof Error ? error.message : "An unexpected error occurred")
         } finally {
             // Mutation completes automatically
         }
@@ -179,11 +179,8 @@ export function CreditsPageClient({
                             </CardHeader>
 
                             <CardContent className="space-y-4">
-                                <div className="space-y-1">
+                                <div>
                                     <p className="text-2xl font-bold">{formatCurrency(pkg.price_eur, "EUR")}</p>
-                                    <p className="text-sm text-muted-foreground">
-                                        {new Intl.NumberFormat("sq-AL", { style: "currency", currency: "ALL", maximumFractionDigits: 0 }).format(pkg.price_lek)}
-                                    </p>
                                 </div>
 
                                 <div className="text-xs text-muted-foreground space-y-1">

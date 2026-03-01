@@ -22,7 +22,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 priority: 0.8,
             }))
     } catch (error) {
-        console.error('Error fetching listings for sitemap:', error)
         // Continue with empty listing URLs if API fails
     }
 

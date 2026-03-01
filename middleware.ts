@@ -12,8 +12,6 @@ import type { NextRequest } from 'next/server';
 const protectedRoutes = [
   '/profile',
   '/settings',
-  '/listings/create',
-  '/admin',
 ];
 
 // Routes only for guests (redirect if authenticated)
@@ -48,8 +46,6 @@ export const config = {
   matcher: [
     '/profile/:path*',
     '/settings/:path*',
-    '/listings/create',
-    '/admin/:path*',
     '/login',
     '/register',
   ],

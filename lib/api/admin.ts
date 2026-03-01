@@ -13,6 +13,8 @@ import type {
   AdminStats,
   UserWithProfile,
   UserRole,
+  CreateAgentRequest,
+  CreateBuyerRequest,
 } from './types';
 
 export const adminApi = {
@@ -93,10 +95,11 @@ export const adminApi = {
   /**
    * Toggle user's email verification status
    */
-  async toggleEmailVerification(userId: string): Promise<{ message: string }> {
+  async toggleEmailVerification(userId: string, emailVerified: boolean): Promise<{ message: string }> {
     try {
       const response = await apiClient.post<{ message: string }>(
-        `/api/admin/users/${userId}/toggle-email-verification`
+        `/api/admin/users/${userId}/toggle-email-verification`,
+        { email_verified: emailVerified }
       );
       return response.data;
     } catch (error) {
@@ -130,13 +133,7 @@ export const adminApi = {
   /**
    * Create agent manually (admin only)
    */
-  async createAgent(data: {
-    email: string;
-    password: string;
-    agency_name: string;
-    license_number: string;
-    phone: string;
-  }): Promise<UserWithProfile> {
+  async createAgent(data: CreateAgentRequest): Promise<UserWithProfile> {
     try {
       const response = await apiClient.post<UserWithProfile>(
         '/api/admin/agents',
@@ -151,11 +148,7 @@ export const adminApi = {
   /**
    * Create buyer manually (admin only)
    */
-  async createBuyer(data: {
-    email: string;
-    password: string;
-    company_name?: string;
-  }): Promise<UserWithProfile> {
+  async createBuyer(data: CreateBuyerRequest): Promise<UserWithProfile> {
     try {
       const response = await apiClient.post<UserWithProfile>(
         '/api/admin/buyers',

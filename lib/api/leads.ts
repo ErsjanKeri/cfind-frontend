@@ -7,15 +7,15 @@
  * - Delete lead
  */
 import { apiClient, getErrorMessage } from './client';
-import type { Lead, CreateLeadRequest } from './types';
+import type { BuyerLead, AgentLead, Listing, CreateLeadRequest } from './types';
 
 export const leadsApi = {
   /**
    * Get leads for a specific buyer (buyer's contact history)
    */
-  async getBuyerLeads(buyerId: string): Promise<Lead[]> {
+  async getBuyerLeads(buyerId: string): Promise<BuyerLead[]> {
     try {
-      const response = await apiClient.get<{ success: boolean; total: number; leads: Lead[] }>(
+      const response = await apiClient.get<{ success: boolean; total: number; leads: BuyerLead[] }>(
         `/api/leads/buyer/${buyerId}`
       );
       return response.data.leads;
@@ -27,9 +27,9 @@ export const leadsApi = {
   /**
    * Get leads for a specific agent (who contacted them)
    */
-  async getAgentLeads(agentId: string): Promise<Lead[]> {
+  async getAgentLeads(agentId: string): Promise<AgentLead[]> {
     try {
-      const response = await apiClient.get<{ success: boolean; total: number; leads: Lead[] }>(
+      const response = await apiClient.get<{ success: boolean; total: number; leads: AgentLead[] }>(
         `/api/leads/agent/${agentId}`
       );
       return response.data.leads;
@@ -41,13 +41,13 @@ export const leadsApi = {
   /**
    * Create new lead (buyer contacts agent about listing)
    */
-  async createLead(data: CreateLeadRequest): Promise<Lead> {
+  async createLead(data: CreateLeadRequest): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await apiClient.post<{ success: boolean; message: string; lead: Lead }>(
+      const response = await apiClient.post<{ success: boolean; message: string; lead: any }>(
         '/api/leads',
         data
       );
-      return response.data.lead;
+      return { success: response.data.success, message: response.data.message };
     } catch (error) {
       throw new Error(getErrorMessage(error));
     }
@@ -67,9 +67,9 @@ export const leadsApi = {
   /**
    * Get saved listings for current buyer
    */
-  async getSavedListings(): Promise<any[]> {
+  async getSavedListings(): Promise<Listing[]> {
     try {
-      const response = await apiClient.get<{ success: boolean; total: number; listings: any[] }>(
+      const response = await apiClient.get<{ success: boolean; total: number; listings: Listing[] }>(
         '/api/leads/saved'
       );
       return response.data.listings;

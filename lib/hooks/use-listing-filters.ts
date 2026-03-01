@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from "react"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
-import { businessCategories } from "@/lib/constants"
+import { businessCategories, MAX_LISTING_PRICE } from "@/lib/constants"
 import type { Listing } from "@/lib/api/types"
 
 interface UseListingFiltersOptions {
@@ -34,7 +34,7 @@ export function useListingFilters({ initialData, enableUrlSync = true }: UseList
 
     // Init Advanced State from URL
     const initialMinPrice = enableUrlSync && searchParams.get("minPrice") ? Number(searchParams.get("minPrice")) : 0
-    const initialMaxPrice = enableUrlSync && searchParams.get("maxPrice") ? Number(searchParams.get("maxPrice")) : 2000000
+    const initialMaxPrice = enableUrlSync && searchParams.get("maxPrice") ? Number(searchParams.get("maxPrice")) : MAX_LISTING_PRICE
     const [priceRange, setPriceRange] = useState<[number, number]>([initialMinPrice, initialMaxPrice])
 
     const [minRoi, setMinRoi] = useState<number>(enableUrlSync && searchParams.get("minRoi") ? Number(searchParams.get("minRoi")) : 0)
@@ -60,7 +60,7 @@ export function useListingFilters({ initialData, enableUrlSync = true }: UseList
             if (newPriceRange[0] > 0) params.set("minPrice", newPriceRange[0].toString())
             else params.delete("minPrice")
 
-            if (newPriceRange[1] < 2000000) params.set("maxPrice", newPriceRange[1].toString())
+            if (newPriceRange[1] < MAX_LISTING_PRICE) params.set("maxPrice", newPriceRange[1].toString())
             else params.delete("maxPrice")
 
             if (newMinRoi > 0) params.set("minRoi", newMinRoi.toString())
@@ -111,7 +111,7 @@ export function useListingFilters({ initialData, enableUrlSync = true }: UseList
         setQuery("")
         setCategory("")
         setCity("")
-        setPriceRange([0, 2000000])
+        setPriceRange([0, MAX_LISTING_PRICE])
         setMinRoi(0)
         setSortBy("newest")
         if (enableUrlSync) {
@@ -196,7 +196,7 @@ export function useListingFilters({ initialData, enableUrlSync = true }: UseList
     const activeFiltersCount =
         (category ? 1 : 0) +
         (city ? 1 : 0) +
-        (priceRange[0] > 0 || priceRange[1] < 2000000 ? 1 : 0) +
+        (priceRange[0] > 0 || priceRange[1] < MAX_LISTING_PRICE ? 1 : 0) +
         (minRoi > 0 ? 1 : 0)
 
     return {

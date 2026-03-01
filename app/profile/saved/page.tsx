@@ -7,7 +7,7 @@ import { useUser } from "@/lib/hooks/useAuth"
 import { useSavedListings } from "@/lib/hooks/useLeads"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { ListingCard } from "@/components/listing-card"
+import { ListingCard } from "@/components/listings/listing-card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Heart, Search, Loader2 } from "lucide-react"
 

@@ -2,7 +2,7 @@
 
 import { ListingFilters } from "@/components/listings/listing-filters"
 import { useListingFilters } from "@/lib/hooks/use-listing-filters"
-import { ListingCard } from "@/components/listing-card"
+import { ListingCard } from "@/components/listings/listing-card"
 import { Button } from "@/components/ui/button"
 import { Loader2, Plus } from "lucide-react"
 import Link from "next/link"
@@ -48,7 +48,7 @@ export default function ListingsClientPage() {
             {/* Listings Grid */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {filteredListings.length > 0 ? (
-                    filteredListings.map((listing: any) => (
+                    filteredListings.map((listing: Listing) => (
                         <ListingCard key={listing.id} listing={listing} />
                     ))
                 ) : (

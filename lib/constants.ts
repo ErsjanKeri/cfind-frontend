@@ -1,6 +1,6 @@
-import { BusinessCategory } from "./types"
+import type { ListingCategory } from "@/lib/api/types"
 
-export const businessCategories: { value: BusinessCategory; label: string }[] = [
+export const businessCategories: { value: ListingCategory; label: string }[] = [
     { value: "restaurant", label: "Restaurant" },
     { value: "bar", label: "Bar & Nightlife" },
     { value: "cafe", label: "Café & Coffee Shop" },
@@ -14,6 +14,14 @@ export const businessCategories: { value: BusinessCategory; label: string }[] = 
     { value: "real-estate", label: "Real Estate" },
     { value: "other", label: "Other" },
 ]
+
+export function getCategoryLabel(category: string): string {
+    return businessCategories.find((c) => c.value === category)?.label ?? category
+}
+
+export const MAX_LISTING_PRICE = 2_000_000
+
+export const SUPPORT_EMAIL = "support@cfind.ai"
 
 export const albanianCities = [
     "Tirana",

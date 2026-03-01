@@ -3,34 +3,43 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { api } from "@/lib/api"
+import type { RegisterRequest } from "@/lib/api/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { FormFieldWrapper } from "@/components/ui/form-field-wrapper"
+import { FormFieldWrapper } from "@/components/shared/form-field-wrapper"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { AlertCircle, Mail, Lock, User, Briefcase, TrendingUp, ArrowRight, FileCheck, XCircle } from "lucide-react"
+import { AlertCircle, Mail, Lock, User, Briefcase, TrendingUp, ArrowRight, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { toast } from "@/components/ui/use-toast"
+import { RegisterAgentFields, type AgentFieldsData } from "@/components/auth/register-agent-fields"
 
 export function RegisterForm() {
     const router = useRouter()
     const [role, setRole] = useState<'buyer' | 'agent'>("buyer")
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [showPassword, setShowPassword] = useState(false)
 
-    // Form fields
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [name, setName] = useState("")
-
-    // Agent-specific fields
-    const [agencyName, setAgencyName] = useState("")
-    const [licenseNumber, setLicenseNumber] = useState("")
-    const [phone, setPhone] = useState("")
-
-    // Buyer-specific fields
     const [companyName, setCompanyName] = useState("")
+
+    const [agentFields, setAgentFields] = useState<AgentFieldsData>({
+        company_name: "",
+        license_number: "",
+        phone: "",
+        whatsapp_number: "",
+        license_document: null,
+        company_document: null,
+        id_document: null,
+    })
+
+    const handleAgentFieldChange = (field: keyof AgentFieldsData, value: string | File | null) => {
+        setAgentFields((prev) => ({ ...prev, [field]: value }))
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -38,23 +47,33 @@ export function RegisterForm() {
         setIsLoading(true)
 
         try {
-            const data: any = {
+            const data: Record<string, string | File> = {
                 name,
                 email,
                 password,
                 role
             }
 
-            // Common field for both roles
             if (role === 'agent') {
-                data.company_name = agencyName
-                data.license_number = licenseNumber
-                data.phone = phone
+                if (!agentFields.whatsapp_number) {
+                    throw new Error("WhatsApp number is required for agent registration")
+                }
+                if (!agentFields.license_document || !agentFields.company_document || !agentFields.id_document) {
+                    throw new Error("All documents (License, Company, ID/Passport) are required for agent registration")
+                }
+
+                data.company_name = agentFields.company_name
+                data.license_number = agentFields.license_number
+                data.phone = agentFields.phone
+                data.whatsapp = agentFields.whatsapp_number
+                data.license_document = agentFields.license_document
+                data.company_document = agentFields.company_document
+                data.id_document = agentFields.id_document
             } else {
                 data.company_name = companyName
             }
 
-            await api.auth.register(data)
+            await api.auth.register(data as unknown as RegisterRequest)
 
             toast({
                 title: "Success!",
@@ -62,8 +81,8 @@ export function RegisterForm() {
             })
 
             router.push("/login?registered=true")
-        } catch (err: any) {
-            const errorMsg = err.message || "Registration failed"
+        } catch (err: unknown) {
+            const errorMsg = err instanceof Error ? err.message : "An unexpected error occurred"
             setError(errorMsg)
         } finally {
             setIsLoading(false)
@@ -122,90 +141,15 @@ export function RegisterForm() {
                 </RadioGroup>
             </div>
 
-            {/* Agent Extra Fields */}
-            {
-                role === "agent" && (
-                    <div className="space-y-4 pt-2 border-t border-border">
-                        <p className="text-sm font-medium text-primary flex items-center gap-2">
-                            <Briefcase className="h-4 w-4" />
-                            Agent Details - All Fields Required
-                        </p>
+            {role === "agent" && (
+                <RegisterAgentFields
+                    data={agentFields}
+                    onChange={handleAgentFieldChange}
+                    disabled={isLoading}
+                />
+            )}
 
-                        <FormFieldWrapper
-                            label="Agency Name"
-                            htmlFor="agencyName"
-                            required
-                        >
-                            <Input
-                                id="agencyName"
-                                name="agencyName"
-                                placeholder="Your Agency Name"
-                                value={agencyName}
-                                onChange={(e) => setAgencyName(e.target.value)}
-                                required={role === "agent"}
-                                disabled={isLoading}
-                            />
-                        </FormFieldWrapper>
-
-                        <FormFieldWrapper
-                            label="License Number"
-                            htmlFor="licenseNumber"
-                            required
-                        >
-                            <Input
-                                id="licenseNumber"
-                                name="licenseNumber"
-                                placeholder="License #"
-                                value={licenseNumber}
-                                onChange={(e) => setLicenseNumber(e.target.value)}
-                                required={role === "agent"}
-                                disabled={isLoading}
-                            />
-                        </FormFieldWrapper>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormFieldWrapper
-                                label="Phone"
-                                htmlFor="phone"
-                                required
-                            >
-                                <Input
-                                    id="phone"
-                                    name="phone"
-                                    placeholder="+355 69 123 4567"
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
-                                    required={role === "agent"}
-                                    disabled={isLoading}
-                                />
-                            </FormFieldWrapper>
-
-                            <FormFieldWrapper
-                                label="WhatsApp (Optional)"
-                                htmlFor="whatsapp"
-                            >
-                                <Input
-                                    id="whatsapp"
-                                    name="whatsapp"
-                                    placeholder="+355 69 123 4567"
-                                    disabled={isLoading}
-                                />
-                            </FormFieldWrapper>
-                        </div>
-
-                        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p className="text-sm text-blue-900">
-                                <strong>Note:</strong> After registration, you'll be asked to upload your license and company documents from your profile to complete verification.
-                            </p>
-                        </div>
-                    </div>
-                )
-            }
-
-            <FormFieldWrapper
-                label="Full Name"
-                htmlFor="name"
-            >
+            <FormFieldWrapper label="Full Name" htmlFor="name">
                 <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -221,10 +165,7 @@ export function RegisterForm() {
                 </div>
             </FormFieldWrapper>
 
-            <FormFieldWrapper
-                label="Email"
-                htmlFor="email"
-            >
+            <FormFieldWrapper label="Email" htmlFor="email">
                 <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -241,24 +182,33 @@ export function RegisterForm() {
                 </div>
             </FormFieldWrapper>
 
-            <FormFieldWrapper
-                label="Password"
-                htmlFor="password"
-            >
+            <FormFieldWrapper label="Password" htmlFor="password">
                 <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                         id="password"
                         name="password"
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         disabled={isLoading}
-                        className="pl-10"
+                        className="pl-10 pr-10"
                         minLength={8}
                     />
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        disabled={isLoading}
+                    >
+                        {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                        ) : (
+                            <Eye className="h-4 w-4" />
+                        )}
+                    </button>
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
                     Minimum 8 characters
@@ -266,11 +216,7 @@ export function RegisterForm() {
             </FormFieldWrapper>
 
             {role === "buyer" && (
-                <FormFieldWrapper
-                    label="Company Name"
-                    htmlFor="companyName"
-                    required
-                >
+                <FormFieldWrapper label="Company Name" htmlFor="companyName" required>
                     <Input
                         id="companyName"
                         name="companyName"
@@ -298,6 +244,6 @@ export function RegisterForm() {
                     Privacy Policy
                 </Link>
             </p>
-        </form >
+        </form>
     )
 }

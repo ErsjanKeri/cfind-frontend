@@ -95,8 +95,6 @@ export function useDeleteDemand() {
  *   preferred_city_en: 'Tirana',
  *   budget_min_eur: 50000,
  *   budget_max_eur: 100000,
- *   budget_min_lek: 5000000,
- *   budget_max_lek: 10000000,
  *   demand_type: 'investor'
  * });
  * ```
@@ -112,8 +110,6 @@ export function useCreateDemand() {
       preferred_area?: string;
       budget_min_eur: number;
       budget_max_eur: number;
-      budget_min_lek: number;
-      budget_max_lek: number;
       demand_type: 'investor' | 'seeking_funding';
     }) => api.demands.createDemand(data),
     onSuccess: () => {

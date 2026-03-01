@@ -19,14 +19,58 @@ import type {
 export const authApi = {
   /**
    * Register new user (buyer or agent)
+   *
+   * For agent registration, files should be included in the data object:
+   * - license_document: File
+   * - company_document: File
+   * - id_document: File
    */
   async register(data: RegisterRequest): Promise<RegisterResponse> {
     try {
-      const response = await apiClient.post<RegisterResponse>(
-        '/api/auth/register',
-        data
-      );
-      return response.data;
+      // Check if this is agent registration with files
+      const hasFiles = data.license_document || data.company_document || data.id_document;
+
+      if (hasFiles) {
+        // Create FormData for multipart/form-data upload
+        const formData = new FormData();
+
+        // Add all text fields
+        Object.entries(data).forEach(([key, value]) => {
+          // Skip file objects and null/undefined values
+          if (value !== null && value !== undefined && !(value instanceof File)) {
+            formData.append(key, String(value));
+          }
+        });
+
+        // Add file fields if present
+        if (data.license_document) {
+          formData.append('license_document', data.license_document);
+        }
+        if (data.company_document) {
+          formData.append('company_document', data.company_document);
+        }
+        if (data.id_document) {
+          formData.append('id_document', data.id_document);
+        }
+
+        const response = await apiClient.post<RegisterResponse>(
+          '/api/auth/register',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+        return response.data;
+      } else {
+        // Regular JSON request for buyers
+        const response = await apiClient.post<RegisterResponse>(
+          '/api/auth/register',
+          data
+        );
+        return response.data;
+      }
     } catch (error) {
       throw new Error(getErrorMessage(error));
     }
@@ -55,7 +99,6 @@ export const authApi = {
       await apiClient.post('/api/auth/logout');
     } catch (error) {
       // Ignore errors on logout, just clear local state
-      console.error('Logout error:', error);
     }
   },
 

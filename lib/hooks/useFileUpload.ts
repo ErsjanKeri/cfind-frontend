@@ -66,7 +66,6 @@ export function useFileUpload() {
 
       return fileUrl;
     } catch (error) {
-      console.error('Upload error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to upload file';
       toast.error(errorMessage);
       return null;

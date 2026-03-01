@@ -1,17 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Building2 } from "lucide-react"
-import type { Currency } from "@/lib/currency"
 
 export function Footer() {
-  const [currency, setCurrency] = useState<Currency>("EUR")
-
-  useEffect(() => {
-    const saved = localStorage.getItem("currency") as Currency
-    if (saved) setCurrency(saved)
-  }, [])
 
   return (
     <footer className="border-t border-border bg-card">
@@ -48,11 +40,6 @@ export function Footer() {
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   How It Works
-                </Link>
-              </li>
-              <li>
-                <Link href="/agents" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Our Agents
                 </Link>
               </li>
               <li>
@@ -107,14 +94,9 @@ export function Footer() {
         </div>
 
         <div className="mt-12 border-t border-border pt-8">
-          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} CompanyFinder. All rights reserved.
-            </p>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span className="font-medium">{currency}</span>
-            </div>
-          </div>
+          <p className="text-sm text-muted-foreground text-center">
+            &copy; {new Date().getFullYear()} CompanyFinder. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

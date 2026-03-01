@@ -164,7 +164,7 @@ it('should only allow verified agents to claim demands', async () => {
 ### Testing Components
 ```typescript
 import { render, screen } from '@testing-library/react';
-import { ListingCard } from '@/components/listing-card';
+import { ListingCard } from '@/components/listings/listing-card';
 
 it('should display listing title', () => {
   render(<ListingCard listing={mockListing} />);

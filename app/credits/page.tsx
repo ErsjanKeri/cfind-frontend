@@ -54,9 +54,9 @@ export default function CreditsPage() {
             <Header />
             <main className="flex-1">
                 <CreditsPageClient
-                    packages={packages as any || []}
+                    packages={packages || []}
                     initialBalance={creditsData?.balance || 0}
-                    transactions={creditsData?.transactions as any || []}
+                    transactions={creditsData?.transactions || []}
                     isVerified={isVerified}
                 />
             </main>

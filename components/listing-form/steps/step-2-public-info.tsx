@@ -3,12 +3,13 @@
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { FormFieldWrapper } from "@/components/ui/form-field-wrapper"
+import { FormFieldWrapper } from "@/components/shared/form-field-wrapper"
+import type { ListingFormData, ListingFormErrors } from "@/lib/api/types"
 
 interface Step2Props {
-    data: any
-    updateData: (field: string, value: any) => void
-    errors?: any
+    data: ListingFormData
+    updateData: (field: string, value: string | number | boolean | string[]) => void
+    errors?: ListingFormErrors
 }
 
 export function Step2PublicInfo({ data, updateData, errors }: Step2Props) {
@@ -22,36 +23,36 @@ export function Step2PublicInfo({ data, updateData, errors }: Step2Props) {
 
             {/* Title */}
             <div className="space-y-2">
-                <Label htmlFor="publicTitleEn">
+                <Label htmlFor="public_title_en">
                     Public Title <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                    id="publicTitleEn"
-                    value={data.publicTitleEn}
-                    onChange={(e) => updateData('publicTitleEn', e.target.value)}
+                    id="public_title_en"
+                    value={data.public_title_en}
+                    onChange={(e) => updateData('public_title_en', e.target.value)}
                     placeholder="e.g. Profitable Cafe in City Center"
-                    className={errors?.publicTitleEn ? "border-red-500" : ""}
+                    className={errors?.public_title_en ? "border-red-500" : ""}
                 />
-                {errors?.publicTitleEn && (
-                    <p className="text-sm text-red-500">{errors.publicTitleEn}</p>
+                {errors?.public_title_en && (
+                    <p className="text-sm text-red-500">{errors.public_title_en}</p>
                 )}
             </div>
 
             {/* Description */}
             <div className="space-y-2">
-                <Label htmlFor="publicDescriptionEn">
+                <Label htmlFor="public_description_en">
                     Public Description <span className="text-red-500">*</span>
                 </Label>
                 <Textarea
-                    id="publicDescriptionEn"
+                    id="public_description_en"
                     rows={6}
-                    value={data.publicDescriptionEn}
-                    onChange={(e) => updateData('publicDescriptionEn', e.target.value)}
+                    value={data.public_description_en}
+                    onChange={(e) => updateData('public_description_en', e.target.value)}
                     placeholder="Describe the business opportunity without revealing sensitive details..."
-                    className={errors?.publicDescriptionEn ? "border-red-500" : ""}
+                    className={errors?.public_description_en ? "border-red-500" : ""}
                 />
-                {errors?.publicDescriptionEn && (
-                    <p className="text-sm text-red-500">{errors.publicDescriptionEn}</p>
+                {errors?.public_description_en && (
+                    <p className="text-sm text-red-500">{errors.public_description_en}</p>
                 )}
             </div>
 
@@ -59,29 +60,29 @@ export function Step2PublicInfo({ data, updateData, errors }: Step2Props) {
             <div className="grid grid-cols-2 gap-4">
                 <FormFieldWrapper
                     label="Area/Neighborhood"
-                    htmlFor="publicArea"
-                    error={errors?.publicArea}
+                    htmlFor="public_location_area"
+                    error={errors?.public_location_area}
                 >
                     <Input
-                        id="publicArea"
-                        value={data.publicArea}
-                        onChange={(e) => updateData("publicArea", e.target.value)}
-                        placeholder="e.g. Blloku, Tirana"
-                        className={errors?.publicArea ? "border-red-500" : ""}
+                        id="public_location_area"
+                        value={data.public_location_area}
+                        onChange={(e) => updateData("public_location_area", e.target.value)}
+                        placeholder="e.g. Blloku"
+                        className={errors?.public_location_area ? "border-red-500" : ""}
                     />
                 </FormFieldWrapper>
 
                 <FormFieldWrapper
                     label="City"
-                    htmlFor="publicCity"
-                    error={errors?.publicCity}
+                    htmlFor="public_location_city_en"
+                    error={errors?.public_location_city_en}
                 >
                     <Input
-                        id="publicCity"
-                        value={data.publicCity}
-                        onChange={(e) => updateData("publicCity", e.target.value)}
+                        id="public_location_city_en"
+                        value={data.public_location_city_en}
+                        onChange={(e) => updateData("public_location_city_en", e.target.value)}
                         placeholder="e.g. Tirana"
-                        className={errors?.publicCity ? "border-red-500" : ""}
+                        className={errors?.public_location_city_en ? "border-red-500" : ""}
                     />
                 </FormFieldWrapper>
             </div>
