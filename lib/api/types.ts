@@ -58,6 +58,12 @@ export interface UserWithProfile extends User {
   // Flat fields returned by admin /users endpoint (matches backend UserListItem)
   verification_status?: 'pending' | 'approved' | 'rejected' | null;
   credit_balance?: number | null;
+  license_number?: string | null;
+  whatsapp_number?: string | null;
+  bio_en?: string | null;
+  license_document_url?: string | null;
+  company_document_url?: string | null;
+  id_document_url?: string | null;
 }
 
 // Auth requests/responses

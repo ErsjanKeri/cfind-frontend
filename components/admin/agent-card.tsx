@@ -75,10 +75,10 @@ export function AdminAgentCard({
             <p className="text-sm text-muted-foreground">{agent.email}</p>
             <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
               <span>{agent.company_name}</span>
-              <span>License: {agent.agent_profile?.license_number || "N/A"}</span>
+              <span>License: {agent.license_number || "N/A"}</span>
             </div>
             <div className="flex items-center gap-2 mt-2">
-              {agent.agent_profile?.license_document_url ? (
+              {agent.license_document_url ? (
                 <Badge variant="outline" className="text-xs text-green-600 border-green-300">
                   <FileText className="h-3 w-3 mr-1" />
                   License
@@ -89,7 +89,7 @@ export function AdminAgentCard({
                   No License
                 </Badge>
               )}
-              {agent.agent_profile?.company_document_url ? (
+              {agent.company_document_url ? (
                 <Badge variant="outline" className="text-xs text-green-600 border-green-300">
                   <Building2 className="h-3 w-3 mr-1" />
                   Company

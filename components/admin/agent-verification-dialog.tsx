@@ -58,7 +58,7 @@ export function AgentVerificationDialog({
               </div>
               <div className="p-3 rounded-lg bg-muted/50">
                 <p className="text-xs text-muted-foreground uppercase">License</p>
-                <p className="font-medium">{agent.agent_profile?.license_number || "N/A"}</p>
+                <p className="font-medium">{agent.license_number || "N/A"}</p>
               </div>
             </div>
 
@@ -70,7 +70,7 @@ export function AgentVerificationDialog({
               </div>
               <div className="p-3 rounded-lg bg-muted/50">
                 <p className="text-xs text-muted-foreground uppercase">WhatsApp</p>
-                <p className="font-medium">{agent.agent_profile?.whatsapp_number || "N/A"}</p>
+                <p className="font-medium">{agent.whatsapp_number || "N/A"}</p>
               </div>
             </div>
 
@@ -78,7 +78,7 @@ export function AgentVerificationDialog({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-semibold">Verification Documents</p>
-                {agent.agent_profile?.license_document_url && agent.agent_profile?.company_document_url && agent.agent_profile?.id_document_url && (
+                {agent.license_document_url && agent.company_document_url && agent.id_document_url && (
                   <Badge variant="outline" className="text-green-600 border-green-300">
                     <CheckCircle className="h-3 w-3 mr-1" />
                     All Uploaded
@@ -90,23 +90,23 @@ export function AgentVerificationDialog({
                 <DocumentViewer
                   label="License Document"
                   description="Professional licensing document"
-                  url={agent.agent_profile?.license_document_url}
+                  url={agent.license_document_url}
                   icon={FileText}
                 />
                 <DocumentViewer
                   label="Company Document"
                   description="Company registration document"
-                  url={agent.agent_profile?.company_document_url}
+                  url={agent.company_document_url}
                   icon={Building2}
                 />
                 <DocumentViewer
                   label="ID / Passport Document"
                   description="Government-issued identification"
-                  url={agent.agent_profile?.id_document_url}
+                  url={agent.id_document_url}
                   icon={FileText}
                 />
 
-                {(!agent.agent_profile?.license_document_url || !agent.agent_profile?.company_document_url || !agent.agent_profile?.id_document_url) && (
+                {(!agent.license_document_url || !agent.company_document_url || !agent.id_document_url) && (
                   <div className="p-3 rounded-lg bg-amber-50 border border-amber-200">
                     <p className="text-xs text-amber-800">
                       Agent has not uploaded all required documents yet (License, Company, and ID/Passport). Verification cannot be completed until all documents are provided.
@@ -117,10 +117,10 @@ export function AgentVerificationDialog({
             </div>
 
             {/* Bio */}
-            {agent.agent_profile?.bio_en && (
+            {agent.bio_en && (
               <div className="p-3 rounded-lg bg-muted/50">
                 <p className="text-xs text-muted-foreground uppercase">Bio</p>
-                <p className="text-sm mt-1">{agent.agent_profile.bio_en}</p>
+                <p className="text-sm mt-1">{agent.bio_en}</p>
               </div>
             )}
           </div>
