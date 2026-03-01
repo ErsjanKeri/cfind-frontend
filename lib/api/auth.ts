@@ -27,50 +27,29 @@ export const authApi = {
    */
   async register(data: RegisterRequest): Promise<RegisterResponse> {
     try {
-      // Check if this is agent registration with files
-      const hasFiles = data.license_document || data.company_document || data.id_document;
+      // Backend uses Form(...) parameters, so always send FormData
+      const formData = new FormData();
 
-      if (hasFiles) {
-        // Create FormData for multipart/form-data upload
-        const formData = new FormData();
-
-        // Add all text fields
-        Object.entries(data).forEach(([key, value]) => {
-          // Skip file objects and null/undefined values
-          if (value !== null && value !== undefined && !(value instanceof File)) {
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          if (value instanceof File) {
+            formData.append(key, value);
+          } else {
             formData.append(key, String(value));
           }
-        });
+        }
+      });
 
-        // Add file fields if present
-        if (data.license_document) {
-          formData.append('license_document', data.license_document);
+      const response = await apiClient.post<RegisterResponse>(
+        '/api/auth/register',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
         }
-        if (data.company_document) {
-          formData.append('company_document', data.company_document);
-        }
-        if (data.id_document) {
-          formData.append('id_document', data.id_document);
-        }
-
-        const response = await apiClient.post<RegisterResponse>(
-          '/api/auth/register',
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          }
-        );
-        return response.data;
-      } else {
-        // Regular JSON request for buyers
-        const response = await apiClient.post<RegisterResponse>(
-          '/api/auth/register',
-          data
-        );
-        return response.data;
-      }
+      );
+      return response.data;
     } catch (error) {
       throw new Error(getErrorMessage(error));
     }
