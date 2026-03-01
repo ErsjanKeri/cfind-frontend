@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useFileUpload } from "@/lib/hooks/useFileUpload"
 import { useUpdateProfile } from "@/lib/hooks/useUser"
-import { useInvalidateUser } from "@/lib/hooks/queries/useUserQuery"
+import { useInvalidateUser } from "@/lib/hooks/useAuth"
 import { api } from "@/lib/api"
 import { toast } from "@/components/ui/use-toast"
 import type { UserWithProfile } from "@/lib/api/types"

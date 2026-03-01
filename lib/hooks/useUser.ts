@@ -7,7 +7,7 @@
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import { USER_QUERY_KEY } from './queries/useUserQuery';
+import { USER_QUERY_KEY } from './useAuth';
 
 /**
  * Update user profile

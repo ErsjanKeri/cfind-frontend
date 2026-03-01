@@ -26,7 +26,7 @@ import { ProfileTab } from "@/components/settings/profile-tab"
 import { DocumentsTab } from "@/components/settings/documents-tab"
 import { BillingTab } from "@/components/settings/billing-tab"
 import { LoadingButton } from "@/components/shared/loading-button"
-import { useInvalidateUser } from "@/lib/hooks/queries/useUserQuery"
+import { useInvalidateUser } from "@/lib/hooks/useAuth"
 
 export default function SettingsPage() {
   const { user, isLoading } = useUser()
