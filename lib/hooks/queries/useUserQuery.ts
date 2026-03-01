@@ -52,13 +52,15 @@ function hasAuthCookie(): boolean {
 export function useUserQuery(options?: { enabled?: boolean }) {
   // Check auth cookie only on client side (after mount) to avoid hydration errors
   const [shouldFetch, setShouldFetch] = useState(false);
+  const [checkedAuth, setCheckedAuth] = useState(false);
 
   useEffect(() => {
     // Only run on client side
     setShouldFetch(hasAuthCookie());
+    setCheckedAuth(true);
   }, []);
 
-  return useQuery({
+  const query = useQuery({
     queryKey: USER_QUERY_KEY,
     queryFn: async () => {
       try {
@@ -88,6 +90,8 @@ export function useUserQuery(options?: { enabled?: boolean }) {
     // Don't retry on auth errors (they're expected when not logged in)
     retry: false,
   });
+
+  return { ...query, checkedAuth };
 }
 
 /**

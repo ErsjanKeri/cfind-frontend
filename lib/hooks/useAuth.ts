@@ -17,6 +17,7 @@ export { useAuth } from '@/lib/contexts/auth-context';
  * Returns null if not logged in
  */
 export function useUser() {
-  const { data: user, isLoading, isFetching } = useUserQuery();
-  return { user: user || null, isLoading: isLoading || isFetching };
+  const { data: user, isLoading, isFetching, checkedAuth } = useUserQuery();
+  // Treat "haven't checked auth cookie yet" as loading to prevent premature redirects
+  return { user: user || null, isLoading: !checkedAuth || isLoading || isFetching };
 }
