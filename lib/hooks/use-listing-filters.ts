@@ -119,64 +119,19 @@ export function useListingFilters({ initialData, enableUrlSync = true }: UseList
         }
     }
 
-    // Filter Logic
+    // Server returns filtered data via URL params. We only handle status filter
+    // (not URL-synced) and sorting (promotion tier priority) client-side.
     const filteredListings = useMemo(() => {
-        // Since the server now returns filtered data based on URL, 
-        // we should ideally trust the server data primarily.
-        // However, to keep the UI snappy for non-URL filters (if any) or hybrid approach, we keep this.
-        // BUT, notice that initialData will already be filtered. 
-        // If we filter again with the same criteria, it's a no-op (safe).
+        let results = listingStatus !== "all"
+            ? initialData.filter((listing) => listing.status === listingStatus)
+            : [...initialData]
 
-        let results = initialData
-
-        // Status filter
-        if (listingStatus !== "all") {
-            results = results.filter((listing) => listing.status === listingStatus)
-        }
-
-        // ... rest of logic remains same as double-check/fallback ...
-
-        // Text search
-        if (query) {
-            const q = query.toLowerCase()
-            results = results.filter(
-                (l) =>
-                    l.public_title_en.toLowerCase().includes(q) ||
-                    l.public_description_en.toLowerCase().includes(q) ||
-                    l.public_location_city_en.toLowerCase().includes(q) ||
-                    (l.public_location_area && l.public_location_area.toLowerCase().includes(q)),
-            )
-        }
-
-        // Category filter
-        if (category) {
-            results = results.filter((l) => l.category === category)
-        }
-
-        // City filter
-        if (city) {
-            results = results.filter((l) => l.public_location_city_en === city)
-        }
-
-        // Price filter (use EUR for filtering)
-        results = results.filter((l) => l.asking_price_eur >= priceRange[0] && l.asking_price_eur <= priceRange[1])
-
-        // ROI filter
-        if (minRoi > 0) {
-            results = results.filter((l) => (l.roi || 0) >= minRoi)
-        }
-
-        // Sort - ALWAYS prioritize promotion tier first, then apply secondary sort
-        // Premium listings appear first, then Featured, then Standard
         const tierOrder = { premium: 0, featured: 1, standard: 2 }
-
         results.sort((a, b) => {
-            // Primary: Sort by promotion tier
             const tierA = tierOrder[a.promotion_tier as keyof typeof tierOrder] ?? 2
             const tierB = tierOrder[b.promotion_tier as keyof typeof tierOrder] ?? 2
             if (tierA !== tierB) return tierA - tierB
 
-            // Secondary: Apply the selected sort within each tier group
             switch (sortBy) {
                 case "price-low":
                     return a.asking_price_eur - b.asking_price_eur
@@ -191,7 +146,7 @@ export function useListingFilters({ initialData, enableUrlSync = true }: UseList
         })
 
         return results
-    }, [initialData, query, category, city, priceRange, minRoi, sortBy, listingStatus])
+    }, [initialData, sortBy, listingStatus])
 
     const activeFiltersCount =
         (category ? 1 : 0) +

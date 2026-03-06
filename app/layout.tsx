@@ -2,7 +2,7 @@ import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
-import { Providers } from "@/components/providers"
+import { QueryProvider } from "@/lib/providers/query-provider"
 import { CookieConsent } from "@/components/shared/cookie-consent"
 import "./globals.css"
 
@@ -50,10 +50,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        <Providers>
+        <QueryProvider>
           {children}
           <CookieConsent />
-        </Providers>
+        </QueryProvider>
         <Analytics />
       </body>
     </html>
