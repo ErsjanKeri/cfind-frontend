@@ -22,6 +22,7 @@ import {
 } from "lucide-react"
 import type { UserWithProfile } from "@/lib/api/types"
 import { getVerificationStatusBadge, getEmailVerificationBadge } from "@/lib/badge-utils"
+import { countries, isValidCountryCode } from "@/lib/constants"
 
 interface AdminAgentCardProps {
   agent: UserWithProfile
@@ -74,6 +75,9 @@ export function AdminAgentCard({
             </div>
             <p className="text-sm text-muted-foreground">{agent.email}</p>
             <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+              {agent.operating_country && isValidCountryCode(agent.operating_country) && (
+                <span>{countries[agent.operating_country].flag} {countries[agent.operating_country].name}</span>
+              )}
               <span>{agent.company_name}</span>
               <span>License: {agent.license_number || "N/A"}</span>
             </div>
@@ -98,6 +102,17 @@ export function AdminAgentCard({
                 <Badge variant="outline" className="text-xs text-amber-600 border-amber-300">
                   <XCircle className="h-3 w-3 mr-1" />
                   No Company
+                </Badge>
+              )}
+              {agent.id_document_url ? (
+                <Badge variant="outline" className="text-xs text-green-600 border-green-300">
+                  <FileText className="h-3 w-3 mr-1" />
+                  ID/Passport
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="text-xs text-amber-600 border-amber-300">
+                  <XCircle className="h-3 w-3 mr-1" />
+                  No ID
                 </Badge>
               )}
             </div>
