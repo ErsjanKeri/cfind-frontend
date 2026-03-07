@@ -121,7 +121,7 @@ export default function ContactHistoryPage() {
                         </p>
 
                         <Button variant="outline" size="sm" className="w-full mt-4 bg-transparent" asChild>
-                          <Link href={`/listings/${lead.listing_id}`}>
+                          <Link href={`/${country}/listings/${lead.listing_id}`}>
                             View Details
                             <ExternalLink className="ml-2 h-3 w-3" />
                           </Link>

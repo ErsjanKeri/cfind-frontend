@@ -14,9 +14,11 @@ import { DemandDialog } from "@/components/demands/demand-dialog"
 import { StatCard } from "@/components/shared/stat-card"
 import { toast } from "sonner"
 import { getDemandStatusBadge } from "@/lib/badge-utils"
+import { getCountryOrDefault } from "@/lib/country"
 
 export function BuyerView() {
     const { user } = useUser() // Fetch user via JWT cookie
+    const country = getCountryOrDefault()
     const [showDemandDialog, setShowDemandDialog] = useState(false)
 
     // React Query hooks - automatically fetch and cache data
@@ -236,7 +238,7 @@ export function BuyerView() {
                             size="sm"
                             action={{
                                 label: "Browse Listings",
-                                onClick: () => window.location.href = "/listings",
+                                onClick: () => window.location.href = `/${country}/listings`,
                                 variant: "default"
                             }}
                         />

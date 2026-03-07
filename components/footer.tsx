@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Building2 } from "lucide-react"
-import { isValidCountryCode, type CountryCode } from "@/lib/constants"
+import { isValidCountryCode, getCountryName, type CountryCode } from "@/lib/constants"
 import { getCountryOrDefault } from "@/lib/country"
 
 export function Footer() {
@@ -25,7 +25,7 @@ export function Footer() {
                 Company<span className="text-primary">Finder</span>
               </span>
             </Link>
-            <p className="mt-4 text-sm text-muted-foreground leading-relaxed">The trusted marketplace for business acquisitions in Albania. Every listing verified. Every agent licensed.</p>
+            <p className="mt-4 text-sm text-muted-foreground leading-relaxed">The trusted marketplace for business acquisitions in {getCountryName(currentCountry)}. Every listing verified. Every agent licensed.</p>
           </div>
 
           {/* Platform */}
