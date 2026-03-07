@@ -15,6 +15,7 @@ import { Step3Financials } from "./steps/step-3-financials"
 import { Step4Review } from "./steps/step-4-review"
 import { useRole } from "@/lib/hooks/useRole"
 import { useAllUsers } from "@/lib/hooks/useAdmin"
+import { useUser } from "@/lib/hooks/useAuth"
 import type { Listing } from "@/lib/api/types"
 
 interface ListingFormProps {
@@ -25,6 +26,10 @@ interface ListingFormProps {
 
 export function ListingForm({ listing, mode, onSuccess }: ListingFormProps) {
   const { isAdmin } = useRole()
+  const { user } = useUser()
+
+  // Agent's operating country (locked for agents, flexible for admins)
+  const agentCountry = !isAdmin ? user?.agent_profile?.operating_country : undefined
 
   // Admin needs verified agents for the agent selection step
   const { data: allUsers } = useAllUsers()
@@ -46,7 +51,7 @@ export function ListingForm({ listing, mode, onSuccess }: ListingFormProps) {
     handleNext,
     handleBack,
     handleSubmit,
-  } = useListingForm({ listing, mode, isAdmin, onSuccess })
+  } = useListingForm({ listing, mode, isAdmin, agentCountry, onSuccess })
 
   const isDialog = !!onSuccess
 
@@ -102,7 +107,7 @@ export function ListingForm({ listing, mode, onSuccess }: ListingFormProps) {
             <CardTitle>Private Business Information</CardTitle>
           </CardHeader>
           <CardContent>
-            <Step1PrivateInfo data={formData} updateData={updateData} errors={fieldErrors} />
+            <Step1PrivateInfo data={formData} updateData={updateData} errors={fieldErrors} showCountry={isAdmin} />
             <div className="flex justify-between mt-6">
               {isAdmin ? (
                 <Button variant="outline" onClick={handleBack}>Back</Button>

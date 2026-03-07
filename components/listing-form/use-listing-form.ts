@@ -12,10 +12,11 @@ interface UseListingFormOptions {
   listing?: Listing
   mode: "create" | "edit"
   isAdmin: boolean
+  agentCountry?: string
   onSuccess?: () => void
 }
 
-export function useListingForm({ listing, mode, isAdmin, onSuccess }: UseListingFormOptions) {
+export function useListingForm({ listing, mode, isAdmin, agentCountry, onSuccess }: UseListingFormOptions) {
   const router = useRouter()
   const { uploadMultiple } = useFileUpload()
   const createListing = useCreateListing()
@@ -28,7 +29,7 @@ export function useListingForm({ listing, mode, isAdmin, onSuccess }: UseListing
 
   const [formData, setFormData] = useState<ListingFormData>({
     agent_id: listing?.agent_id || "",
-    country_code: listing?.country_code || getCountryOrDefault(),
+    country_code: listing?.country_code || agentCountry || getCountryOrDefault(),
     real_business_name: listing?.real_business_name || "",
     real_location_address: listing?.real_location_address || "",
     real_description_en: listing?.real_description_en || "",

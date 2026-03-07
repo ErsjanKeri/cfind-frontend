@@ -31,6 +31,7 @@ export interface User {
 
 export interface AgentProfile {
   user_id: string;
+  operating_country: string;
   // agency_name REMOVED - use User.company_name
   // phone_number REMOVED - use User.phone_number
   license_number: string | null;
@@ -73,10 +74,12 @@ export interface RegisterRequest {
   email: string;
   password: string;
   role: 'buyer' | 'agent';
+  country_preference?: string;
   // Common fields
   phone?: string;
   company_name?: string;
   // Agent-specific
+  operating_country?: string;
   license_number?: string;
   whatsapp?: string;
   bio_en?: string;

@@ -149,7 +149,7 @@ export function Header() {
                   <DropdownMenuItem
                     key={code}
                     onClick={() => handleCountrySwitch(code)}
-                    className={`cursor-pointer ${code === currentCountry ? "bg-accent" : ""}`}
+                    className={`cursor-pointer ${code === currentCountry ? "bg-muted font-medium" : ""}`}
                   >
                     <span className="mr-2 text-base">{countries[code].flag}</span>
                     {countries[code].name}

@@ -32,6 +32,7 @@ export function CreateAgentDialog({ open, onOpenChange }: CreateAgentDialogProps
     const [preApproved, setPreApproved] = useState(true)
 
     const [agentFields, setAgentFields] = useState<AgentFieldsData>({
+        operating_country: "al",
         company_name: "",
         license_number: "",
         phone: "",

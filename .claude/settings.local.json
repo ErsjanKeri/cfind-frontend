@@ -51,7 +51,9 @@
       "Bash(python scripts/audit_backend.py:*)",
       "Bash(npm ls:*)",
       "Bash(sed:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "mcp__digitalocean__apps-list",
+      "mcp__digitalocean__apps-get-deployment-status"
     ],
     "deny": [],
     "ask": []

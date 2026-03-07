@@ -14,6 +14,7 @@ import { AlertCircle, Mail, Lock, User, Briefcase, TrendingUp, ArrowRight, Eye, 
 import Link from "next/link"
 import { toast } from "sonner"
 import { RegisterAgentFields, type AgentFieldsData } from "@/components/auth/register-agent-fields"
+import { getCountryOrDefault } from "@/lib/country"
 
 export function RegisterForm() {
     const router = useRouter()
@@ -28,6 +29,7 @@ export function RegisterForm() {
     const [companyName, setCompanyName] = useState("")
 
     const [agentFields, setAgentFields] = useState<AgentFieldsData>({
+        operating_country: getCountryOrDefault(),
         company_name: "",
         license_number: "",
         phone: "",
@@ -47,14 +49,19 @@ export function RegisterForm() {
         setIsLoading(true)
 
         try {
+            const currentCountry = getCountryOrDefault()
             const data: Record<string, string | File> = {
                 name,
                 email,
                 password,
-                role
+                role,
+                country_preference: currentCountry,
             }
 
             if (role === 'agent') {
+                if (!agentFields.operating_country) {
+                    throw new Error("Operating country is required for agent registration")
+                }
                 if (!agentFields.whatsapp_number) {
                     throw new Error("WhatsApp number is required for agent registration")
                 }
@@ -62,6 +69,7 @@ export function RegisterForm() {
                     throw new Error("All documents (License, Company, ID/Passport) are required for agent registration")
                 }
 
+                data.operating_country = agentFields.operating_country
                 data.company_name = agentFields.company_name
                 data.license_number = agentFields.license_number
                 data.phone = agentFields.phone

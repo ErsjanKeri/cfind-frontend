@@ -17,9 +17,10 @@ interface Step1Props {
     data: ListingFormData
     updateData: (field: string, value: string | number | boolean | string[]) => void
     errors?: ListingFormErrors
+    showCountry?: boolean
 }
 
-export function Step1PrivateInfo({ data, updateData, errors }: Step1Props) {
+export function Step1PrivateInfo({ data, updateData, errors, showCountry = true }: Step1Props) {
     const handleCountryChange = (value: string) => {
         updateData("country_code", value)
         // Reset city and area when country changes
@@ -66,28 +67,30 @@ export function Step1PrivateInfo({ data, updateData, errors }: Step1Props) {
                 </FormFieldWrapper>
             </div>
 
-            {/* Country */}
-            <FormFieldWrapper
-                label="Country"
-                htmlFor="country_code"
-                error={errors?.country_code}
-            >
-                <Select
-                    value={data.country_code}
-                    onValueChange={handleCountryChange}
+            {/* Country - only shown to admins, agents have it auto-set */}
+            {showCountry && (
+                <FormFieldWrapper
+                    label="Country"
+                    htmlFor="country_code"
+                    error={errors?.country_code}
                 >
-                    <SelectTrigger className={errors?.country_code ? "border-red-500" : ""}>
-                        <SelectValue placeholder="Select country" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {VALID_COUNTRY_CODES.map((code) => (
-                            <SelectItem key={code} value={code}>
-                                {countries[code].flag} {countries[code].name}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </FormFieldWrapper>
+                    <Select
+                        value={data.country_code}
+                        onValueChange={handleCountryChange}
+                    >
+                        <SelectTrigger className={errors?.country_code ? "border-red-500" : ""}>
+                            <SelectValue placeholder="Select country" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {VALID_COUNTRY_CODES.map((code) => (
+                                <SelectItem key={code} value={code}>
+                                    {countries[code].flag} {countries[code].name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </FormFieldWrapper>
+            )}
 
             <FormFieldWrapper
                 label="Full Address (Private)"

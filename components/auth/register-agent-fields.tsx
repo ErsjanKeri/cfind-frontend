@@ -1,10 +1,19 @@
 "use client"
 
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { FormFieldWrapper } from "@/components/shared/form-field-wrapper"
-import { Briefcase, FileCheck, Upload } from "lucide-react"
+import { FileCheck, Upload } from "lucide-react"
+import { countries, VALID_COUNTRY_CODES } from "@/lib/constants"
 
 export interface AgentFieldsData {
+  operating_country: string
   company_name: string
   license_number: string
   phone: string
@@ -32,6 +41,25 @@ export function RegisterAgentFields({
 }: RegisterAgentFieldsProps) {
   return (
     <div className="space-y-4">
+      <FormFieldWrapper label="Operating Country" htmlFor="operating_country" required>
+        <Select
+          value={data.operating_country}
+          onValueChange={(val) => onChange("operating_country", val)}
+          disabled={disabled}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select your operating country" />
+          </SelectTrigger>
+          <SelectContent>
+            {VALID_COUNTRY_CODES.map((code) => (
+              <SelectItem key={code} value={code}>
+                {countries[code].flag} {countries[code].name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </FormFieldWrapper>
+
       <FormFieldWrapper label="Company / Agency Name" htmlFor="company_name" required>
         <Input
           id="company_name"
