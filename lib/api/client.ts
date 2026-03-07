@@ -98,9 +98,10 @@ export const getErrorMessage = (error: unknown): string => {
     if (data?.detail && typeof data.detail === 'string') return data.detail;
     if (Array.isArray(data?.detail)) {
       return data.detail
-        .map((err: { loc?: string[]; msg?: string }) => {
-          const field = err.loc?.slice(-1)[0];
-          return field ? `${field}: ${err.msg}` : err.msg;
+        .map((err: { field?: string; message?: string; loc?: string[]; msg?: string }) => {
+          const name = err.field || err.loc?.slice(-1)[0];
+          const msg = err.message || err.msg;
+          return name ? `${name}: ${msg}` : msg;
         })
         .join('\n');
     }
