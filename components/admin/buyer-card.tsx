@@ -11,16 +11,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreVertical, CheckCircle, Eye } from "lucide-react"
+import { MoreVertical, CheckCircle, Eye, Trash2 } from "lucide-react"
 import type { UserWithProfile } from "@/lib/api/types"
 import { getEmailVerificationBadge } from "@/lib/badge-utils"
 
 interface AdminBuyerCardProps {
   buyer: UserWithProfile
   onToggleEmail: (buyer: UserWithProfile) => void
+  onDelete: (buyer: UserWithProfile) => void
 }
 
-export function AdminBuyerCard({ buyer, onToggleEmail }: AdminBuyerCardProps) {
+export function AdminBuyerCard({ buyer, onToggleEmail, onDelete }: AdminBuyerCardProps) {
   const eBadge = getEmailVerificationBadge(buyer.email_verified)
 
   return (
@@ -63,6 +64,11 @@ export function AdminBuyerCard({ buyer, onToggleEmail }: AdminBuyerCardProps) {
                 <DropdownMenuItem onClick={() => onToggleEmail(buyer)}>
                   <CheckCircle className="h-4 w-4 mr-2" />
                   {buyer.email_verified ? "Mark Email Unverified" : "Mark Email Verified"}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-destructive" onClick={() => onDelete(buyer)}>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Buyer
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

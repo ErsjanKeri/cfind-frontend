@@ -47,7 +47,7 @@ export function RegisterAgentFields({
           onValueChange={(val) => onChange("operating_country", val)}
           disabled={disabled}
         >
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder="Select your operating country" />
           </SelectTrigger>
           <SelectContent>

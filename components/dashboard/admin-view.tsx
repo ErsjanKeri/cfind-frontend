@@ -77,15 +77,15 @@ export function AdminView() {
         }
     }
 
-    const handleDeleteAgent = async (agent: UserWithProfile) => {
+    const handleDeleteUser = async (user: UserWithProfile) => {
         setShowAgentDialog(false)
         setSelectedAgent(null)
 
         try {
-            await deleteUser.mutateAsync(agent.id)
-            toast.success("Agent deleted successfully")
+            await deleteUser.mutateAsync(user.id)
+            toast.success(`${user.role === "agent" ? "Agent" : "Buyer"} deleted successfully`)
         } catch (error: unknown) {
-            toast.error(error instanceof Error ? error.message : "Failed to delete agent")
+            toast.error(error instanceof Error ? error.message : `Failed to delete ${user.role}`)
         }
     }
 
@@ -270,7 +270,7 @@ export function AdminView() {
                                 onView={openVerifyDialog}
                                 onVerify={openVerifyDialog}
                                 onReject={openRejectDialog}
-                                onDelete={handleDeleteAgent}
+                                onDelete={handleDeleteUser}
                                 onToggleEmail={handleToggleEmailVerification}
                             />
                         ))}
@@ -301,6 +301,7 @@ export function AdminView() {
                                 key={buyer.id}
                                 buyer={buyer}
                                 onToggleEmail={handleToggleEmailVerification}
+                                onDelete={handleDeleteUser}
                             />
                         ))}
                     </div>
