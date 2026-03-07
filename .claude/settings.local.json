@@ -48,7 +48,10 @@
       "Bash(/usr/local/bin/npx prisma migrate dev --name simplify_listing_status_remove_subscriptions --create-only)",
       "Bash(/opt/homebrew/bin/npx prisma migrate dev --name simplify_listing_status_remove_subscriptions --create-only)",
       "Bash(source venv/bin/activate)",
-      "Bash(python scripts/audit_backend.py:*)"
+      "Bash(python scripts/audit_backend.py:*)",
+      "Bash(npm ls:*)",
+      "Bash(sed:*)",
+      "Bash(cp:*)"
     ],
     "deny": [],
     "ask": []

@@ -18,6 +18,7 @@ export interface User {
   email_verified: boolean;
   image: string | null;
   role: UserRole;
+  country_preference: string | null;
 
   // Common fields (for both buyers and agents)
   phone_number: string | null;
@@ -140,6 +141,7 @@ export interface ListingImage {
 export interface Listing {
   id: string;
   agent_id: string;
+  country_code: string;
   status: ListingStatus;
   promotion_tier: PromotionTier;
   promotion_start_date: string | null;
@@ -185,6 +187,7 @@ export interface Listing {
 
 export interface CreateListingRequest {
   // Required fields
+  country_code: string;
   real_business_name: string;
   real_location_address: string;
   public_title_en: string;
@@ -210,6 +213,7 @@ export interface CreateListingRequest {
 
 export interface ListingFormData {
   agent_id: string;
+  country_code: string;
   real_business_name: string;
   real_location_address: string;
   real_description_en: string;
@@ -294,6 +298,7 @@ export interface BuyerDemand {
   buyer_name: string;
   buyer_email: string;
   buyer_company: string | null;
+  country_code: string;
 
   description: string;
   category: string;
@@ -318,6 +323,7 @@ export interface BuyerDemand {
 }
 
 export interface CreateDemandRequest {
+  country_code: string;
   description: string;
   category: string;
   preferred_city_en: string;
@@ -450,8 +456,10 @@ export interface PaginationParams {
 }
 
 export interface ListingFilters extends PaginationParams {
+  country_code: string;
   category?: ListingCategory;
-  location?: string;
+  city?: string;
+  area?: string;
   min_price_eur?: number;
   max_price_eur?: number;
   promotion_tier?: PromotionTier;
@@ -460,8 +468,9 @@ export interface ListingFilters extends PaginationParams {
 }
 
 export interface DemandFilters extends PaginationParams {
+  country_code: string;
   category?: ListingCategory;
-  location?: string;
+  city?: string;
   demand_type?: DemandType;
   status?: DemandStatus;
 }

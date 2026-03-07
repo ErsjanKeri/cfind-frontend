@@ -23,15 +23,18 @@ import {
 } from "@/components/ui/select"
 import { FormError } from "@/components/shared/form-error"
 import { useCreateDemand } from "@/lib/hooks/useDemands"
-import { businessCategories, albanianCities } from "@/lib/constants"
+import { businessCategories, getCountryCities, getCityAreas, type CountryCode } from "@/lib/constants"
+import { getCountryOrDefault } from "@/lib/country"
 
 interface DemandDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     onSuccess?: () => void
+    country?: CountryCode
 }
 
-export function DemandDialog({ open, onOpenChange, onSuccess }: DemandDialogProps) {
+export function DemandDialog({ open, onOpenChange, onSuccess, country }: DemandDialogProps) {
+    const resolvedCountry = country || getCountryOrDefault()
     const createDemand = useCreateDemand()
     const [formData, setFormData] = useState({
         demand_type: "investor" as "investor" | "seeking_funding",
@@ -56,8 +59,13 @@ export function DemandDialog({ open, onOpenChange, onSuccess }: DemandDialogProp
         setFormData(prev => ({
             ...prev,
             preferred_city_en: city,
+            preferred_area: "", // Reset area when city changes
         }))
     }
+
+    const areas = formData.preferred_city_en
+        ? getCityAreas(resolvedCountry, formData.preferred_city_en)
+        : []
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -66,6 +74,7 @@ export function DemandDialog({ open, onOpenChange, onSuccess }: DemandDialogProp
 
         try {
             await createDemand.mutateAsync({
+                country_code: resolvedCountry,
                 description: formData.description,
                 category: formData.category,
                 preferred_city_en: formData.preferred_city_en,
@@ -193,7 +202,7 @@ export function DemandDialog({ open, onOpenChange, onSuccess }: DemandDialogProp
                                 <SelectValue placeholder="Select a city" />
                             </SelectTrigger>
                             <SelectContent>
-                                {albanianCities.map((city) => (
+                                {getCountryCities(resolvedCountry).map((city) => (
                                     <SelectItem key={city} value={city}>
                                         {city}
                                     </SelectItem>
@@ -208,11 +217,20 @@ export function DemandDialog({ open, onOpenChange, onSuccess }: DemandDialogProp
                     {/* Area (Optional) */}
                     <div className="space-y-2">
                         <Label>Preferred Area</Label>
-                        <Input
+                        <Select
                             value={formData.preferred_area}
-                            onChange={(e) => updateField("preferred_area", e.target.value)}
-                            placeholder="e.g., Blloku, Pazari i Ri"
-                        />
+                            onValueChange={(val) => updateField("preferred_area", val)}
+                            disabled={areas.length === 0}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder={areas.length === 0 ? "Select city first" : "Select area"} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {areas.map((area) => (
+                                    <SelectItem key={area} value={area}>{area}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     {/* Description */}

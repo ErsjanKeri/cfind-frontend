@@ -1,36 +1,54 @@
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { HeroSection } from "@/components/home/hero-section"
-import { FeaturedListings } from "@/components/home/featured-listings"
-import { PremiumCarousel } from "@/components/home/premium-carousel"
-import { HowItWorksPreview } from "@/components/home/how-it-works-preview"
-import { StatsSection } from "@/components/home/stats-section"
-import { api } from "@/lib/api"
-import type { Listing } from "@/lib/api/types"
+"use client"
 
-export const dynamic = "force-dynamic"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { countries, type CountryCode, VALID_COUNTRY_CODES } from "@/lib/constants"
+import { getCountryCookie } from "@/lib/country"
 
-export default async function HomePage() {
-  // Fetch listings from backend API (server component)
-  let listings: Listing[] = []
-  try {
-    const response = await api.listings.getListings({ page: 1, page_size: 20 })
-    listings = response.listings || []
-  } catch (error) {
-    listings = []
+export default function SplashPage() {
+  const router = useRouter()
+  const [show, setShow] = useState(false)
+
+  useEffect(() => {
+    const saved = getCountryCookie()
+    if (saved) {
+      router.replace(`/${saved}`)
+    } else {
+      setShow(true)
+    }
+  }, [router])
+
+  const handleSelect = (code: CountryCode) => {
+    document.cookie = `country=${code};path=/;max-age=${60 * 60 * 24 * 365};samesite=lax`
+    router.replace(`/${code}`)
   }
 
+  if (!show) return null
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1">
-        <HeroSection />
-        <PremiumCarousel listings={listings} />
-        <StatsSection />
-        <FeaturedListings listings={listings} />
-        <HowItWorksPreview />
-      </main>
-      <Footer />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted/30 p-4">
+      <div className="w-full max-w-lg space-y-8 text-center">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">Welcome to CompanyFinder</h1>
+          <p className="text-muted-foreground">Where are you looking to buy or sell a business?</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          {VALID_COUNTRY_CODES.map((code) => {
+            const c = countries[code]
+            return (
+              <button
+                key={code}
+                onClick={() => handleSelect(code)}
+                className="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-md transition-all cursor-pointer"
+              >
+                <span className="text-5xl">{c.flag}</span>
+                <span className="font-semibold text-lg">{c.name}</span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
     </div>
   )
 }

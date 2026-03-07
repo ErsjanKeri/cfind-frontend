@@ -107,7 +107,7 @@ interface PremiumListingCardProps {
 
 function PremiumListingCard({ listing }: PremiumListingCardProps) {
     return (
-        <Link href={`/listings/${listing.id}`} className="snap-start">
+        <Link href={`/${listing.country_code}/listings/${listing.id}`} className="snap-start">
             <Card className="w-[360px] sm:w-[400px] flex-shrink-0 overflow-hidden border-2 border-amber-400 shadow-xl shadow-amber-200/40 hover:shadow-2xl hover:shadow-amber-300/50 hover:border-amber-500 transition-all duration-300 bg-white">
                 {/* Image with Premium ribbon */}
                 <div className="relative aspect-[16/9] overflow-hidden">

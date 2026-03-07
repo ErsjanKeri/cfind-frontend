@@ -104,6 +104,7 @@ export function useCreateDemand() {
 
   return useMutation({
     mutationFn: (data: {
+      country_code: string;
       description: string;
       category: string;
       preferred_city_en: string;

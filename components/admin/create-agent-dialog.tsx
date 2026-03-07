@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { LoadingButton } from "@/components/shared/loading-button"
 import { FormFieldWrapper } from "@/components/shared/form-field-wrapper"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import {
     Dialog,
     DialogContent,
@@ -53,16 +53,9 @@ export function CreateAgentDialog({ open, onOpenChange }: CreateAgentDialogProps
                 email_verified: preApproved
             })
             onOpenChange(false)
-            toast({
-                title: "Success",
-                description: "Agent created successfully"
-            })
+            toast.success("Agent created successfully")
         } catch (error: unknown) {
-            toast({
-                title: "Error",
-                description: error instanceof Error ? error.message : "An unexpected error occurred",
-                variant: "destructive",
-            })
+            toast.error(error instanceof Error ? error.message : "An unexpected error occurred")
         }
     }
 

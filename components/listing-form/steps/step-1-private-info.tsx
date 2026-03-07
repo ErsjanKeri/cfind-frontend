@@ -10,7 +10,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { FormFieldWrapper } from "@/components/shared/form-field-wrapper"
-import { businessCategories } from "@/lib/constants"
+import { businessCategories, countries, VALID_COUNTRY_CODES } from "@/lib/constants"
 import type { ListingFormData, ListingFormErrors } from "@/lib/api/types"
 
 interface Step1Props {
@@ -20,6 +20,13 @@ interface Step1Props {
 }
 
 export function Step1PrivateInfo({ data, updateData, errors }: Step1Props) {
+    const handleCountryChange = (value: string) => {
+        updateData("country_code", value)
+        // Reset city and area when country changes
+        updateData("public_location_city_en", "")
+        updateData("public_location_area", "")
+    }
+
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -58,6 +65,29 @@ export function Step1PrivateInfo({ data, updateData, errors }: Step1Props) {
                     </Select>
                 </FormFieldWrapper>
             </div>
+
+            {/* Country */}
+            <FormFieldWrapper
+                label="Country"
+                htmlFor="country_code"
+                error={errors?.country_code}
+            >
+                <Select
+                    value={data.country_code}
+                    onValueChange={handleCountryChange}
+                >
+                    <SelectTrigger className={errors?.country_code ? "border-red-500" : ""}>
+                        <SelectValue placeholder="Select country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {VALID_COUNTRY_CODES.map((code) => (
+                            <SelectItem key={code} value={code}>
+                                {countries[code].flag} {countries[code].name}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </FormFieldWrapper>
 
             <FormFieldWrapper
                 label="Full Address (Private)"

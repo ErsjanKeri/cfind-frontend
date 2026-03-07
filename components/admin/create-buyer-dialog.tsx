@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { LoadingButton } from "@/components/shared/loading-button"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import {
     Dialog,
     DialogContent,
@@ -33,18 +33,11 @@ export function CreateBuyerDialog({ open, onOpenChange }: CreateBuyerDialogProps
     const handleSubmit = async () => {
         try {
             await createBuyer.mutateAsync(data)
-            toast({
-                title: "Success",
-                description: "Buyer created successfully",
-            })
+            toast.success("Buyer created successfully")
             onOpenChange(false)
             setData({ name: "", email: "", company_name: "", password: "" })
         } catch (error: unknown) {
-            toast({
-                title: "Error",
-                description: error instanceof Error ? error.message : "Failed to create buyer",
-                variant: "destructive",
-            })
+            toast.error(error instanceof Error ? error.message : "Failed to create buyer")
         }
     }
 

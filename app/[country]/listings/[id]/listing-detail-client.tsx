@@ -33,15 +33,17 @@ import {
 } from "lucide-react"
 import { getInitials } from "@/lib/utils"
 import type { Listing } from "@/lib/api/types"
+import type { CountryCode } from "@/lib/constants"
 import { ListingImageGallery } from "@/components/listings/listing-image-gallery"
 import { FinancialOverviewCard } from "@/components/listings/financial-overview-card"
 import { AgentContactSidebar } from "@/components/listings/agent-contact-sidebar"
 
 interface ListingDetailClientProps {
   listingId: string
+  country: CountryCode
 }
 
-export function ListingDetailClient({ listingId }: ListingDetailClientProps) {
+export function ListingDetailClient({ listingId, country }: ListingDetailClientProps) {
   const { user } = useUser() // Fetch user via JWT cookie
   const isAuthenticated = !!user // Derived
 
@@ -89,7 +91,7 @@ export function ListingDetailClient({ listingId }: ListingDetailClientProps) {
           <div className="text-center">
             <h1 className="text-2xl font-bold">Listing Not Found</h1>
             <p className="text-muted-foreground mt-2">The listing you&apos;re looking for doesn&apos;t exist.</p>
-            <Link href="/listings">
+            <Link href={`/${country}/listings`}>
               <Button className="mt-4">Browse Listings</Button>
             </Link>
           </div>
@@ -166,7 +168,7 @@ export function ListingDetailClient({ listingId }: ListingDetailClientProps) {
         <div className="bg-card border-b border-border">
           <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
             <nav className="flex items-center gap-2 text-sm">
-              <Link href="/listings" className="text-muted-foreground hover:text-foreground">
+              <Link href={`/${country}/listings`} className="text-muted-foreground hover:text-foreground">
                 Listings
               </Link>
               <span className="text-muted-foreground">/</span>
@@ -340,7 +342,7 @@ export function ListingDetailClient({ listingId }: ListingDetailClientProps) {
               Maybe Later
             </Button>
             <Button asChild className="flex-1">
-              <Link href={`/register?redirect=${encodeURIComponent(`/listings/${listing.id}`)}`}>
+              <Link href={`/register?redirect=${encodeURIComponent(`/${country}/listings/${listing.id}`)}`}>
                 Create Free Account
               </Link>
             </Button>
@@ -348,7 +350,7 @@ export function ListingDetailClient({ listingId }: ListingDetailClientProps) {
           <div className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
             <Link
-              href={`/login?redirect=${encodeURIComponent(`/listings/${listing.id}`)}`}
+              href={`/login?redirect=${encodeURIComponent(`/${country}/listings/${listing.id}`)}`}
               className="text-primary hover:underline"
             >
               Sign In

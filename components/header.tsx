@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useAuth, useUser } from "@/lib/hooks/useAuth"
 import { useRole } from "@/lib/hooks/useRole"
 import { Button } from "@/components/ui/button"
@@ -15,9 +15,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Building2, LogOut, Menu, X, LayoutDashboard, Settings, Heart, Plus } from "lucide-react"
+import { Building2, LogOut, Menu, X, LayoutDashboard, Settings, Heart, Plus, Globe } from "lucide-react"
 import { DemandDialog } from "@/components/demands/demand-dialog"
 import { getInitials } from "@/lib/utils"
+import { countries, isValidCountryCode, VALID_COUNTRY_CODES, type CountryCode } from "@/lib/constants"
+import { setCountryCookie, getCountryOrDefault } from "@/lib/country"
+import { api } from "@/lib/api"
 
 export function Header() {
   const { logout } = useAuth() // Auth actions only
@@ -27,6 +30,29 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showDemandDialog, setShowDemandDialog] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
+
+  // Extract country from URL (e.g. /al/listings → "al"), fall back to cookie
+  const pathSegments = pathname?.split("/").filter(Boolean) || []
+  const urlCountry = pathSegments[0] && isValidCountryCode(pathSegments[0]) ? pathSegments[0] : null
+  const currentCountry: CountryCode = urlCountry || getCountryOrDefault()
+
+  const handleCountrySwitch = (code: CountryCode) => {
+    setCountryCookie(code)
+
+    // Persist to backend if logged in (fire-and-forget)
+    if (isAuthenticated) {
+      api.user.updateProfile({ country_preference: code }).catch(() => {})
+    }
+
+    if (urlCountry) {
+      // Replace country prefix in current path: /al/listings → /ae/listings
+      const rest = pathSegments.slice(1).join("/")
+      router.push(`/${code}${rest ? `/${rest}` : ""}`)
+    } else {
+      router.push(`/${code}`)
+    }
+  }
 
   const getRoleBadge = () => {
     if (!user) return null
@@ -61,7 +87,7 @@ export function Header() {
   }
 
   const isActive = (path: string) => {
-    if (path === "/listings") return pathname?.startsWith("/listings")
+    if (path.endsWith("/listings")) return pathname?.includes("/listings")
     return pathname === path
   }
 
@@ -81,8 +107,8 @@ export function Header() {
 
           <nav className="hidden md:flex items-center gap-8">
             <Link
-              href="/listings"
-              className={`text-sm font-medium transition-colors hover:text-primary ${isActive("/listings") ? "text-primary" : "text-muted-foreground"
+              href={`/${currentCountry}/listings`}
+              className={`text-sm font-medium transition-colors hover:text-primary ${isActive(`/${currentCountry}/listings`) ? "text-primary" : "text-muted-foreground"
                 }`}
             >
               Browse Listings
@@ -109,6 +135,29 @@ export function Header() {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-1">
+            {/* Country Picker */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-1.5 px-2">
+                  <span className="text-base leading-none">{countries[currentCountry].flag}</span>
+                  <Globe className="h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-44">
+                <DropdownMenuLabel className="text-xs text-muted-foreground">Country</DropdownMenuLabel>
+                {VALID_COUNTRY_CODES.map((code) => (
+                  <DropdownMenuItem
+                    key={code}
+                    onClick={() => handleCountrySwitch(code)}
+                    className={`cursor-pointer ${code === currentCountry ? "bg-accent" : ""}`}
+                  >
+                    <span className="mr-2 text-base">{countries[code].flag}</span>
+                    {countries[code].name}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {isLoading ? (
               // Show skeleton while loading auth state
               <div className="h-9 w-24 bg-muted animate-pulse rounded-md" />
@@ -194,7 +243,7 @@ export function Header() {
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-border py-4">
             <nav className="flex flex-col gap-1">
-              <Link href="/listings" onClick={() => setMobileMenuOpen(false)}>
+              <Link href={`/${currentCountry}/listings`} onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="ghost" className="w-full justify-start text-muted-foreground">
                   Browse Listings
                 </Button>

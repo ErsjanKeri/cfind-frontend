@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, Mail, Lock } from "lucide-react"
 import Link from "next/link"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 
 interface LoginFormProps {
     showResendVerification?: boolean
@@ -40,10 +40,7 @@ export function LoginForm({ showResendVerification = false }: LoginFormProps) {
 
         try {
             await login(email, password)
-            toast({
-                title: "Success",
-                description: "Logged in successfully!",
-            })
+            toast.success("Logged in successfully!")
             router.push("/profile")
         } catch (err: unknown) {
             const errorMsg = err instanceof Error ? err.message : "An unexpected error occurred"
@@ -56,11 +53,7 @@ export function LoginForm({ showResendVerification = false }: LoginFormProps) {
     const handleResendVerification = async (e: React.MouseEvent) => {
         e.preventDefault()
         if (!email) {
-            toast({
-                title: "Email Required",
-                description: "Please enter your email address in the form above",
-                variant: "destructive",
-            })
+            toast.error("Please enter your email address in the form above")
             return
         }
 
@@ -68,16 +61,9 @@ export function LoginForm({ showResendVerification = false }: LoginFormProps) {
         try {
             await api.auth.resendVerification(email)
             setResendSuccess(true)
-            toast({
-                title: "Success",
-                description: "Verification email sent! Please check your inbox.",
-            })
+            toast.success("Verification email sent! Please check your inbox.")
         } catch (err: unknown) {
-            toast({
-                title: "Error",
-                description: err instanceof Error ? err.message : "An unexpected error occurred",
-                variant: "destructive",
-            })
+            toast.error(err instanceof Error ? err.message : "An unexpected error occurred")
         } finally {
             setResending(false)
         }

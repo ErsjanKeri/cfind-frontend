@@ -10,8 +10,10 @@ import { Footer } from "@/components/footer"
 import { ListingCard } from "@/components/listings/listing-card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Heart, Search, Loader2 } from "lucide-react"
+import { getCountryOrDefault } from "@/lib/country"
 
 export default function SavedListingsPage() {
+  const country = getCountryOrDefault()
   const router = useRouter()
   const { user } = useUser() // Fetch user via JWT cookie
   const isAuthenticated = !!user // Derived
@@ -71,7 +73,7 @@ export default function SavedListingsPage() {
               <h3 className="text-xl font-semibold text-foreground mb-2">No saved listings</h3>
               <p className="text-muted-foreground mb-6">Browse listings and save your favorites to see them here</p>
               <Button asChild>
-                <Link href="/listings">
+                <Link href={`/${country}/listings`}>
                   <Search className="mr-2 h-4 w-4" />
                   Browse Listings
                 </Link>

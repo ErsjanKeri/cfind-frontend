@@ -16,7 +16,7 @@ import { AdminAgentCard } from "@/components/admin/agent-card"
 import { AdminBuyerCard } from "@/components/admin/buyer-card"
 import { ListingDialog } from "@/components/listings/listing-dialog"
 import { Button } from "@/components/ui/button"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { StatCard } from "@/components/shared/stat-card"
 import { AvatarWithInitials } from "@/components/shared/avatar-with-initials"
@@ -71,13 +71,9 @@ export function AdminView() {
 
         try {
             await verifyAgent.mutateAsync(agent.id)
-            toast({ title: "Success", description: "Agent verified successfully" })
+            toast.success("Agent verified successfully")
         } catch (error: unknown) {
-            toast({
-                title: "Error",
-                description: error instanceof Error ? error.message : "Failed to verify agent",
-                variant: "destructive",
-            })
+            toast.error(error instanceof Error ? error.message : "Failed to verify agent")
         }
     }
 
@@ -87,13 +83,9 @@ export function AdminView() {
 
         try {
             await deleteUser.mutateAsync(agent.id)
-            toast({ title: "Success", description: "Agent deleted successfully" })
+            toast.success("Agent deleted successfully")
         } catch (error: unknown) {
-            toast({
-                title: "Error",
-                description: error instanceof Error ? error.message : "Failed to delete agent",
-                variant: "destructive",
-            })
+            toast.error(error instanceof Error ? error.message : "Failed to delete agent")
         }
     }
 
@@ -104,16 +96,9 @@ export function AdminView() {
                 userId: user.id,
                 emailVerified: newVerifiedStatus
             })
-            toast({
-                title: "Success",
-                description: newVerifiedStatus ? "Email marked as verified" : "Email marked as unverified",
-            })
+            toast.success(newVerifiedStatus ? "Email marked as verified" : "Email marked as unverified")
         } catch (error: unknown) {
-            toast({
-                title: "Error",
-                description: error instanceof Error ? error.message : "Failed to update email verification",
-                variant: "destructive",
-            })
+            toast.error(error instanceof Error ? error.message : "Failed to update email verification")
         }
     }
 

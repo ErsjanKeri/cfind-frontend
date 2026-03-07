@@ -8,13 +8,16 @@ import { Loader2, Plus } from "lucide-react"
 import Link from "next/link"
 import { useListings } from "@/lib/hooks/useListings"
 import type { Listing } from "@/lib/api/types"
+import { getCountryName, type CountryCode } from "@/lib/constants"
 
-export default function ListingsClientPage() {
-    // Fetch listings using React Query
-    const { data: listingsData, isLoading } = useListings({ page: 1, page_size: 100 })
+interface ListingsClientPageProps {
+    country: CountryCode
+}
+
+export default function ListingsClientPage({ country }: ListingsClientPageProps) {
+    const { data: listingsData, isLoading } = useListings({ country_code: country, page: 1, page_size: 100 })
     const listings = listingsData?.listings || []
 
-    // Client-side filtering
     const { filters, setters, filteredListings } = useListingFilters({ initialData: listings })
 
     if (isLoading) {
@@ -31,7 +34,7 @@ export default function ListingsClientPage() {
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Listings</h1>
                     <p className="text-muted-foreground mt-1">
-                        Find out verified business listings for sale in Albania
+                        Find verified business listings for sale in {getCountryName(country)}
                     </p>
                 </div>
                 <Button asChild>
@@ -42,14 +45,12 @@ export default function ListingsClientPage() {
                 </Button>
             </div>
 
-            {/* Filters */}
-            <ListingFilters filters={filters} setters={setters} />
+            <ListingFilters filters={filters} setters={setters} country={country} />
 
-            {/* Listings Grid */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {filteredListings.length > 0 ? (
                     filteredListings.map((listing: Listing) => (
-                        <ListingCard key={listing.id} listing={listing} />
+                        <ListingCard key={listing.id} listing={listing} country={country} />
                     ))
                 ) : (
                     <div className="col-span-full text-center py-12 text-muted-foreground">

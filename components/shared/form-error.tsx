@@ -21,7 +21,7 @@
  */
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, XCircle, AlertTriangle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 
 interface FormErrorProps {
   error: string | Error | null | undefined;

@@ -4,8 +4,9 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useCreateListing, useUpdateListing } from "@/lib/hooks/useListings"
 import { useFileUpload } from "@/lib/hooks/useFileUpload"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import type { Listing, ListingFormData } from "@/lib/api/types"
+import { getCountryOrDefault } from "@/lib/country"
 
 interface UseListingFormOptions {
   listing?: Listing
@@ -27,6 +28,7 @@ export function useListingForm({ listing, mode, isAdmin, onSuccess }: UseListing
 
   const [formData, setFormData] = useState<ListingFormData>({
     agent_id: listing?.agent_id || "",
+    country_code: listing?.country_code || getCountryOrDefault(),
     real_business_name: listing?.real_business_name || "",
     real_location_address: listing?.real_location_address || "",
     real_description_en: listing?.real_description_en || "",
@@ -72,6 +74,7 @@ export function useListingForm({ listing, mode, isAdmin, onSuccess }: UseListing
     if (step === 1) {
       if (!formData.real_business_name) errors.real_business_name = "Business name is required"
       if (!formData.category) errors.category = "Category is required"
+      if (!formData.country_code) errors.country_code = "Country is required"
       if (!formData.real_location_address) errors.real_location_address = "Address is required"
     }
 
@@ -141,7 +144,7 @@ export function useListingForm({ listing, mode, isAdmin, onSuccess }: UseListing
           setIsSubmitting(false)
           return
         }
-        toast({ title: "Success", description: "Listing created details" })
+        toast.success("Listing created successfully")
       } else {
         if (!listing) return
         const result = await updateListing.mutateAsync({ id: listing.id, data: payload })
@@ -152,7 +155,7 @@ export function useListingForm({ listing, mode, isAdmin, onSuccess }: UseListing
           setIsSubmitting(false)
           return
         }
-        toast({ title: "Updated", description: "Listing updated" })
+        toast.success("Listing updated")
       }
 
       if (onSuccess) {

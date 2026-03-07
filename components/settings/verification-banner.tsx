@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { XCircle, AlertTriangle } from "lucide-react"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 
 interface VerificationBannerProps {
   verificationStatus: "pending" | "approved" | "rejected"
@@ -51,16 +51,9 @@ export function VerificationBanner({ verificationStatus, rejectionReason, onResu
               setResubmitting(true)
               try {
                 onResubmit()
-                toast({
-                  title: "Success",
-                  description: "Successfully resubmitted for verification!"
-                })
+                toast.success("Successfully resubmitted for verification!")
               } catch {
-                toast({
-                  title: "Error",
-                  description: "Failed to resubmit for verification",
-                  variant: "destructive"
-                })
+                toast.error("Failed to resubmit for verification")
               } finally {
                 setResubmitting(false)
               }

@@ -22,11 +22,13 @@ import {
     SheetFooter,
 } from "@/components/ui/sheet"
 import { Search, MapPin, SlidersHorizontal, X } from "lucide-react"
-import { businessCategories, albanianCities, getCategoryLabel, MAX_LISTING_PRICE } from "@/lib/constants"
+import { businessCategories, getCategoryLabel, getCountryCities, MAX_LISTING_PRICE } from "@/lib/constants"
+import type { CountryCode } from "@/lib/constants"
 import { formatCurrency } from "@/lib/currency"
 import { useState } from "react"
 
 interface ListingFiltersProps {
+    country: CountryCode
     filters: {
         query: string
         category: string
@@ -47,7 +49,7 @@ interface ListingFiltersProps {
     }
 }
 
-export function ListingFilters({ filters, setters }: ListingFiltersProps) {
+export function ListingFilters({ country, filters, setters }: ListingFiltersProps) {
     const [isFilterOpen, setIsFilterOpen] = useState(false)
 
     const activeFiltersList = []
@@ -123,7 +125,7 @@ export function ListingFilters({ filters, setters }: ListingFiltersProps) {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">All Cities</SelectItem>
-                            {albanianCities.map((c) => (
+                            {getCountryCities(country).map((c) => (
                                 <SelectItem key={c} value={c}>
                                     {c}
                                 </SelectItem>

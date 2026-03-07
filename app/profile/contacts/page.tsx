@@ -16,8 +16,10 @@ import { ArrowLeft, MessageCircle, Phone, Mail, Search, ExternalLink, Loader2 } 
 import { WhatsAppIcon } from "@/components/shared/whatsapp-icon"
 import { getInitials } from "@/lib/utils"
 import type { Lead } from "@/lib/api/types"
+import { getCountryOrDefault } from "@/lib/country"
 
 export default function ContactHistoryPage() {
+  const country = getCountryOrDefault()
   const router = useRouter()
   const { user } = useUser() // Fetch user via JWT cookie
   const isAuthenticated = !!user // Derived
@@ -136,7 +138,7 @@ export default function ContactHistoryPage() {
               <h3 className="text-xl font-semibold text-foreground mb-2">No contacts yet</h3>
               <p className="text-muted-foreground mb-6">Browse listings and contact agents to see your contact history here</p>
               <Button asChild>
-                <Link href="/listings">
+                <Link href={`/${country}/listings`}>
                   <Search className="mr-2 h-4 w-4" />
                   Browse Listings
                 </Link>

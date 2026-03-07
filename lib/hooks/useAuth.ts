@@ -11,6 +11,8 @@
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { isValidCountryCode } from '@/lib/constants';
+import { setCountryCookie } from '@/lib/country';
 
 export const USER_QUERY_KEY = ['user', 'profile'] as const;
 
@@ -58,6 +60,11 @@ export function useAuth() {
     // component that calls useUser() sees the logged-in user immediately.
     const userData = await api.user.getProfile();
     queryClient.setQueryData(USER_QUERY_KEY, userData);
+
+    // Sync country preference from backend → cookie
+    if (userData?.country_preference && isValidCountryCode(userData.country_preference)) {
+      setCountryCookie(userData.country_preference);
+    }
   };
 
   const logout = async () => {

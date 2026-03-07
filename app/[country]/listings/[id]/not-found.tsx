@@ -17,7 +17,7 @@ export default function ListingNotFound() {
           <p className="text-muted-foreground mt-2 max-w-sm mx-auto">
             This listing may have been removed or is no longer available.
           </p>
-          <Link href="/listings" className="inline-block mt-6">
+          <Link href="/" className="inline-block mt-6">
             <Button>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Listings

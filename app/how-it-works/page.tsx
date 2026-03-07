@@ -11,8 +11,10 @@ import { TrustPillars } from "@/components/how-it-works/trust-pillars"
 import { InvestorJourney } from "@/components/how-it-works/investor-journey"
 import { SellerJourney } from "@/components/how-it-works/seller-journey"
 import { FaqSection } from "@/components/how-it-works/faq-section"
+import { getCountryOrDefault } from "@/lib/country"
 
 export default function HowItWorksPage() {
+  const country = getCountryOrDefault()
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -90,7 +92,7 @@ export default function HowItWorksPage() {
             <p className="text-lg text-primary-foreground/80 mb-8 max-w-2xl mx-auto">Whether you&apos;re looking to buy or sell, CompanyFinder provides the secure, agent-driven process you need.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" variant="secondary" className="text-base">
-                <Link href="/listings">
+                <Link href={`/${country}/listings`}>
                   <Search className="mr-2 h-5 w-5" />
                   Browse Listings
                 </Link>

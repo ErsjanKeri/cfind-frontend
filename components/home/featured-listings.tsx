@@ -6,12 +6,14 @@ import { ListingCard } from "@/components/listings/listing-card"
 import { ArrowRight } from "lucide-react"
 
 import { Listing } from "@/lib/api/types"
+import { getCountryName, type CountryCode } from "@/lib/constants"
 
 interface FeaturedListingsProps {
   listings: Listing[]
+  country: CountryCode
 }
 
-export function FeaturedListings({ listings }: FeaturedListingsProps) {
+export function FeaturedListings({ listings, country }: FeaturedListingsProps) {
   // Get first 6 listings (already limited by parent or slice here)
   const featuredListings = listings.slice(0, 6)
 
@@ -22,9 +24,9 @@ export function FeaturedListings({ listings }: FeaturedListingsProps) {
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
           <div>
             <h2 className="text-3xl font-bold text-foreground">Featured Opportunities</h2>
-            <p className="mt-2 text-muted-foreground">Explore verified business listings across Albania</p>
+            <p className="mt-2 text-muted-foreground">Explore verified business listings across {getCountryName(country)}</p>
           </div>
-          <Link href="/listings">
+          <Link href={`/${country}/listings`}>
             <Button variant="outline" className="group bg-transparent">
               Browse Listings
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -35,7 +37,7 @@ export function FeaturedListings({ listings }: FeaturedListingsProps) {
         {/* Listings Grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {featuredListings.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
+            <ListingCard key={listing.id} listing={listing} country={country} />
           ))}
         </div>
       </div>

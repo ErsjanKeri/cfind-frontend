@@ -2,8 +2,13 @@
 
 import { SearchBar } from "./search-bar"
 import { Shield, CheckCircle, Lock } from "lucide-react"
+import { getCountryName, type CountryCode } from "@/lib/constants"
 
-export function HeroSection() {
+interface HeroSectionProps {
+  country: CountryCode
+}
+
+export function HeroSection({ country }: HeroSectionProps) {
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-background to-background">
       {/* Background Pattern */}
@@ -20,17 +25,17 @@ export function HeroSection() {
           {/* Headline */}
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl text-balance">
             Discover Your Next Business Opportunity
-            <span className="block text-primary">in Albania</span>
+            <span className="block text-primary">in {getCountryName(country)}</span>
           </h1>
 
           {/* Subheadline */}
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground leading-relaxed text-pretty">
-            Connect with verified business brokers and explore confidential listings across Albania. From thriving cafes to established retail stores – find your perfect acquisition.
+            Connect with verified business brokers and explore confidential listings across {getCountryName(country)}. From thriving cafes to established retail stores – find your perfect acquisition.
           </p>
 
           {/* Search Bar */}
           <div className="mt-10">
-            <SearchBar variant="hero" />
+            <SearchBar country={country} variant="hero" />
           </div>
 
           {/* Trust Points */}

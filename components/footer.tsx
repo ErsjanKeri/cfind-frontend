@@ -1,9 +1,15 @@
 "use client"
 
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Building2 } from "lucide-react"
+import { isValidCountryCode, type CountryCode } from "@/lib/constants"
+import { getCountryOrDefault } from "@/lib/country"
 
 export function Footer() {
+  const pathname = usePathname()
+  const pathSegments = pathname?.split("/").filter(Boolean) || []
+  const currentCountry: CountryCode = pathSegments[0] && isValidCountryCode(pathSegments[0]) ? pathSegments[0] : getCountryOrDefault()
 
   return (
     <footer className="border-t border-border bg-card">
@@ -28,7 +34,7 @@ export function Footer() {
             <ul className="mt-4 space-y-3">
               <li>
                 <Link
-                  href="/listings"
+                  href={`/${currentCountry}/listings`}
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Browse Listings

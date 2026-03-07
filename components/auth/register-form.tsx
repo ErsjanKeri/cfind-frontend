@@ -12,7 +12,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { AlertCircle, Mail, Lock, User, Briefcase, TrendingUp, ArrowRight, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { RegisterAgentFields, type AgentFieldsData } from "@/components/auth/register-agent-fields"
 
 export function RegisterForm() {
@@ -75,10 +75,7 @@ export function RegisterForm() {
 
             await api.auth.register(data as unknown as RegisterRequest)
 
-            toast({
-                title: "Success!",
-                description: "Registration successful! Please check your email to verify your account.",
-            })
+            toast.success("Registration successful! Please check your email to verify your account.")
 
             router.push("/login?registered=true")
         } catch (err: unknown) {

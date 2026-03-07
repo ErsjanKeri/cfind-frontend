@@ -18,9 +18,11 @@ import { getCategoryLabel } from "@/lib/constants"
 import { PromotionBadge } from "@/components/shared/promotion-badge"
 import { toast } from "sonner"
 import type { Listing, PromotionTier } from "@/lib/api/types"
+import type { CountryCode } from "@/lib/constants"
 
 interface ListingCardProps {
   listing: Listing
+  country?: CountryCode
 }
 
 // Get card styling based on promotion tier
@@ -40,7 +42,7 @@ function getCardStyles(tier: PromotionTier): string {
   }
 }
 
-export function ListingCard({ listing }: ListingCardProps) {
+export function ListingCard({ listing, country }: ListingCardProps) {
   const { user } = useUser()
   const { isBuyer } = useRole()
   const router = useRouter()
@@ -64,7 +66,7 @@ export function ListingCard({ listing }: ListingCardProps) {
     e.stopPropagation()
 
     if (!isAuthenticated) {
-      router.push(`/login?redirect=${encodeURIComponent(`/listings/${listing.id}`)}`)
+      router.push(`/login?redirect=${encodeURIComponent(`/${country || listing.country_code}/listings/${listing.id}`)}`)
       return
     }
 
@@ -86,7 +88,7 @@ export function ListingCard({ listing }: ListingCardProps) {
   const firstImageUrl = listing.images?.[0]?.url || "/placeholder.svg?height=400&width=600&query=business storefront"
 
   return (
-    <Link href={`/listings/${listing.id}`}>
+    <Link href={`/${country || listing.country_code}/listings/${listing.id}`}>
       <Card className={getCardStyles(promotionTier)}>
         {/* Image */}
         <div className="relative aspect-[16/10] overflow-hidden bg-muted">

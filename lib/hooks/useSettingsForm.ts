@@ -5,7 +5,7 @@ import { useFileUpload } from "@/lib/hooks/useFileUpload"
 import { useUpdateProfile } from "@/lib/hooks/useUser"
 import { useInvalidateUser } from "@/lib/hooks/useAuth"
 import { api } from "@/lib/api"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import type { UserWithProfile } from "@/lib/api/types"
 
 // ============================================================================
@@ -133,7 +133,7 @@ export function useSettingsForm(user: UserWithProfile | undefined, isAgent: bool
     if (!allowedTypes.includes(fileExt) && !allowedMimeTypes.includes(file.type)) {
       const errorMsg = "Invalid file type. Please upload PDF, JPG, or PNG files only."
       setDocuments(prev => ({ ...prev, [docType]: { file: null, error: errorMsg } }))
-      toast({ title: "Invalid File Type", description: errorMsg, variant: "destructive" })
+      toast.error(errorMsg)
       e.target.value = ""
       return
     }
@@ -141,13 +141,13 @@ export function useSettingsForm(user: UserWithProfile | undefined, isAgent: bool
     if (file.size > MAX_FILE_SIZE) {
       const errorMsg = `${docTypeName} document is ${fileSizeMB}MB. Maximum size is 50MB. Please compress the file.`
       setDocuments(prev => ({ ...prev, [docType]: { file: null, error: errorMsg } }))
-      toast({ title: "File Too Large", description: errorMsg, variant: "destructive" })
+      toast.error(errorMsg)
       e.target.value = ""
       return
     }
 
     setDocuments(prev => ({ ...prev, [docType]: { file, error: null } }))
-    toast({ title: "File Selected", description: `${file.name} (${fileSizeMB}MB) - ready to upload` })
+    toast.success(`${file.name} (${fileSizeMB}MB) - ready to upload`)
   }
 
   // ---------------------------------------------------------------------------
@@ -159,35 +159,35 @@ export function useSettingsForm(user: UserWithProfile | undefined, isAgent: bool
 
     const allowedImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"]
     if (!allowedImageTypes.includes(file.type)) {
-      toast({ title: "Invalid File Type", description: "Please select an image file (JPG, PNG, or WebP).", variant: "destructive" })
+      toast.error("Please select an image file (JPG, PNG, or WebP).")
       e.target.value = ""
       return
     }
 
     const maxSize = 10 * 1024 * 1024
     if (file.size > maxSize) {
-      toast({ title: "File Too Large", description: `Please select an image smaller than 10MB. Your file is ${(file.size / (1024 * 1024)).toFixed(2)}MB.`, variant: "destructive" })
+      toast.error(`Please select an image smaller than 10MB. Your file is ${(file.size / (1024 * 1024)).toFixed(2)}MB.`)
       e.target.value = ""
       return
     }
 
-    toast({ title: "Uploading...", description: "Please wait" })
+    toast("Uploading... Please wait")
 
     try {
       const imageUrl = await uploadFile(file, "avatar")
       if (imageUrl) {
         await updateProfile.mutateAsync({ image: imageUrl })
         invalidateUser()
-        toast({ title: "Success", description: "Profile photo updated successfully!" })
+        toast.success("Profile photo updated successfully!")
       } else {
-        toast({ title: "Error", description: "Upload failed", variant: "destructive" })
+        toast.error("Upload failed")
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
       if (errorMessage.includes("MB limit") || errorMessage.includes("Body exceeded") || errorMessage.includes("bodySizeLimit")) {
-        toast({ title: "File Too Large", description: "Please select an image smaller than 10MB. Try compressing your image.", variant: "destructive" })
+        toast.error("Please select an image smaller than 10MB. Try compressing your image.")
       } else {
-        toast({ title: "Upload Failed", description: errorMessage || "An error occurred while uploading. Please try again.", variant: "destructive" })
+        toast.error(errorMessage || "An error occurred while uploading. Please try again.")
       }
     }
   }
@@ -243,9 +243,9 @@ export function useSettingsForm(user: UserWithProfile | undefined, isAgent: bool
         id: { file: null, error: null },
       })
 
-      toast({ title: "Success", description: "Settings saved successfully" })
+      toast.success("Settings saved successfully")
     } catch {
-      toast({ title: "Error", description: "An unexpected error occurred", variant: "destructive" })
+      toast.error("An unexpected error occurred")
     } finally {
       setSaving(false)
     }

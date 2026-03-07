@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, MapPin, Building } from "lucide-react"
-import { businessCategories, albanianCities } from "@/lib/constants"
+import { businessCategories, getCountryCities, type CountryCode } from "@/lib/constants"
 
 interface SearchBarProps {
+  country: CountryCode
   variant?: "hero" | "compact"
   initialValues?: {
     query?: string
@@ -19,7 +20,7 @@ interface SearchBarProps {
   }
 }
 
-export function SearchBar({ variant = "hero", initialValues }: SearchBarProps) {
+export function SearchBar({ country, variant = "hero", initialValues }: SearchBarProps) {
   const router = useRouter()
   const [query, setQuery] = useState(initialValues?.query ?? "")
   const [category, setCategory] = useState(initialValues?.category ?? "")
@@ -31,7 +32,7 @@ export function SearchBar({ variant = "hero", initialValues }: SearchBarProps) {
     if (category) params.set("category", category)
     if (city) params.set("city", city)
 
-    router.push(`/listings?${params.toString()}`)
+    router.push(`/${country}/listings?${params.toString()}`)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -116,7 +117,7 @@ export function SearchBar({ variant = "hero", initialValues }: SearchBarProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Cities</SelectItem>
-              {albanianCities.map((c) => (
+              {getCountryCities(country).map((c) => (
                 <SelectItem key={c} value={c}>
                   {c}
                 </SelectItem>
