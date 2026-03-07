@@ -23,8 +23,8 @@ export const adminApi = {
    */
   async getStats(): Promise<AdminStats> {
     try {
-      const response = await apiClient.get<AdminStats>('/api/admin/stats');
-      return response.data;
+      const response = await apiClient.get<{ success: boolean; stats: AdminStats }>('/api/admin/stats');
+      return response.data.stats;
     } catch (error) {
       throw new Error(getErrorMessage(error));
     }

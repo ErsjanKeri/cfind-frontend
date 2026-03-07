@@ -96,6 +96,14 @@ export const getErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data;
     if (data?.detail && typeof data.detail === 'string') return data.detail;
+    if (Array.isArray(data?.detail)) {
+      return data.detail
+        .map((err: { loc?: string[]; msg?: string }) => {
+          const field = err.loc?.slice(-1)[0];
+          return field ? `${field}: ${err.msg}` : err.msg;
+        })
+        .join('\n');
+    }
     if (data?.message && typeof data.message === 'string') return data.message;
     return error.message;
   }

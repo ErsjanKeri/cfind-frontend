@@ -61,6 +61,7 @@ export function Step2PublicInfo({ data, updateData, errors }: Step2Props) {
             <div className="space-y-2">
                 <Label htmlFor="public_description_en">
                     Public Description <span className="text-red-500">*</span>
+                    <span className="text-muted-foreground font-normal ml-1">(must be at least 20 characters)</span>
                 </Label>
                 <Textarea
                     id="public_description_en"
@@ -87,7 +88,7 @@ export function Step2PublicInfo({ data, updateData, errors }: Step2Props) {
                         onValueChange={handleCityChange}
                         disabled={cities.length === 0}
                     >
-                        <SelectTrigger className={errors?.public_location_city_en ? "border-red-500" : ""}>
+                        <SelectTrigger className={`w-full ${errors?.public_location_city_en ? "border-red-500" : ""}`}>
                             <SelectValue placeholder={cities.length === 0 ? "Select country first" : "Select city"} />
                         </SelectTrigger>
                         <SelectContent>
@@ -108,7 +109,7 @@ export function Step2PublicInfo({ data, updateData, errors }: Step2Props) {
                         onValueChange={(val) => updateData("public_location_area", val)}
                         disabled={areas.length === 0}
                     >
-                        <SelectTrigger className={errors?.public_location_area ? "border-red-500" : ""}>
+                        <SelectTrigger className={`w-full ${errors?.public_location_area ? "border-red-500" : ""}`}>
                             <SelectValue placeholder={areas.length === 0 ? "Select city first" : "Select area"} />
                         </SelectTrigger>
                         <SelectContent>
