@@ -1,3 +1,7 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # Rules
 
 - Work in small chunks. Think first, ask first if unclear.
@@ -9,17 +13,13 @@
 - Only commit/push when explicitly told to.
 - Do not add verbose section divider comments. Keep comments minimal.
 
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Project Overview
 
-CompanyFinder is a business acquisition marketplace for Albania. Verified agents list businesses for sale; vetted buyers browse and contact agents. The platform maintains business confidentiality by showing limited public information until buyers engage.
+CompanyFinder is a business acquisition marketplace. Verified agents list businesses for sale; vetted buyers browse and contact agents. The platform maintains business confidentiality by showing limited public information until buyers engage.
 
 This is a **frontend-only** Next.js application. The backend is a separate FastAPI service (repo: `cfind-backend`) that handles database, auth, S3 uploads, and email.
 
-**Tech Stack**: Next.js 16 (App Router), React 19, TypeScript, TanStack Query v5, Axios, Tailwind CSS v4, Radix UI / shadcn/ui
+**Tech Stack**: Next.js 16 (App Router), React 19, TypeScript, TanStack Query v5, Axios, Tailwind CSS v4, Radix UI / shadcn/ui, Vitest
 
 **Language**: English only (no Albanian translations)
 
@@ -53,8 +53,15 @@ Cookie-based JWT managed entirely by the backend:
 - Backend sets `access_token` and `refresh_token` as httpOnly cookies
 - `lib/api/client.ts` has an Axios interceptor that auto-refreshes on 401
 - CSRF token sent via `X-CSRF-Token` header on state-changing requests
-- Middleware (`middleware.ts`) does a simple cookie-presence check for protected routes (`/profile`, `/settings`)
-- No NextAuth - auth state comes from `useUser()` hook which calls `GET /api/users/me`
+- Middleware (`middleware.ts`) does a simple cookie-presence check for protected routes (`/profile`, `/settings`) and redirects guests away; redirects logged-in users away from `/login`, `/register`
+- No NextAuth — auth state comes from `useUser()` hook which calls `GET /api/users/me`
+
+### Country Routing
+
+The app supports multiple countries (`al` = Albania, `ae` = UAE). Listings and demands are scoped by country:
+- URL pattern: `/{country}/listings`, `/{country}/listings/{id}`
+- Middleware redirects `/` to `/{country}` if a `country` cookie exists
+- Country data (cities, areas) lives in `lib/constants.ts`
 
 ### API Client Layer (`lib/api/`)
 
@@ -134,12 +141,12 @@ Agent documents (license, company, ID) are uploaded via `api.user.updateAgentPro
 ### Form Handling
 
 Uses `react-hook-form` + `zod`. Schemas defined in `lib/schemas.ts`:
-- `ListingSchema` - Multi-step listing creation form
-- `BuyerDemandSchema` - Buyer demand creation
+- `ListingSchema` — Multi-step listing creation form
+- `BuyerDemandSchema` — Buyer demand creation
 
 ### Currency
 
-Dual display: EUR and ALL (Albanian Lek). Rate: 100 ALL = 1 EUR. Use `formatCurrency(amount, currency)` from `lib/currency.ts`. All API amounts are in EUR; conversion is display-only.
+Dual display: EUR and ALL (Albanian Lek). All API amounts are in EUR; conversion is display-only. Use `formatCurrency(amount, currency)` from `lib/currency.ts` and `useCurrency()` hook from `lib/contexts/currency-context`.
 
 ## Key Files
 
@@ -151,48 +158,25 @@ Dual display: EUR and ALL (Albanian Lek). Rate: 100 ALL = 1 EUR. Use `formatCurr
 | `lib/hooks/useAuth.ts` | `useUser()`, `useAuth()`, `useInvalidateUser()` |
 | `lib/hooks/useRole.ts` | Derived role helpers (`isAgent`, `isVerifiedAgent`, etc.) |
 | `lib/schemas.ts` | Zod validation schemas |
-| `lib/constants.ts` | Business categories, Albanian cities, max price |
+| `lib/constants.ts` | Business categories, country/city/area data, max price |
 | `lib/currency.ts` | Currency formatting (EUR/ALL) |
 | `lib/providers/query-provider.tsx` | React Query setup (wraps app) |
-| `middleware.ts` | Route protection (cookie-presence check) |
+| `middleware.ts` | Route protection + country redirect |
 | `components/ui/` | shadcn/ui primitives |
 | `components/listing-form/` | Multi-step listing creation form |
 | `components/dashboard/` | Role-based dashboard views (agent, buyer, admin) |
 
 ## Important Constraints
 
-1. **No server actions, no Prisma** - This is a pure frontend; all data goes through the API client
-2. **snake_case types** - Types match Python backend schemas, not JavaScript convention
-3. **Data privacy** - Never render `real_business_name`, `real_description_en`, or exact address in public-facing components
-4. **Public listings only from approved agents** - Backend enforces this, but UI should also respect it
-5. **English only** - No Albanian (`*Sq`) fields exist
+1. **No server actions, no Prisma** — This is a pure frontend; all data goes through the API client
+2. **snake_case types** — Types match Python backend schemas, not JavaScript convention
+3. **Data privacy** — Never render `real_business_name`, `real_description_en`, or exact address in public-facing components
+4. **Public listings only from approved agents** — Backend enforces this, but UI should also respect it
+5. **English only** — No Albanian fields exist
 6. **Listing statuses**: `draft` | `active` | `sold` | `inactive`
 7. **Buyer demand deletion**: Only `"active"` demands can be deleted (assigned/fulfilled/closed are kept for history)
 8. **Agent verification required** for: creating listings, claiming demands
 
-## .claude/ Configuration
+## Stale `.claude/rules/` Warning
 
-### Custom Commands
-
-| Command | Description |
-|---------|-------------|
-| `/fix-ts` | Find and fix all TypeScript errors |
-| `/test` | Run the test suite |
-| `/lint` | Run ESLint and auto-fix |
-| `/build` | Run production build |
-| `/db` | Database operations (migrate, push, seed) |
-| `/review-ui` | UI/UX review of a page |
-
-### Subagents
-
-| Agent | Purpose |
-|-------|---------|
-| `ui-reviewer` | Visual UI/UX validation with Playwright |
-| `code-reviewer` | Code quality & security review |
-| `ts-fixer` | Fix TypeScript errors systematically |
-| `test-runner` | Run and fix failing tests |
-| `deep-researcher` | Research libraries/approaches |
-
-### Path-Specific Rules
-
-Rules in `.claude/rules/` provide context-specific guidance for auth, listings, and component patterns. **Note**: These rules reference the old full-stack architecture (Prisma, server actions) and need updating - the backend enforcement patterns they describe are now handled by the FastAPI backend, not this frontend.
+The files in `.claude/rules/` (`auth.md`, `listings.md`, `components.md`) reference the **old full-stack architecture** (Prisma, NextAuth, server actions, `auth()`, `prisma.*`). These patterns do NOT exist in this frontend-only codebase. The backend (FastAPI) handles all of that. Ignore Prisma/NextAuth/server-action code patterns in those rule files; follow the API client patterns described above instead.

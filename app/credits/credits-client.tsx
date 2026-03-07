@@ -46,7 +46,6 @@ export function CreditsPageClient({
         try {
             const result = await purchaseCredits.mutateAsync({
                 package_id: pkg.id,
-                payment_method: 'manual' // Simulated payment
             })
             toast.success(`Successfully purchased ${pkg.credits} credits!`)
             if (result.new_balance !== undefined) {

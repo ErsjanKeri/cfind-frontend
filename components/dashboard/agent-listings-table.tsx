@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { formatCurrency } from "@/lib/currency"
 import { PromotionBadge } from "@/components/shared/promotion-badge"
-import { getListingStatusBadge, type ListingStatus } from "@/lib/badge-utils"
+import { getListingStatusBadge } from "@/lib/badge-utils"
 import { Edit, Sparkles } from "lucide-react"
 import {
   Table,
@@ -44,7 +44,7 @@ export function AgentListingsTable({ listings, onEdit, onPromote }: AgentListing
             </TableCell>
             <TableCell>
               {(() => {
-                const badge = getListingStatusBadge(listing.status as ListingStatus)
+                const badge = getListingStatusBadge(listing.status)
                 return (
                   <Badge className={`font-normal ${badge.className}`}>
                     {badge.label ?? listing.status}

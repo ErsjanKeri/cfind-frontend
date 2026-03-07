@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Lock, Globe, DollarSign } from "lucide-react"
-import type { ListingFormData } from "@/lib/api/types"
+import type { ListingFormData } from "../use-listing-form"
 
 interface Step4Props {
     data: ListingFormData

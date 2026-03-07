@@ -92,6 +92,18 @@ apiClient.interceptors.response.use(
 // Error message extraction — simple fallback chain
 // ---------------------------------------------------------------------------
 
+/**
+ * Wraps an async API call to normalize errors with getErrorMessage.
+ * Eliminates repetitive try/catch in every API function.
+ */
+export async function apiCall<T>(fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
 export const getErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data;

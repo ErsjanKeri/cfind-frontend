@@ -6,8 +6,7 @@
  */
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-
-const VALID_COUNTRIES = ['al', 'ae'];
+import { VALID_COUNTRY_CODES } from '@/lib/constants';
 
 // Routes that require authentication
 const protectedRoutes = ['/profile', '/settings'];
@@ -21,7 +20,7 @@ export function middleware(request: NextRequest) {
   // --- Country redirect: `/` → `/{country}` ---
   if (pathname === '/') {
     const country = request.cookies.get('country')?.value;
-    if (country && VALID_COUNTRIES.includes(country)) {
+    if (country && (VALID_COUNTRY_CODES as readonly string[]).includes(country)) {
       return NextResponse.redirect(new URL(`/${country}`, request.url));
     }
     // No cookie → fall through to splash page

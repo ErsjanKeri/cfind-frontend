@@ -125,7 +125,6 @@ export type ListingCategory =
   | 'bar'
   | 'hotel'
   | 'retail'
-  | 'service'
   | 'services'
   | 'manufacturing'
   | 'technology'
@@ -214,27 +213,6 @@ export interface CreateListingRequest {
   agent_id?: string;
   status?: 'draft' | 'active' | 'sold' | 'inactive';
 }
-
-export interface ListingFormData {
-  agent_id: string;
-  country_code: string;
-  real_business_name: string;
-  real_location_address: string;
-  real_description_en: string;
-  category: string;
-  public_title_en: string;
-  public_description_en: string;
-  public_location_area: string;
-  public_location_city_en: string;
-  images: string[];
-  asking_price_eur: string | number;
-  monthly_revenue_eur: string | number;
-  employee_count: string | number;
-  years_in_operation: string | number;
-  is_physically_verified: boolean;
-}
-
-export type ListingFormErrors = Partial<Record<keyof ListingFormData, string>>
 
 export interface ListingsResponse {
   success: boolean;

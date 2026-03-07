@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select"
 import { FormFieldWrapper } from "@/components/shared/form-field-wrapper"
 import { businessCategories, countries, VALID_COUNTRY_CODES } from "@/lib/constants"
-import type { ListingFormData, ListingFormErrors } from "@/lib/api/types"
+import type { ListingFormData, ListingFormErrors } from "../use-listing-form"
 
 interface Step1Props {
     data: ListingFormData

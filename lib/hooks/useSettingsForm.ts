@@ -1,10 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useFileUpload } from "@/lib/hooks/useFileUpload"
 import { useUpdateProfile } from "@/lib/hooks/useUser"
 import { useInvalidateUser } from "@/lib/hooks/useAuth"
-import { api } from "@/lib/api"
+import { api, uploadApi } from "@/lib/api"
 import { toast } from "sonner"
 import type { UserWithProfile } from "@/lib/api/types"
 
@@ -46,7 +45,6 @@ export interface DocumentsState {
 // ============================================================================
 
 export function useSettingsForm(user: UserWithProfile | undefined, isAgent: boolean) {
-  const { uploadFile } = useFileUpload()
   const updateProfile = useUpdateProfile()
   const invalidateUser = useInvalidateUser()
 
@@ -174,14 +172,10 @@ export function useSettingsForm(user: UserWithProfile | undefined, isAgent: bool
     toast("Uploading... Please wait")
 
     try {
-      const imageUrl = await uploadFile(file, "avatar")
-      if (imageUrl) {
-        await updateProfile.mutateAsync({ image: imageUrl })
-        invalidateUser()
-        toast.success("Profile photo updated successfully!")
-      } else {
-        toast.error("Upload failed")
-      }
+      const imageUrl = await uploadApi.uploadFile(file, "avatar")
+      await updateProfile.mutateAsync({ image: imageUrl })
+      invalidateUser()
+      toast.success("Profile photo updated successfully!")
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
       if (errorMessage.includes("MB limit") || errorMessage.includes("Body exceeded") || errorMessage.includes("bodySizeLimit")) {

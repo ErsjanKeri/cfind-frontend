@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
 import { FormFieldWrapper } from "@/components/shared/form-field-wrapper"
-import type { ListingFormData, ListingFormErrors } from "@/lib/api/types"
+import type { ListingFormData, ListingFormErrors } from "../use-listing-form"
 
 interface Step3Props {
     data: ListingFormData

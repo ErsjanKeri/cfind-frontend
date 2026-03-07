@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select"
 import { FormFieldWrapper } from "@/components/shared/form-field-wrapper"
 import { getCountryCities, getCityAreas, isValidCountryCode } from "@/lib/constants"
-import type { ListingFormData, ListingFormErrors } from "@/lib/api/types"
+import type { ListingFormData, ListingFormErrors } from "../use-listing-form"
 
 interface Step2Props {
     data: ListingFormData

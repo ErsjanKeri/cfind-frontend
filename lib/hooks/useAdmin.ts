@@ -1,61 +1,37 @@
 'use client';
 
-/**
- * Admin Hooks - Phase 5
- *
- * React Query hooks for admin operations
- */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import type { UserRole, CreateAgentRequest, CreateBuyerRequest } from '@/lib/api/types';
 
-// ============================================================================
-// QUERY HOOKS (READ Operations)
-// ============================================================================
-
-/**
- * Get platform statistics (admin dashboard)
- */
 export function useAdminStats() {
   return useQuery({
     queryKey: ['adminStats'],
     queryFn: () => api.admin.getStats(),
+    staleTime: 5 * 60 * 1000,
   });
 }
 
-/**
- * Get all users with optional role filter
- */
 export function useAllUsers(role?: UserRole) {
   return useQuery({
     queryKey: ['users', role],
     queryFn: () => api.admin.getUsers(role),
+    staleTime: 5 * 60 * 1000,
   });
 }
 
-// ============================================================================
-// MUTATION HOOKS (WRITE Operations)
-// ============================================================================
-
-/**
- * Verify agent (admin approves agent account)
- */
 export function useVerifyAgent() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (agentId: string) => api.admin.verifyAgent(agentId),
     onSuccess: () => {
-      // Invalidate users list to show updated verification status
       queryClient.invalidateQueries({ queryKey: ['users'] });
       queryClient.invalidateQueries({ queryKey: ['adminStats'] });
     },
   });
 }
 
-/**
- * Reject agent with reason
- */
 export function useRejectAgent() {
   const queryClient = useQueryClient();
 
@@ -69,9 +45,6 @@ export function useRejectAgent() {
   });
 }
 
-/**
- * Delete user (admin only)
- */
 export function useDeleteUser() {
   const queryClient = useQueryClient();
 
@@ -84,9 +57,6 @@ export function useDeleteUser() {
   });
 }
 
-/**
- * Toggle user's email verification status
- */
 export function useToggleEmailVerification() {
   const queryClient = useQueryClient();
 
@@ -99,9 +69,6 @@ export function useToggleEmailVerification() {
   });
 }
 
-/**
- * Adjust agent credits (add or remove)
- */
 export function useAdjustCredits() {
   const queryClient = useQueryClient();
 
@@ -110,14 +77,11 @@ export function useAdjustCredits() {
       api.admin.adjustCredits(agentId, amount, reason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      queryClient.invalidateQueries({ queryKey: ['credits'] });
+      queryClient.invalidateQueries({ queryKey: ['agentCredits'] });
     },
   });
 }
 
-/**
- * Create agent (admin creates pre-verified agent)
- */
 export function useCreateAgent() {
   const queryClient = useQueryClient();
 
@@ -130,9 +94,6 @@ export function useCreateAgent() {
   });
 }
 
-/**
- * Create buyer (admin creates buyer)
- */
 export function useCreateBuyer() {
   const queryClient = useQueryClient();
 

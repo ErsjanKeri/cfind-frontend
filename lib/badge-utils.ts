@@ -1,11 +1,7 @@
-/**
- * Utility functions for consistent badge styling across the application
- */
 import { ShieldCheck, Clock, XCircle, type LucideIcon } from "lucide-react"
+import type { ListingStatus, DemandStatus } from "@/lib/api/types"
 
-export type ListingStatus = "active" | "draft" | "sold" | "inactive" | "rejected"
-export type VerificationStatus = "approved" | "pending" | "rejected"
-export type DemandStatus = "active" | "assigned" | "fulfilled" | "closed"
+type VerificationStatus = "approved" | "pending" | "rejected"
 
 interface BadgeConfig {
   className: string
@@ -33,10 +29,6 @@ export function getListingStatusBadge(status: ListingStatus): BadgeConfig {
     inactive: {
       className: "bg-muted text-muted-foreground hover:bg-muted",
       label: "Inactive",
-    },
-    rejected: {
-      className: "bg-red-100 text-red-700 hover:bg-red-100",
-      label: "Rejected",
     },
   }
 

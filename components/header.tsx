@@ -25,7 +25,7 @@ import { api } from "@/lib/api"
 export function Header() {
   const { logout } = useAuth() // Auth actions only
   const { user, isLoading } = useUser() // User data via JWT cookie
-  const { isBuyer } = useRole()
+  const { isBuyer, isAgent, isAdmin, isRejectedAgent, isVerifiedAgent, isPendingAgent } = useRole()
   const isAuthenticated = !!user // Derived from user data
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showDemandDialog, setShowDemandDialog] = useState(false)
@@ -57,23 +57,21 @@ export function Header() {
   const getRoleBadge = () => {
     if (!user) return null
 
-    if (user.role === "admin") {
+    if (isAdmin) {
       return <span className="text-xs text-primary font-medium">Admin</span>
     }
 
-    if (user.role === "agent" && user.agent_profile) {
-      const agentProfile = user.agent_profile
-      // verificationStatus is the single source of truth: "pending" | "approved" | "rejected"
-      if (agentProfile.verification_status === "rejected") {
+    if (isAgent) {
+      if (isRejectedAgent) {
         return <span className="text-xs text-red-600 font-medium">Verification Rejected</span>
       }
-      if (agentProfile.verification_status === "approved") {
+      if (isVerifiedAgent) {
         return <span className="text-xs text-emerald-600 font-medium">Licensed Agent</span>
       }
       return <span className="text-xs text-amber-600 font-medium">Pending Approval</span>
     }
 
-    if (user.role === "buyer") {
+    if (isBuyer) {
       return <span className="text-xs text-muted-foreground">Buyer</span>
     }
 
@@ -189,10 +187,10 @@ export function Header() {
                     <DropdownMenuItem asChild>
                       <Link href={getDashboardLink()} className="flex items-center cursor-pointer">
                         <LayoutDashboard className="mr-2 h-4 w-4" />
-                        {user.role === "buyer" ? "My Profile" : "Dashboard"}
+                        {isBuyer ? "My Profile" : "Dashboard"}
                       </Link>
                     </DropdownMenuItem>
-                    {user.role === "buyer" && (
+                    {isBuyer && (
                       <DropdownMenuItem asChild>
                         <Link href="/profile/saved" className="flex items-center cursor-pointer">
                           <Heart className="mr-2 h-4 w-4" />
