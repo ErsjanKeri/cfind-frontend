@@ -5,6 +5,7 @@ import { useUpdateProfile } from "@/lib/hooks/useUser"
 import { useInvalidateUser } from "@/lib/hooks/useAuth"
 import { api, uploadApi } from "@/lib/api"
 import { toast } from "sonner"
+import { getErrorMessage } from "@/lib/utils"
 import type { UserWithProfile } from "@/lib/api/types"
 
 // ============================================================================
@@ -177,7 +178,7 @@ export function useSettingsForm(user: UserWithProfile | undefined, isAgent: bool
       invalidateUser()
       toast.success("Profile photo updated successfully!")
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
+      const errorMessage = getErrorMessage(error)
       if (errorMessage.includes("MB limit") || errorMessage.includes("Body exceeded") || errorMessage.includes("bodySizeLimit")) {
         toast.error("Please select an image smaller than 10MB. Try compressing your image.")
       } else {
@@ -239,7 +240,7 @@ export function useSettingsForm(user: UserWithProfile | undefined, isAgent: bool
 
       toast.success("Settings saved successfully")
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "An unexpected error occurred")
+      toast.error(getErrorMessage(error))
     } finally {
       setSaving(false)
     }

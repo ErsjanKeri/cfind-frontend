@@ -6,19 +6,11 @@ import { usePathname, useRouter } from "next/navigation"
 import { useAuth, useUser } from "@/lib/hooks/useAuth"
 import { useRole } from "@/lib/hooks/useRole"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Building2, LogOut, Menu, X, LayoutDashboard, Settings, Heart, Plus, Globe } from "lucide-react"
+import { Building2, Menu, X, Plus } from "lucide-react"
 import { DemandDialog } from "@/components/demands/demand-dialog"
-import { getInitials } from "@/lib/utils"
-import { countries, isValidCountryCode, VALID_COUNTRY_CODES, type CountryCode } from "@/lib/constants"
+import { CountryPicker } from "@/components/header/country-picker"
+import { UserMenu } from "@/components/header/user-menu"
+import { isValidCountryCode, type CountryCode } from "@/lib/constants"
 import { setCountryCookie, getCountryOrDefault } from "@/lib/country"
 import { api } from "@/lib/api"
 
@@ -78,12 +70,6 @@ export function Header() {
     return null
   }
 
-  const getDashboardLink = () => {
-    if (!user) return "/login"
-    // Unified profile route for all roles
-    return "/profile"
-  }
-
   const isActive = (path: string) => {
     if (path.endsWith("/listings")) return pathname?.includes("/listings")
     return pathname === path
@@ -133,85 +119,20 @@ export function Header() {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-1">
-            {/* Country Picker */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-1.5 px-2">
-                  <span className="text-base leading-none">{countries[currentCountry].flag}</span>
-                  <Globe className="h-3.5 w-3.5 text-muted-foreground" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-44">
-                <DropdownMenuLabel className="text-xs text-muted-foreground">Country</DropdownMenuLabel>
-                {VALID_COUNTRY_CODES.map((code) => (
-                  <DropdownMenuItem
-                    key={code}
-                    onClick={() => handleCountrySwitch(code)}
-                    className={`cursor-pointer ${code === currentCountry ? "bg-muted font-medium" : ""}`}
-                  >
-                    <span className="mr-2 text-base">{countries[code].flag}</span>
-                    {countries[code].name}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <CountryPicker currentCountry={currentCountry} onCountrySwitch={handleCountrySwitch} />
 
             {isLoading ? (
               // Show skeleton while loading auth state
               <div className="h-9 w-24 bg-muted animate-pulse rounded-md" />
             ) : isAuthenticated && user ? (
-              <>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="flex items-center gap-2 px-2 h-9">
-                      <Avatar className="h-7 w-7">
-                        <AvatarImage src={user.image || "/placeholder.svg"} alt={user.name || "User"} />
-                        <AvatarFallback className="bg-muted text-muted-foreground text-xs font-medium">
-                          {getInitials(user.name || user.email)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="hidden lg:flex flex-col items-start">
-                        <span className="text-sm font-medium leading-none">{user.name}</span>
-                        {getRoleBadge()}
-                      </div>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuLabel className="font-normal">
-                      <div className="flex flex-col gap-1">
-                        <p className="text-sm font-medium leading-none">{user.name}</p>
-                        <p className="text-xs text-muted-foreground">{user.email}</p>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href={getDashboardLink()} className="flex items-center cursor-pointer">
-                        <LayoutDashboard className="mr-2 h-4 w-4" />
-                        {isBuyer ? "My Profile" : "Dashboard"}
-                      </Link>
-                    </DropdownMenuItem>
-                    {isBuyer && (
-                      <DropdownMenuItem asChild>
-                        <Link href="/profile/saved" className="flex items-center cursor-pointer">
-                          <Heart className="mr-2 h-4 w-4" />
-                          Saved Listings
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem asChild>
-                      <Link href="/settings" className="flex items-center cursor-pointer">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Settings
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={logout} className="text-destructive cursor-pointer">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Sign Out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
+              <UserMenu
+                userName={user.name}
+                userEmail={user.email}
+                userImage={user.image}
+                isBuyer={isBuyer}
+                roleBadge={getRoleBadge()}
+                onLogout={logout}
+              />
             ) : (
               <>
                 <Link href="/login" className="hidden sm:block">

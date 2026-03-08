@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Lock, CheckCircle, XCircle, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
+import { getErrorMessage } from "@/lib/utils"
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams()
@@ -71,7 +72,7 @@ function ResetPasswordForm() {
       }, 3000)
     } catch (error) {
       setStatus("error")
-      setErrorMessage(error instanceof Error ? error.message : "Failed to reset password")
+      setErrorMessage(getErrorMessage(error, "Failed to reset password"))
     }
 
     setLoading(false)

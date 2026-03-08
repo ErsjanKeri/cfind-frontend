@@ -1,6 +1,7 @@
 import { useMemo } from "react"
 import { useToggleSavedListing, useSavedListings } from "@/lib/hooks/useLeads"
 import { toast } from "sonner"
+import { getErrorMessage } from "@/lib/utils"
 
 export function useSavedListing(listingId: string | undefined) {
     const { data: savedListings } = useSavedListings()
@@ -18,7 +19,7 @@ export function useSavedListing(listingId: string | undefined) {
             const result = await toggleMutation.mutateAsync(listingId)
             toast.success(result.is_saved ? "Listing saved!" : "Listing unsaved")
         } catch (error: unknown) {
-            toast.error(error instanceof Error ? error.message : "Failed to save listing")
+            toast.error(getErrorMessage(error, "Failed to save listing"))
         }
     }
 

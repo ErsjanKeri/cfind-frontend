@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { CheckCircle, XCircle, Loader2, Mail, Building2 } from "lucide-react"
 import Link from "next/link"
+import { getErrorMessage } from "@/lib/utils"
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams()
@@ -40,7 +41,7 @@ function VerifyEmailContent() {
       }, 3000)
     } catch (error) {
       setStatus("error")
-      setErrorMessage(error instanceof Error ? error.message : "Failed to verify email")
+      setErrorMessage(getErrorMessage(error, "Failed to verify email"))
     }
   }
 

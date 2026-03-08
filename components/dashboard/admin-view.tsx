@@ -12,8 +12,8 @@ import { CreateAgentDialog } from "@/components/admin/create-agent-dialog"
 import { CreateBuyerDialog } from "@/components/admin/create-buyer-dialog"
 import { RejectAgentDialog } from "@/components/admin/reject-agent-dialog"
 import { AgentVerificationDialog } from "@/components/admin/agent-verification-dialog"
-import { AdminAgentCard } from "@/components/admin/agent-card"
-import { AdminBuyerCard } from "@/components/admin/buyer-card"
+import { AdminAgentList } from "@/components/admin/admin-agent-list"
+import { AdminBuyerList } from "@/components/admin/admin-buyer-list"
 import { ListingDialog } from "@/components/listings/listing-dialog"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
@@ -22,21 +22,13 @@ import { StatCard } from "@/components/shared/stat-card"
 import { AvatarWithInitials } from "@/components/shared/avatar-with-initials"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-    Building2,
-    Users,
-    FileText,
-    AlertTriangle,
-    Plus,
-} from "lucide-react"
-import { SearchInput } from "@/components/shared/search-input"
+import { Users, FileText, AlertTriangle, Plus } from "lucide-react"
+import { getErrorMessage } from "@/lib/utils"
 import type { UserWithProfile } from "@/lib/api/types"
 import { getVerificationStatusBadge } from "@/lib/badge-utils"
 
 export function AdminView() {
     const [activeTab, setActiveTab] = useState("overview")
-    const [agentSearchQuery, setAgentSearchQuery] = useState("")
-    const [buyerSearchQuery, setBuyerSearchQuery] = useState("")
 
     const { data: stats } = useAdminStats()
     const { data: allUsers } = useAllUsers()
@@ -72,7 +64,7 @@ export function AdminView() {
             await verifyAgent.mutateAsync(agent.id)
             toast.success("Agent verified successfully")
         } catch (error: unknown) {
-            toast.error(error instanceof Error ? error.message : "Failed to verify agent")
+            toast.error(getErrorMessage(error, "Failed to verify agent"))
         }
     }
 
@@ -84,7 +76,7 @@ export function AdminView() {
             await deleteUser.mutateAsync(user.id)
             toast.success(`${user.role === "agent" ? "Agent" : "Buyer"} deleted successfully`)
         } catch (error: unknown) {
-            toast.error(error instanceof Error ? error.message : `Failed to delete ${user.role}`)
+            toast.error(getErrorMessage(error, `Failed to delete ${user.role}`))
         }
     }
 
@@ -97,7 +89,7 @@ export function AdminView() {
             })
             toast.success(newVerifiedStatus ? "Email marked as verified" : "Email marked as unverified")
         } catch (error: unknown) {
-            toast.error(error instanceof Error ? error.message : "Failed to update email verification")
+            toast.error(getErrorMessage(error, "Failed to update email verification"))
         }
     }
 
@@ -113,20 +105,6 @@ export function AdminView() {
             agentName: agent.name || agent.email,
         })
     }
-
-    const filteredAgents = agents.filter(
-        (a) =>
-            agentSearchQuery === "" ||
-            (a.name && a.name.toLowerCase().includes(agentSearchQuery.toLowerCase())) ||
-            a.email.toLowerCase().includes(agentSearchQuery.toLowerCase()),
-    )
-
-    const filteredBuyers = buyers.filter(
-        (b) =>
-            buyerSearchQuery === "" ||
-            (b.name && b.name.toLowerCase().includes(buyerSearchQuery.toLowerCase())) ||
-            b.email.toLowerCase().includes(buyerSearchQuery.toLowerCase()),
-    )
 
     return (
         <div className="space-y-6">
@@ -198,9 +176,9 @@ export function AdminView() {
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="mb-6">
-                    <TabsTrigger value="overview">Overview</TabsTrigger>
-                    <TabsTrigger value="agents" className="gap-2">
+                <TabsList className="bg-muted/60 p-1 h-auto mb-6">
+                    <TabsTrigger value="overview" className="px-6 py-2">Overview</TabsTrigger>
+                    <TabsTrigger value="agents" className="px-6 py-2 gap-2">
                         Agents
                         {pendingAgents.length > 0 && (
                             <Badge variant="secondary" className="h-5 min-w-5 text-xs">
@@ -208,7 +186,7 @@ export function AdminView() {
                             </Badge>
                         )}
                     </TabsTrigger>
-                    <TabsTrigger value="buyers">Buyers</TabsTrigger>
+                    <TabsTrigger value="buyers" className="px-6 py-2">Buyers</TabsTrigger>
                 </TabsList>
 
                 {/* Overview Tab */}
@@ -243,61 +221,25 @@ export function AdminView() {
                     </div>
                 </TabsContent>
 
-                {/* Agents Tab */}
                 <TabsContent value="agents">
-                    <div className="mb-4 flex items-center justify-between">
-                        <SearchInput
-                            placeholder="Search agents..."
-                            wrapperClassName="max-w-md flex-1"
-                            value={agentSearchQuery}
-                            onChange={(e) => setAgentSearchQuery(e.target.value)}
-                        />
-                        <Button onClick={() => setShowCreateAgentDialog(true)} className="ml-4">
-                            <Users className="h-4 w-4 mr-2" />
-                            Add Agent
-                        </Button>
-                    </div>
-
-                    <div className="space-y-4">
-                        {filteredAgents.map((agent) => (
-                            <AdminAgentCard
-                                key={agent.id}
-                                agent={agent}
-                                onView={openVerifyDialog}
-                                onVerify={openVerifyDialog}
-                                onReject={openRejectDialog}
-                                onDelete={handleDeleteUser}
-                                onToggleEmail={handleToggleEmailVerification}
-                            />
-                        ))}
-                    </div>
+                    <AdminAgentList
+                        agents={agents}
+                        onView={openVerifyDialog}
+                        onVerify={openVerifyDialog}
+                        onReject={openRejectDialog}
+                        onDelete={handleDeleteUser}
+                        onToggleEmail={handleToggleEmailVerification}
+                        onCreateAgent={() => setShowCreateAgentDialog(true)}
+                    />
                 </TabsContent>
 
-                {/* Buyers Tab */}
                 <TabsContent value="buyers">
-                    <div className="mb-4 flex items-center justify-between">
-                        <SearchInput
-                            placeholder="Search buyers..."
-                            wrapperClassName="max-w-md flex-1"
-                            value={buyerSearchQuery}
-                            onChange={(e) => setBuyerSearchQuery(e.target.value)}
-                        />
-                        <Button onClick={() => setShowCreateBuyerDialog(true)} className="ml-4">
-                            <Building2 className="h-4 w-4 mr-2" />
-                            Add Buyer
-                        </Button>
-                    </div>
-
-                    <div className="space-y-4">
-                        {filteredBuyers.map((buyer) => (
-                            <AdminBuyerCard
-                                key={buyer.id}
-                                buyer={buyer}
-                                onToggleEmail={handleToggleEmailVerification}
-                                onDelete={handleDeleteUser}
-                            />
-                        ))}
-                    </div>
+                    <AdminBuyerList
+                        buyers={buyers}
+                        onDelete={handleDeleteUser}
+                        onToggleEmail={handleToggleEmailVerification}
+                        onCreateBuyer={() => setShowCreateBuyerDialog(true)}
+                    />
                 </TabsContent>
             </Tabs>
 

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { LoadingButton } from "@/components/shared/loading-button"
 import { FormFieldWrapper } from "@/components/shared/form-field-wrapper"
 import { toast } from "sonner"
+import { getErrorMessage } from "@/lib/utils"
 import {
     Dialog,
     DialogContent,
@@ -56,7 +57,7 @@ export function CreateAgentDialog({ open, onOpenChange }: CreateAgentDialogProps
             onOpenChange(false)
             toast.success("Agent created successfully")
         } catch (error: unknown) {
-            toast.error(error instanceof Error ? error.message : "An unexpected error occurred")
+            toast.error(getErrorMessage(error))
         }
     }
 

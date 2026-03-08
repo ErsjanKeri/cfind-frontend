@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { toast } from "sonner"
+import { getErrorMessage } from "@/lib/utils"
 import {
     Dialog,
     DialogContent,
@@ -107,7 +108,7 @@ export function DemandDialog({ open, onOpenChange, onSuccess, country }: DemandD
             })
         } catch (error: unknown) {
             // Show inline error for validation errors
-            setFormError(error instanceof Error ? error.message : "An unexpected error occurred")
+            setFormError(getErrorMessage(error))
         }
     }
 

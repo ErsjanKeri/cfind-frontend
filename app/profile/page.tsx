@@ -26,7 +26,7 @@ import { BuyerView } from "@/components/dashboard/buyer-view"
 import { ImageUpload } from "@/components/shared/image-upload"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { getInitials } from "@/lib/utils"
+import { getInitials, getErrorMessage } from "@/lib/utils"
 import { toast } from "sonner"
 
 export default function ProfilePage() {
@@ -68,7 +68,7 @@ export default function ProfilePage() {
         toast.success("Profile photo updated successfully!")
         setShowImageUpload(false)
       } catch (error: unknown) {
-        toast.error(error instanceof Error ? error.message : "An unexpected error occurred")
+        toast.error(getErrorMessage(error))
       }
     }
   }

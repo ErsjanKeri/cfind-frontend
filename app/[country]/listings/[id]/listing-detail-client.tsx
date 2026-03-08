@@ -8,35 +8,19 @@ import { useUser } from "@/lib/hooks/useAuth"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { toast } from "sonner"
 import { useCreateLead } from "@/lib/hooks/useLeads"
 import { useSavedListing } from "@/lib/hooks/useSavedListing"
 import { useListing } from "@/lib/hooks/useListings"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import {
-  MapPin,
-  Users,
-  Clock,
-  Eye,
-  Lock,
-  Building2,
-  FileText,
-  CheckCircle,
-} from "lucide-react"
+import { MapPin, Lock, FileText } from "lucide-react"
 import { LoadingSpinner } from "@/components/shared/loading-spinner"
-import { getInitials } from "@/lib/utils"
+import { LoginPromptDialog } from "@/components/shared/login-prompt-dialog"
+import { getErrorMessage } from "@/lib/utils"
 import type { CountryCode } from "@/lib/constants"
 import { ListingImageGallery } from "@/components/listings/listing-image-gallery"
 import { FinancialOverviewCard } from "@/components/listings/financial-overview-card"
 import { AgentContactSidebar } from "@/components/listings/agent-contact-sidebar"
+import { BusinessDetailsCard } from "@/components/listings/business-details-card"
 
 interface ListingDetailClientProps {
   listingId: string
@@ -103,7 +87,7 @@ export function ListingDetailClient({ listingId, country }: ListingDetailClientP
         await createLead.mutateAsync({ listing_id: listing.id, interaction_type: method })
         toast.success("Contact recorded! Opening contact method...")
       } catch (error: unknown) {
-        toast.error(error instanceof Error ? error.message : "Failed to record contact")
+        toast.error(getErrorMessage(error, "Failed to record contact"))
         setIsContactingAgent(false)
         return
       } finally {
@@ -205,60 +189,11 @@ export function ListingDetailClient({ listingId, country }: ListingDetailClientP
                 roi={listing.roi}
               />
 
-              {/* Business Details */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Building2 className="h-5 w-5 text-muted-foreground" />
-                    Business Details
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                    <div className="flex items-start gap-3">
-                      <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
-                        <Users className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Employees</p>
-                        <p className="font-semibold">{listing.employee_count || "-"}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
-                        <Clock className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Years Operating</p>
-                        <p className="font-semibold">
-                          {listing.years_in_operation ? `${listing.years_in_operation} years` : "-"}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
-                        <Eye className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Views</p>
-                        <p className="font-semibold">
-                          {listing.view_count || 0}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 p-4 rounded-lg bg-muted/50 border border-border">
-                    <div className="flex items-start gap-3">
-                      <Lock className="h-5 w-5 text-muted-foreground mt-0.5" />
-                      <div>
-                        <p className="font-medium text-foreground">Additional Information Hidden</p>
-                        <p className="text-sm text-muted-foreground mt-1">Contact the agent to receive the full business profile including exact location, business name, and detailed financials.</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <BusinessDetailsCard
+                employeeCount={listing.employee_count}
+                yearsInOperation={listing.years_in_operation}
+                viewCount={listing.view_count}
+              />
             </div>
 
             {/* Sidebar */}
@@ -279,63 +214,13 @@ export function ListingDetailClient({ listingId, country }: ListingDetailClientP
 
       <Footer />
 
-      <Dialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Lock className="h-5 w-5 text-primary" />
-              Create Account to Contact
-            </DialogTitle>
-            <DialogDescription>Create a free account to view agent contact information</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="p-4 rounded-lg bg-muted">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarFallback>{getInitials(listing.agent_name || "Agent")}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-medium">{listing.agent_name}</p>
-                  <p className="text-sm text-muted-foreground">{listing.agent_agency_name}</p>
-                </div>
-              </div>
-            </div>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-verified" />
-                View agent contact details
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-verified" />
-                Save favorite listings
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-verified" />
-                Get instant responses
-              </li>
-            </ul>
-          </div>
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={() => setShowLoginPrompt(false)} className="flex-1">
-              Maybe Later
-            </Button>
-            <Button asChild className="flex-1">
-              <Link href={`/register?redirect=${encodeURIComponent(`/${country}/listings/${listing.id}`)}`}>
-                Create Free Account
-              </Link>
-            </Button>
-          </DialogFooter>
-          <div className="text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
-            <Link
-              href={`/login?redirect=${encodeURIComponent(`/${country}/listings/${listing.id}`)}`}
-              className="text-primary hover:underline"
-            >
-              Sign In
-            </Link>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <LoginPromptDialog
+        open={showLoginPrompt}
+        onOpenChange={setShowLoginPrompt}
+        redirectPath={`/${country}/listings/${listing.id}`}
+        agentName={listing.agent_name}
+        agentAgencyName={listing.agent_agency_name}
+      />
     </div>
   )
 }

@@ -14,6 +14,7 @@ import { DemandCard } from "@/components/demands/demand-card"
 import { DemandDialog } from "@/components/demands/demand-dialog"
 import { StatCard } from "@/components/shared/stat-card"
 import { toast } from "sonner"
+import { getErrorMessage } from "@/lib/utils"
 import { getDemandStatusBadge } from "@/lib/badge-utils"
 import { getCountryOrDefault } from "@/lib/country"
 
@@ -39,7 +40,7 @@ export function BuyerView() {
             await updateDemandStatus.mutateAsync({ id: demandId, status: "fulfilled" })
             toast.success("Demand marked as fulfilled")
         } catch (error: unknown) {
-            toast.error(error instanceof Error ? error.message : "An unexpected error occurred")
+            toast.error(getErrorMessage(error))
         }
     }
 
@@ -48,7 +49,7 @@ export function BuyerView() {
             await updateDemandStatus.mutateAsync({ id: demandId, status: "closed" })
             toast.success("Demand closed")
         } catch (error: unknown) {
-            toast.error(error instanceof Error ? error.message : "An unexpected error occurred")
+            toast.error(getErrorMessage(error))
         }
     }
 
@@ -57,7 +58,7 @@ export function BuyerView() {
             await deleteDemand.mutateAsync(demandId)
             toast.success("Demand deleted")
         } catch (error: unknown) {
-            toast.error(error instanceof Error ? error.message : "An unexpected error occurred")
+            toast.error(getErrorMessage(error))
         }
     }
 

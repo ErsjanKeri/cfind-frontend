@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { uploadApi } from '@/lib/api';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/utils';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
@@ -31,7 +32,7 @@ export function useFileUpload() {
       toast.success('File uploaded successfully');
       return fileUrl;
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to upload file');
+      toast.error(getErrorMessage(error, 'Failed to upload file'));
       return null;
     } finally {
       setIsUploading(false);

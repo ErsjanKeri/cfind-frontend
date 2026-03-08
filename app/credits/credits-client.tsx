@@ -18,6 +18,7 @@ import {
     Minus,
 } from "lucide-react"
 import { formatCurrency } from "@/lib/currency"
+import { getErrorMessage } from "@/lib/utils"
 import { usePurchaseCredits, useCreditPackages, useAgentCredits } from "@/lib/hooks/usePromotions"
 import type { CreditPackage, CreditTransaction } from "@/lib/api/types"
 
@@ -52,7 +53,7 @@ export function CreditsPageClient({
                 setBalance(result.new_balance)
             }
         } catch (error: unknown) {
-            toast.error(error instanceof Error ? error.message : "An unexpected error occurred")
+            toast.error(getErrorMessage(error))
         } finally {
             // Mutation completes automatically
         }

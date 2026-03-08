@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Mail, ArrowLeft, CheckCircle } from "lucide-react"
 import Link from "next/link"
+import { getErrorMessage } from "@/lib/utils"
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("")
@@ -26,7 +27,7 @@ export default function ForgotPasswordPage() {
       setStatus("success")
     } catch (error) {
       setStatus("error")
-      setErrorMessage(error instanceof Error ? error.message : "Failed to send reset email")
+      setErrorMessage(getErrorMessage(error, "Failed to send reset email"))
     }
 
     setLoading(false)

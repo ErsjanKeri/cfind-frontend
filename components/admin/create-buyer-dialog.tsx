@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { LoadingButton } from "@/components/shared/loading-button"
 import { toast } from "sonner"
+import { getErrorMessage } from "@/lib/utils"
 import {
     Dialog,
     DialogContent,
@@ -37,7 +38,7 @@ export function CreateBuyerDialog({ open, onOpenChange }: CreateBuyerDialogProps
             onOpenChange(false)
             setData({ name: "", email: "", company_name: "", password: "" })
         } catch (error: unknown) {
-            toast.error(error instanceof Error ? error.message : "Failed to create buyer")
+            toast.error(getErrorMessage(error, "Failed to create buyer"))
         }
     }
 

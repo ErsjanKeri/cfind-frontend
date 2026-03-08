@@ -1,6 +1,7 @@
 "use client"
 
 import { useRejectAgent } from "@/lib/hooks/useAdmin"
+import { getErrorMessage } from "@/lib/utils"
 import { BaseRejectDialog } from "./base-reject-dialog"
 
 interface RejectAgentDialogProps {
@@ -23,7 +24,7 @@ export function RejectAgentDialog({
       await rejectAgent.mutateAsync({ agentId, reason: rejectionReason })
       return { success: true }
     } catch (error: unknown) {
-      return { success: false, error: error instanceof Error ? error.message : "An unexpected error occurred" }
+      return { success: false, error: getErrorMessage(error) }
     }
   }
 

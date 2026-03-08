@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge"
 import { Star, Sparkles, CheckCircle, Coins } from "lucide-react"
 import { LoadingSpinner } from "@/components/shared/loading-spinner"
 import { usePromotionTiers, useAgentCredits, usePromoteListing } from "@/lib/hooks/usePromotions"
+import { getErrorMessage } from "@/lib/utils"
 import type { PromotionTier, PromotionTierConfig } from "@/lib/api/types"
 
 interface PromoteListingDialogProps {
@@ -80,7 +81,7 @@ export function PromoteListingDialog({
             onOpenChange(false)
             onSuccess?.()
         } catch (error: unknown) {
-            toast.error(error instanceof Error ? error.message : "Failed to promote listing")
+            toast.error(getErrorMessage(error, "Failed to promote listing"))
         }
     }
 
