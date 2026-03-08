@@ -1,31 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-
-function ListingCardSkeleton() {
-  return (
-    <div className="rounded-lg border border-border bg-card overflow-hidden">
-      {/* Image placeholder */}
-      <Skeleton className="h-48 w-full rounded-none" />
-      {/* Content */}
-      <div className="p-4 space-y-3">
-        {/* Category badge */}
-        <Skeleton className="h-5 w-20 rounded-full" />
-        {/* Title */}
-        <Skeleton className="h-5 w-3/4" />
-        {/* Location */}
-        <Skeleton className="h-4 w-1/2" />
-        {/* Price */}
-        <Skeleton className="h-6 w-28" />
-        {/* Stats row */}
-        <div className="flex gap-4 pt-2">
-          <Skeleton className="h-4 w-16" />
-          <Skeleton className="h-4 w-16" />
-        </div>
-      </div>
-    </div>
-  )
-}
+import { ListingCardSkeleton } from "@/components/shared/listing-card-skeleton"
 
 export default function Loading() {
   return (

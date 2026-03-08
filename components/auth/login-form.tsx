@@ -5,9 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useAuth } from "@/lib/hooks/useAuth"
 import { api } from "@/lib/api"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { IconInput } from "@/components/shared/icon-input"
 import { AlertCircle, Mail, Lock } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -119,20 +119,17 @@ export function LoginForm({ showResendVerification = false }: LoginFormProps) {
 
             <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        id="email"
-                        type="email"
-                        name="email"
-                        placeholder="you@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        disabled={isLoading}
-                        className="pl-10"
-                    />
-                </div>
+                <IconInput
+                    icon={Mail}
+                    id="email"
+                    type="email"
+                    name="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={isLoading}
+                />
             </div>
 
             <div className="space-y-2">
@@ -142,21 +139,18 @@ export function LoginForm({ showResendVerification = false }: LoginFormProps) {
                         Forgot password?
                     </Link>
                 </div>
-                <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        id="password"
-                        type="password"
-                        name="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        disabled={isLoading}
-                        className="pl-10"
-                        minLength={6}
-                    />
-                </div>
+                <IconInput
+                    icon={Lock}
+                    id="password"
+                    type="password"
+                    name="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    minLength={6}
+                />
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>

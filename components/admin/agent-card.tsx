@@ -19,6 +19,7 @@ import {
   XCircle,
   Eye,
   Trash2,
+  type LucideIcon,
 } from "lucide-react"
 import type { UserWithProfile } from "@/lib/api/types"
 import { getVerificationStatusBadge, getEmailVerificationBadge } from "@/lib/badge-utils"
@@ -45,6 +46,19 @@ export function AdminAgentCard({
   const vBadge = getVerificationStatusBadge(status)
   const eBadge = getEmailVerificationBadge(agent.email_verified)
   const VIcon = vBadge.icon
+
+  const docBadge = (url: string | null | undefined, Icon: LucideIcon, label: string, missingLabel: string) =>
+    url ? (
+      <Badge variant="outline" className="text-xs text-green-600 border-green-300">
+        <Icon className="h-3 w-3 mr-1" />
+        {label}
+      </Badge>
+    ) : (
+      <Badge variant="outline" className="text-xs text-amber-600 border-amber-300">
+        <XCircle className="h-3 w-3 mr-1" />
+        {missingLabel}
+      </Badge>
+    )
 
   return (
     <Card className={
@@ -82,39 +96,9 @@ export function AdminAgentCard({
               <span>License: {agent.license_number || "N/A"}</span>
             </div>
             <div className="flex items-center gap-2 mt-2">
-              {agent.license_document_url ? (
-                <Badge variant="outline" className="text-xs text-green-600 border-green-300">
-                  <FileText className="h-3 w-3 mr-1" />
-                  License
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="text-xs text-amber-600 border-amber-300">
-                  <XCircle className="h-3 w-3 mr-1" />
-                  No License
-                </Badge>
-              )}
-              {agent.company_document_url ? (
-                <Badge variant="outline" className="text-xs text-green-600 border-green-300">
-                  <Building2 className="h-3 w-3 mr-1" />
-                  Company
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="text-xs text-amber-600 border-amber-300">
-                  <XCircle className="h-3 w-3 mr-1" />
-                  No Company
-                </Badge>
-              )}
-              {agent.id_document_url ? (
-                <Badge variant="outline" className="text-xs text-green-600 border-green-300">
-                  <FileText className="h-3 w-3 mr-1" />
-                  ID/Passport
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="text-xs text-amber-600 border-amber-300">
-                  <XCircle className="h-3 w-3 mr-1" />
-                  No ID
-                </Badge>
-              )}
+              {docBadge(agent.license_document_url, FileText, "License", "No License")}
+              {docBadge(agent.company_document_url, Building2, "Company", "No Company")}
+              {docBadge(agent.id_document_url, FileText, "ID/Passport", "No ID")}
             </div>
           </div>
 

@@ -7,7 +7,7 @@ import { formatCurrency } from "@/lib/currency"
 import { MapPin, Banknote, Tag, Phone, Mail, MessageSquare, Trash2, CheckCircle, XCircle, User } from "lucide-react"
 import type { BuyerDemand } from "@/lib/api/types"
 import { getCategoryLabel } from "@/lib/constants"
-import { getDemandStatusBadge } from "@/lib/badge-utils"
+import { getDemandStatusBadge, getDemandTypeBadge } from "@/lib/badge-utils"
 
 interface DemandCardProps {
     demand: BuyerDemand
@@ -29,16 +29,7 @@ export function DemandCard({
     isClaimLoading
 }: DemandCardProps) {
     const statusBadge = getDemandStatusBadge(demand.status)
-
-    const getDemandTypeLabel = () => {
-        return demand.demand_type === "seeking_funding"
-            ? "Seeking Funding"
-            : "Investor"
-    }
-
-    const demandTypeColors = demand.demand_type === "seeking_funding"
-        ? "bg-blue-50 text-blue-700 border-blue-200"
-        : "bg-emerald-50 text-emerald-700 border-emerald-200"
+    const typeBadge = getDemandTypeBadge(demand.demand_type)
 
     return (
         <Card className="hover:border-primary/30 transition-colors">
@@ -49,8 +40,8 @@ export function DemandCard({
                             <Tag className="h-4 w-4 text-primary" />
                             <span className="font-medium">{getCategoryLabel(demand.category)}</span>
                         </div>
-                        <Badge className={`w-fit text-xs ${demandTypeColors}`}>
-                            {getDemandTypeLabel()}
+                        <Badge className={`w-fit text-xs ${typeBadge.className}`}>
+                            {typeBadge.label}
                         </Badge>
                     </div>
                     <Badge className={statusBadge.className}>

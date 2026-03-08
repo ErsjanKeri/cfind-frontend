@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { IconInput } from "@/components/shared/icon-input"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -104,63 +105,52 @@ export function ProfileTab({
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="name"
-                value={profile.name}
-                onChange={(e) => setProfile(prev => ({ ...prev, name: e.target.value }))}
-                className="pl-10"
-                disabled={fetching}
-              />
-            </div>
+            <IconInput
+              icon={User}
+              id="name"
+              value={profile.name}
+              onChange={(e) => setProfile(prev => ({ ...prev, name: e.target.value }))}
+              disabled={fetching}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email Address</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="email"
-                type="email"
-                value={profile.email}
-                disabled={true}
-                className="pl-10 bg-muted cursor-not-allowed"
-                readOnly
-              />
-            </div>
+            <IconInput
+              icon={Mail}
+              id="email"
+              type="email"
+              value={profile.email}
+              disabled={true}
+              className="bg-muted cursor-not-allowed"
+              readOnly
+            />
             <p className="text-xs text-muted-foreground">
               Email cannot be changed. Contact support if you need to update your email address.
             </p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="phone">Phone Number</Label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="phone"
-                value={profile.phone}
-                onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))}
-                className="pl-10"
-                placeholder="+383 44 123 456"
-                disabled={fetching}
-              />
-            </div>
+            <IconInput
+              icon={Phone}
+              id="phone"
+              value={profile.phone}
+              onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))}
+              placeholder="+383 44 123 456"
+              disabled={fetching}
+            />
           </div>
 
           {isAgent && (
             <div className="space-y-2">
               <Label htmlFor="whatsapp">WhatsApp Number</Label>
-              <div className="relative">
-                <MessageSquare className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="whatsapp"
-                  value={profile.whatsapp}
-                  onChange={(e) => setProfile(prev => ({ ...prev, whatsapp: e.target.value }))}
-                  className="pl-10"
-                  placeholder="+383 44 123 456"
-                  disabled={fetching}
-                />
-              </div>
+              <IconInput
+                icon={MessageSquare}
+                id="whatsapp"
+                value={profile.whatsapp}
+                onChange={(e) => setProfile(prev => ({ ...prev, whatsapp: e.target.value }))}
+                placeholder="+383 44 123 456"
+                disabled={fetching}
+              />
             </div>
           )}
 
@@ -168,32 +158,26 @@ export function ProfileTab({
             <Label htmlFor="company">
               {isAgent ? "Agency Name" : "Company Name"}
             </Label>
-            <div className="relative">
-              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="company"
-                value={profile.company}
-                onChange={(e) => setProfile(prev => ({ ...prev, company: e.target.value }))}
-                placeholder={isAgent ? "Your agency name" : "Optional"}
-                className="pl-10"
-                disabled={fetching}
-              />
-            </div>
+            <IconInput
+              icon={Building2}
+              id="company"
+              value={profile.company}
+              onChange={(e) => setProfile(prev => ({ ...prev, company: e.target.value }))}
+              placeholder={isAgent ? "Your agency name" : "Optional"}
+              disabled={fetching}
+            />
           </div>
 
           <div className="space-y-2 sm:col-span-2">
             <Label htmlFor="website">Website</Label>
-            <div className="relative">
-              <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="website"
-                value={profile.website}
-                onChange={(e) => setProfile(prev => ({ ...prev, website: e.target.value }))}
-                placeholder="https://example.com"
-                className="pl-10"
-                disabled={fetching}
-              />
-            </div>
+            <IconInput
+              icon={Globe}
+              id="website"
+              value={profile.website}
+              onChange={(e) => setProfile(prev => ({ ...prev, website: e.target.value }))}
+              placeholder="https://example.com"
+              disabled={fetching}
+            />
           </div>
         </div>
 

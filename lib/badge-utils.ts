@@ -88,6 +88,24 @@ export function getDemandStatusBadge(status: DemandStatus): BadgeConfig {
 }
 
 /**
+ * Get consistent badge styling for demand types
+ */
+export function getDemandTypeBadge(demandType: "investor" | "seeking_funding"): BadgeConfig {
+  const configs: Record<string, BadgeConfig> = {
+    seeking_funding: {
+      className: "bg-blue-50 text-blue-700 border-blue-200",
+      label: "Seeking Funding",
+    },
+    investor: {
+      className: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      label: "Investor",
+    },
+  }
+
+  return configs[demandType] || { className: "bg-muted text-muted-foreground", label: demandType }
+}
+
+/**
  * Get consistent badge styling for email verification
  */
 export function getEmailVerificationBadge(isVerified: boolean): BadgeConfig {

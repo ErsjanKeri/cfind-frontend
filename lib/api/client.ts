@@ -104,7 +104,7 @@ export async function apiCall<T>(fn: () => Promise<T>): Promise<T> {
   }
 }
 
-export const getErrorMessage = (error: unknown): string => {
+const getErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data;
     if (data?.detail && typeof data.detail === 'string') return data.detail;

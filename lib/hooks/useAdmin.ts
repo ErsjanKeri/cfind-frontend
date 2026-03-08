@@ -69,19 +69,6 @@ export function useToggleEmailVerification() {
   });
 }
 
-export function useAdjustCredits() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ agentId, amount, reason }: { agentId: string; amount: number; reason: string }) =>
-      api.admin.adjustCredits(agentId, amount, reason),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-      queryClient.invalidateQueries({ queryKey: ['agentCredits'] });
-    },
-  });
-}
-
 export function useCreateAgent() {
   const queryClient = useQueryClient();
 

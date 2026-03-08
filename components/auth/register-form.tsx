@@ -7,6 +7,7 @@ import type { RegisterRequest } from "@/lib/api/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { IconInput } from "@/components/shared/icon-input"
 import { FormFieldWrapper } from "@/components/shared/form-field-wrapper"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
@@ -155,36 +156,30 @@ export function RegisterForm() {
             )}
 
             <FormFieldWrapper label="Full Name" htmlFor="name">
-                <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        id="name"
-                        name="name"
-                        placeholder="John Doe"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                        disabled={isLoading}
-                        className="pl-10"
-                    />
-                </div>
+                <IconInput
+                    icon={User}
+                    id="name"
+                    name="name"
+                    placeholder="John Doe"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    disabled={isLoading}
+                />
             </FormFieldWrapper>
 
             <FormFieldWrapper label="Email" htmlFor="email">
-                <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        placeholder="you@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        disabled={isLoading}
-                        className="pl-10"
-                    />
-                </div>
+                <IconInput
+                    icon={Mail}
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={isLoading}
+                />
             </FormFieldWrapper>
 
             <FormFieldWrapper label="Password" htmlFor="password">
