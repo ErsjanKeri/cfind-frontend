@@ -62,12 +62,14 @@ export function ListingImageGallery({
         <>
           <button
             onClick={prevImage}
+            aria-label="Previous image"
             className="absolute left-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-card/90 backdrop-blur flex items-center justify-center hover:bg-card transition-colors"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
           <button
             onClick={nextImage}
+            aria-label="Next image"
             className="absolute right-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-card/90 backdrop-blur flex items-center justify-center hover:bg-card transition-colors"
           >
             <ChevronRight className="h-5 w-5" />

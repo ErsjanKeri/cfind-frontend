@@ -12,7 +12,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, MessageCircle, Phone, Mail, Search, ExternalLink, Loader2 } from "lucide-react"
+import { ArrowLeft, MessageCircle, Phone, Mail, Search, ExternalLink } from "lucide-react"
+import { LoadingSpinner } from "@/components/shared/loading-spinner"
 import { WhatsAppIcon } from "@/components/shared/whatsapp-icon"
 import { getInitials } from "@/lib/utils"
 import type { Lead } from "@/lib/api/types"
@@ -78,7 +79,7 @@ export default function ContactHistoryPage() {
           {/* Contact History List */}
           {loading ? (
             <div className="flex items-center justify-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <LoadingSpinner />
             </div>
           ) : contactHistory.length > 0 ? (
             <div className="space-y-4">

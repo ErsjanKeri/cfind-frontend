@@ -9,7 +9,8 @@ import { formatCurrency } from "@/lib/currency"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatCard } from "@/components/shared/stat-card"
 import { EmptyState } from "@/components/shared/empty-state"
-import { Building2, Plus, Eye, TrendingUp, MessageSquare, Loader2 } from "lucide-react"
+import { Building2, Plus, Eye, TrendingUp, MessageSquare } from "lucide-react"
+import { LoadingSpinner } from "@/components/shared/loading-spinner"
 import { ListingDialog } from "@/components/listings/listing-dialog"
 import { CreditBalanceWidget } from "@/components/dashboard/credit-balance-widget"
 import { PromoteListingDialog } from "@/components/listings/promote-listing-dialog"
@@ -44,7 +45,7 @@ export function AgentView() {
     if (isLoading) {
         return (
             <div className="flex h-full items-center justify-center p-8">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <LoadingSpinner />
             </div>
         )
     }

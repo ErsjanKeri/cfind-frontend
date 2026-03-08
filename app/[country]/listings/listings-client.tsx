@@ -4,7 +4,8 @@ import { ListingFilters } from "@/components/listings/listing-filters"
 import { useListingFilters } from "@/lib/hooks/use-listing-filters"
 import { ListingCard } from "@/components/listings/listing-card"
 import { Button } from "@/components/ui/button"
-import { Loader2, Plus } from "lucide-react"
+import { Plus } from "lucide-react"
+import { LoadingSpinner } from "@/components/shared/loading-spinner"
 import Link from "next/link"
 import { useListings } from "@/lib/hooks/useListings"
 import type { Listing } from "@/lib/api/types"
@@ -23,7 +24,7 @@ export default function ListingsClientPage({ country }: ListingsClientPageProps)
     if (isLoading) {
         return (
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <LoadingSpinner />
             </div>
         )
     }

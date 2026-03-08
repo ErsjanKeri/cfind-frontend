@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, MapPin, Building } from "lucide-react"
+import { SearchInput } from "@/components/shared/search-input"
 import { businessCategories, getCountryCities, type CountryCode } from "@/lib/constants"
 
 interface SearchBarProps {
@@ -44,16 +45,13 @@ export function SearchBar({ country, variant = "hero", initialValues }: SearchBa
   if (variant === "compact") {
     return (
       <div className="flex items-center gap-2 w-full">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search businesses..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="pl-9"
-          />
-        </div>
+        <SearchInput
+          placeholder="Search businesses..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
+          wrapperClassName="flex-1"
+        />
         <Select value={category} onValueChange={setCategory}>
           <SelectTrigger className="w-[140px]">
             <SelectValue placeholder="Category" />

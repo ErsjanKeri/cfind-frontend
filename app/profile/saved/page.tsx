@@ -9,7 +9,8 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { ListingCard } from "@/components/listings/listing-card"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Heart, Search, Loader2 } from "lucide-react"
+import { ArrowLeft, Heart, Search } from "lucide-react"
+import { LoadingSpinner } from "@/components/shared/loading-spinner"
 import { getCountryOrDefault } from "@/lib/country"
 
 export default function SavedListingsPage() {
@@ -59,7 +60,7 @@ export default function SavedListingsPage() {
           {/* Saved Listings Grid */}
           {loading ? (
             <div className="flex items-center justify-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <LoadingSpinner />
             </div>
           ) : savedListings.length > 0 ? (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

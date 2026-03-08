@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useAuth } from "@/lib/hooks/useAuth"
 import { api } from "@/lib/api"
 import { Button } from "@/components/ui/button"
@@ -18,6 +18,7 @@ interface LoginFormProps {
 
 export function LoginForm({ showResendVerification = false }: LoginFormProps) {
     const router = useRouter()
+    const searchParams = useSearchParams()
     const { login } = useAuth()
 
     // Form state
@@ -41,7 +42,8 @@ export function LoginForm({ showResendVerification = false }: LoginFormProps) {
         try {
             await login(email, password)
             toast.success("Logged in successfully!")
-            router.push("/profile")
+            const redirectTo = searchParams?.get("redirect") || "/profile"
+            router.push(redirectTo)
         } catch (err: unknown) {
             const errorMsg = err instanceof Error ? err.message : "An unexpected error occurred"
             setError(errorMsg)

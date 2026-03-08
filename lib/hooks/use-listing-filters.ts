@@ -119,13 +119,45 @@ export function useListingFilters({ initialData, enableUrlSync = true }: UseList
         }
     }
 
-    // Server returns filtered data via URL params. We only handle status filter
-    // (not URL-synced) and sorting (promotion tier priority) client-side.
     const filteredListings = useMemo(() => {
         let results = listingStatus !== "all"
             ? initialData.filter((listing) => listing.status === listingStatus)
             : [...initialData]
 
+        // Apply category filter
+        if (category) {
+            results = results.filter((listing) => listing.category === category)
+        }
+
+        // Apply city filter
+        if (city) {
+            results = results.filter((listing) => listing.public_location_city_en === city)
+        }
+
+        // Apply search query filter
+        if (query) {
+            const q = query.toLowerCase()
+            results = results.filter((listing) =>
+                listing.public_title_en.toLowerCase().includes(q) ||
+                listing.public_description_en.toLowerCase().includes(q) ||
+                listing.category.toLowerCase().includes(q) ||
+                (listing.public_location_area?.toLowerCase().includes(q))
+            )
+        }
+
+        // Apply price range filter
+        if (priceRange[0] > 0 || priceRange[1] < MAX_LISTING_PRICE) {
+            results = results.filter((listing) =>
+                listing.asking_price_eur >= priceRange[0] && listing.asking_price_eur <= priceRange[1]
+            )
+        }
+
+        // Apply minimum ROI filter
+        if (minRoi > 0) {
+            results = results.filter((listing) => (listing.roi || 0) >= minRoi)
+        }
+
+        // Sort: promotion tier first, then by selected sort
         const tierOrder = { premium: 0, featured: 1, standard: 2 }
         results.sort((a, b) => {
             const tierA = tierOrder[a.promotion_tier as keyof typeof tierOrder] ?? 2
@@ -146,7 +178,7 @@ export function useListingFilters({ initialData, enableUrlSync = true }: UseList
         })
 
         return results
-    }, [initialData, sortBy, listingStatus])
+    }, [initialData, sortBy, listingStatus, category, city, query, priceRange, minRoi])
 
     const activeFiltersCount =
         (category ? 1 : 0) +

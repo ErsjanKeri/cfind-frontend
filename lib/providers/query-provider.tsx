@@ -28,10 +28,13 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
             // Don't refetch on window focus (can be annoying during development)
             refetchOnWindowFocus: false,
 
-            // Retry failed requests once
-            retry: 1,
-
-            // Don't retry on 4xx errors (client errors)
+            // Retry once, but only for network/server errors (not 4xx client errors)
+            retry: (failureCount, error) => {
+              if (failureCount >= 1) return false;
+              const status = (error as { response?: { status?: number } })?.response?.status;
+              if (status && status >= 400 && status < 500) return false;
+              return true;
+            },
             retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
           },
           mutations: {

@@ -12,7 +12,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { LoadingButton } from "@/components/shared/loading-button"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, Star, Sparkles, CheckCircle, Coins } from "lucide-react"
+import { Star, Sparkles, CheckCircle, Coins } from "lucide-react"
+import { LoadingSpinner } from "@/components/shared/loading-spinner"
 import { usePromotionTiers, useAgentCredits, usePromoteListing } from "@/lib/hooks/usePromotions"
 import type { PromotionTier, PromotionTierConfig } from "@/lib/api/types"
 
@@ -107,7 +108,7 @@ export function PromoteListingDialog({
 
                 {isLoading ? (
                     <div className="flex items-center justify-center py-8">
-                        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                        <LoadingSpinner className="text-muted-foreground" />
                     </div>
                 ) : (
                     <div className="space-y-6">

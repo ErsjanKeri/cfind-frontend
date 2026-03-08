@@ -1,6 +1,5 @@
 "use client"
 
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Slider } from "@/components/ui/slider"
@@ -21,11 +20,19 @@ import {
     SheetTrigger,
     SheetFooter,
 } from "@/components/ui/sheet"
-import { Search, MapPin, SlidersHorizontal, X } from "lucide-react"
+import { MapPin, SlidersHorizontal, X } from "lucide-react"
+import { SearchInput } from "@/components/shared/search-input"
 import { businessCategories, getCategoryLabel, getCountryCities, MAX_LISTING_PRICE } from "@/lib/constants"
 import type { CountryCode } from "@/lib/constants"
 import { formatCurrency } from "@/lib/currency"
 import { useState } from "react"
+
+const SORT_OPTIONS = [
+    { value: "newest", label: "Newest First" },
+    { value: "price-low", label: "Price: Low to High" },
+    { value: "price-high", label: "Price: High to Low" },
+    { value: "roi", label: "Highest ROI" },
+] as const
 
 interface ListingFiltersProps {
     country: CountryCode
@@ -88,15 +95,13 @@ export function ListingFilters({ country, filters, setters }: ListingFiltersProp
         <div className="flex flex-col gap-5">
             <div className="flex flex-col lg:flex-row gap-3">
                 {/* Search Input */}
-                <div className="relative flex-1 min-w-0">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        placeholder="Search by name or keyword..."
-                        value={filters.query}
-                        onChange={(e) => setters.setQuery(e.target.value)}
-                        className="h-10 pl-9 bg-background"
-                    />
-                </div>
+                <SearchInput
+                    placeholder="Search by name or keyword..."
+                    value={filters.query}
+                    onChange={(e) => setters.setQuery(e.target.value)}
+                    className="h-10 bg-background"
+                    wrapperClassName="flex-1 min-w-0"
+                />
 
                 {/* Filter Controls */}
                 <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
@@ -212,10 +217,9 @@ export function ListingFilters({ country, filters, setters }: ListingFiltersProp
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="newest">Newest First</SelectItem>
-                                                <SelectItem value="price-low">Price: Low to High</SelectItem>
-                                                <SelectItem value="price-high">Price: High to Low</SelectItem>
-                                                <SelectItem value="roi">Highest ROI</SelectItem>
+                                                {SORT_OPTIONS.map((opt) => (
+                                                    <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                                                ))}
                                             </SelectContent>
                                         </Select>
                                     </div>
@@ -249,10 +253,9 @@ export function ListingFilters({ country, filters, setters }: ListingFiltersProp
                             <SelectValue placeholder="Sort By" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="newest">Newest First</SelectItem>
-                            <SelectItem value="price-low">Price: Low to High</SelectItem>
-                            <SelectItem value="price-high">Price: High to Low</SelectItem>
-                            <SelectItem value="roi">Highest ROI</SelectItem>
+                            {SORT_OPTIONS.map((opt) => (
+                                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>

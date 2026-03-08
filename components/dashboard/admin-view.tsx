@@ -22,15 +22,14 @@ import { StatCard } from "@/components/shared/stat-card"
 import { AvatarWithInitials } from "@/components/shared/avatar-with-initials"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
 import {
     Building2,
     Users,
     FileText,
-    Search,
     AlertTriangle,
     Plus,
 } from "lucide-react"
+import { SearchInput } from "@/components/shared/search-input"
 import type { UserWithProfile } from "@/lib/api/types"
 import { getVerificationStatusBadge } from "@/lib/badge-utils"
 
@@ -247,15 +246,12 @@ export function AdminView() {
                 {/* Agents Tab */}
                 <TabsContent value="agents">
                     <div className="mb-4 flex items-center justify-between">
-                        <div className="relative max-w-md flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                placeholder="Search agents..."
-                                className="pl-10"
-                                value={agentSearchQuery}
-                                onChange={(e) => setAgentSearchQuery(e.target.value)}
-                            />
-                        </div>
+                        <SearchInput
+                            placeholder="Search agents..."
+                            wrapperClassName="max-w-md flex-1"
+                            value={agentSearchQuery}
+                            onChange={(e) => setAgentSearchQuery(e.target.value)}
+                        />
                         <Button onClick={() => setShowCreateAgentDialog(true)} className="ml-4">
                             <Users className="h-4 w-4 mr-2" />
                             Add Agent
@@ -280,15 +276,12 @@ export function AdminView() {
                 {/* Buyers Tab */}
                 <TabsContent value="buyers">
                     <div className="mb-4 flex items-center justify-between">
-                        <div className="relative max-w-md flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                placeholder="Search buyers..."
-                                className="pl-10 mr-4"
-                                value={buyerSearchQuery}
-                                onChange={(e) => setBuyerSearchQuery(e.target.value)}
-                            />
-                        </div>
+                        <SearchInput
+                            placeholder="Search buyers..."
+                            wrapperClassName="max-w-md flex-1"
+                            value={buyerSearchQuery}
+                            onChange={(e) => setBuyerSearchQuery(e.target.value)}
+                        />
                         <Button onClick={() => setShowCreateBuyerDialog(true)} className="ml-4">
                             <Building2 className="h-4 w-4 mr-2" />
                             Add Buyer

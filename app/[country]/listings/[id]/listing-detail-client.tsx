@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
@@ -10,7 +10,8 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { toast } from "sonner"
-import { useCreateLead, useToggleSavedListing, useSavedListings } from "@/lib/hooks/useLeads"
+import { useCreateLead } from "@/lib/hooks/useLeads"
+import { useSavedListing } from "@/lib/hooks/useSavedListing"
 import { useListing } from "@/lib/hooks/useListings"
 import {
   Dialog,
@@ -29,10 +30,9 @@ import {
   Building2,
   FileText,
   CheckCircle,
-  Loader2,
 } from "lucide-react"
+import { LoadingSpinner } from "@/components/shared/loading-spinner"
 import { getInitials } from "@/lib/utils"
-import type { Listing } from "@/lib/api/types"
 import type { CountryCode } from "@/lib/constants"
 import { ListingImageGallery } from "@/components/listings/listing-image-gallery"
 import { FinancialOverviewCard } from "@/components/listings/financial-overview-card"
@@ -51,22 +51,9 @@ export function ListingDetailClient({ listingId, country }: ListingDetailClientP
   const { data: listing, isLoading } = useListing(listingId)
 
   const createLead = useCreateLead()
-  const toggleSaved = useToggleSavedListing()
-  const { data: savedListings } = useSavedListings()
+  const { isSaved, toggleSave, isPending: isSaving } = useSavedListing(listing?.id)
   const [showLoginPrompt, setShowLoginPrompt] = useState(false)
-  const [isSaved, setIsSaved] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
   const [isContactingAgent, setIsContactingAgent] = useState(false)
-
-  // Check if listing is already saved on mount
-  useEffect(() => {
-    if (user?.id && listing) {
-      Promise.resolve(savedListings || []).then((savedListings) => {
-        const isAlreadySaved = savedListings.some((saved: Listing) => saved.id === listing.id)
-        setIsSaved(isAlreadySaved)
-      })
-    }
-  }, [user?.id, listing, savedListings])
 
 
   // Loading state
@@ -75,7 +62,7 @@ export function ListingDetailClient({ listingId, country }: ListingDetailClientP
       <div className="min-h-screen flex flex-col bg-background">
         <Header />
         <main className="flex-1 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <LoadingSpinner />
         </main>
         <Footer />
       </div>
@@ -137,7 +124,7 @@ export function ListingDetailClient({ listingId, country }: ListingDetailClientP
         setShowLoginPrompt(true)
         return
       }
-      window.location.href = `mailto:${listing.agent_email}?subject=Inquiry about: ${listing.public_title_en}`
+      window.location.href = `mailto:${listing.agent_email}?subject=${encodeURIComponent(`Inquiry about: ${listing.public_title_en}`)}`
     }
   }
 
@@ -147,16 +134,7 @@ export function ListingDetailClient({ listingId, country }: ListingDetailClientP
       return
     }
 
-    setIsSaving(true)
-    try {
-      const result = await toggleSaved.mutateAsync(listing.id)
-      setIsSaved(result.is_saved)
-      toast.success(result.is_saved ? "Listing saved!" : "Listing unsaved")
-    } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : "Failed to save listing")
-    } finally {
-      setIsSaving(false)
-    }
+    await toggleSave()
   }
 
   return (
@@ -253,7 +231,7 @@ export function ListingDetailClient({ listingId, country }: ListingDetailClientP
                       <div>
                         <p className="text-sm text-muted-foreground">Years Operating</p>
                         <p className="font-semibold">
-                          {listing.years_in_operation || "-"} years
+                          {listing.years_in_operation ? `${listing.years_in_operation} years` : "-"}
                         </p>
                       </div>
                     </div>

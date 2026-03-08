@@ -50,7 +50,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/list-your-business"
+                  href="/register"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   List Your Business
@@ -64,7 +64,7 @@ export function Footer() {
             <h3 className="text-sm font-semibold text-foreground">Company</h3>
             <ul className="mt-4 space-y-3">
               <li>
-                <Link href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   About Us
                 </Link>
               </li>
@@ -81,13 +81,8 @@ export function Footer() {
             <h3 className="text-sm font-semibold text-foreground">Legal</h3>
             <ul className="mt-4 space-y-3">
               <li>
-                <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/cookies" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Terms of Service
                 </Link>
               </li>
               <li>

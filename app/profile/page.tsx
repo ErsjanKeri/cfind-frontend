@@ -18,7 +18,8 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Loader2, Settings } from "lucide-react"
+import { Settings } from "lucide-react"
+import { LoadingSpinner } from "@/components/shared/loading-spinner"
 import { AdminView } from "@/components/dashboard/admin-view"
 import { AgentView } from "@/components/dashboard/agent-view"
 import { BuyerView } from "@/components/dashboard/buyer-view"
@@ -48,7 +49,7 @@ export default function ProfilePage() {
       <div className="min-h-screen flex flex-col">
         <Header />
         <div className="flex-1 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <LoadingSpinner />
         </div>
         <Footer />
       </div>

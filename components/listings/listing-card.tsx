@@ -2,7 +2,6 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
@@ -13,7 +12,7 @@ import { MapPin, TrendingUp, Users, Clock, Eye, Heart, Loader2 } from "lucide-re
 import { formatCurrency } from "@/lib/currency"
 import { useUser } from "@/lib/hooks/useAuth"
 import { useRole } from "@/lib/hooks/useRole"
-import { useToggleSavedListing, useSavedListings } from "@/lib/hooks/useLeads"
+import { useSavedListing } from "@/lib/hooks/useSavedListing"
 import { getCategoryLabel } from "@/lib/constants"
 import { PromotionBadge } from "@/components/shared/promotion-badge"
 import { toast } from "sonner"
@@ -48,18 +47,7 @@ export function ListingCard({ listing, country }: ListingCardProps) {
   const router = useRouter()
   const isAuthenticated = !!user
 
-  const toggleSaved = useToggleSavedListing()
-  const { data: savedListings } = useSavedListings()
-
-  const [isSaved, setIsSaved] = useState(false)
-
-  // Sync local state with saved listings data
-  useEffect(() => {
-    if (savedListings) {
-      const isAlreadySaved = savedListings.some((saved: Listing) => saved.id === listing.id)
-      setIsSaved(isAlreadySaved)
-    }
-  }, [savedListings, listing.id])
+  const { isSaved, toggleSave, isPending: isSavePending } = useSavedListing(listing.id)
 
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -75,13 +63,7 @@ export function ListingCard({ listing, country }: ListingCardProps) {
       return
     }
 
-    try {
-      const result = await toggleSaved.mutateAsync(listing.id)
-      setIsSaved(result.is_saved)
-      toast.success(result.is_saved ? "Listing saved!" : "Listing unsaved")
-    } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : "Failed to save listing")
-    }
+    await toggleSave()
   }
 
   const promotionTier = listing.promotion_tier || "standard"
@@ -137,9 +119,9 @@ export function ListingCard({ listing, country }: ListingCardProps) {
             className={`absolute ${promotionTier !== "standard" ? "top-9" : "top-2"} right-2 h-8 w-8 rounded-full bg-card/80 backdrop-blur-sm hover:bg-card ${isSaved ? "text-red-500" : "text-muted-foreground"
               }`}
             onClick={handleSave}
-            disabled={toggleSaved.isPending}
+            disabled={isSavePending}
           >
-            {toggleSaved.isPending ? (
+            {isSavePending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <Heart className={`h-4 w-4 ${isSaved ? "fill-current" : ""}`} />

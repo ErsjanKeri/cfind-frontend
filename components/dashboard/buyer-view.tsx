@@ -8,7 +8,8 @@ import { useBuyerDemands, useUpdateDemandStatus, useDeleteDemand } from "@/lib/h
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { EmptyState } from "@/components/shared/empty-state"
-import { MessageCircle, Heart, ArrowRight, Phone, Mail, Loader2, Plus, Tag, Calendar } from "lucide-react"
+import { MessageCircle, Heart, ArrowRight, Phone, Mail, Plus, Tag, Calendar } from "lucide-react"
+import { LoadingSpinner } from "@/components/shared/loading-spinner"
 import { DemandCard } from "@/components/demands/demand-card"
 import { DemandDialog } from "@/components/demands/demand-dialog"
 import { StatCard } from "@/components/shared/stat-card"
@@ -68,7 +69,7 @@ export function BuyerView() {
     if (isLoading) {
         return (
             <div className="h-40 flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <LoadingSpinner />
             </div>
         )
     }

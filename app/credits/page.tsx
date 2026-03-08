@@ -1,13 +1,5 @@
 'use client';
 
-/**
- * Credits Page - Phase 5 Migration
- *
- * Converted to client component using React Query hooks
- * - No more server-side data fetching
- * - No more Prisma queries
- * - All data from backend API
- */
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Header } from "@/components/header"
@@ -28,7 +20,6 @@ export default function CreditsPage() {
         }
     }, [user, authLoading, router])
 
-    // Phase 5: Use React Query hooks instead of server actions
     const { data: packages, isLoading: packagesLoading } = useCreditPackages()
     const { data: creditsData, isLoading: creditsLoading } = useAgentCredits()
 

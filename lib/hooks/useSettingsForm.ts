@@ -238,8 +238,8 @@ export function useSettingsForm(user: UserWithProfile | undefined, isAgent: bool
       })
 
       toast.success("Settings saved successfully")
-    } catch {
-      toast.error("An unexpected error occurred")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "An unexpected error occurred")
     } finally {
       setSaving(false)
     }

@@ -72,6 +72,13 @@ export function DemandDialog({ open, onOpenChange, onSuccess, country }: DemandD
         setErrors({})
         setFormError(null)
 
+        const min = parseFloat(formData.budget_min_eur)
+        const max = parseFloat(formData.budget_max_eur)
+        if (!isNaN(min) && !isNaN(max) && min > max) {
+            setErrors(prev => ({ ...prev, budget_max_eur: "Max budget must be greater than or equal to min budget" }))
+            return
+        }
+
         try {
             await createDemand.mutateAsync({
                 country_code: resolvedCountry,

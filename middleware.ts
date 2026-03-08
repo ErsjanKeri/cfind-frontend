@@ -9,7 +9,7 @@ import type { NextRequest } from 'next/server';
 import { VALID_COUNTRY_CODES } from '@/lib/constants';
 
 // Routes that require authentication
-const protectedRoutes = ['/profile', '/settings'];
+const protectedRoutes = ['/profile', '/settings', '/credits'];
 
 // Routes only for guests (redirect if authenticated)
 const guestOnlyRoutes = ['/login', '/register'];
@@ -52,6 +52,7 @@ export const config = {
     '/',
     '/profile/:path*',
     '/settings/:path*',
+    '/credits/:path*',
     '/login',
     '/register',
   ],

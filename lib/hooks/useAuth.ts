@@ -10,7 +10,9 @@
 
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { api } from '@/lib/api';
+import { apiClient } from '@/lib/api/client';
 import { isValidCountryCode } from '@/lib/constants';
 import { setCountryCookie } from '@/lib/country';
 
@@ -27,16 +29,12 @@ export function useUser() {
     queryKey: USER_QUERY_KEY,
     queryFn: async () => {
       try {
-        return await api.user.getProfile();
+        const response = await apiClient.get('/api/users/me');
+        return response.data;
       } catch (error: unknown) {
-        const isUnauthorized =
-          (error instanceof Error &&
-            (error.message.includes('401') || error.message.includes('Unauthorized'))) ||
-          (typeof error === 'object' &&
-            error !== null &&
-            'response' in error &&
-            (error as { response?: { status?: number } }).response?.status === 401);
-        if (isUnauthorized) return null;
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          return null;
+        }
         throw error;
       }
     },
