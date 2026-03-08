@@ -26,7 +26,8 @@ export default function ContactHistoryPage() {
   const isAuthenticated = !!user // Derived
 
   // Use React Query hook instead of deprecated action
-  const { data: contactHistory = [], isLoading: loading } = useBuyerLeads(user?.id)
+  const { data: contactsData, isLoading: loading } = useBuyerLeads(user?.id)
+  const contactHistory = contactsData?.leads ?? []
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -71,7 +72,7 @@ export default function ContactHistoryPage() {
             <div>
               <h1 className="text-2xl font-bold text-foreground">Contact History</h1>
               <p className="text-muted-foreground mt-1">
-                {contactHistory.length} agents contacted
+                {contactsData?.total ?? contactHistory.length} agents contacted
               </p>
             </div>
           </div>

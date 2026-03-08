@@ -1,22 +1,28 @@
 import { apiClient, apiCall } from './client';
-import type { BuyerLead, AgentLead, Listing, CreateLeadRequest } from './types';
+import type {
+  BuyerLead, AgentLead, Listing, CreateLeadRequest,
+  BuyerLeadsResponse, AgentLeadsResponse, SavedListingsResponse,
+  PaginationParams,
+} from './types';
 
 export const leadsApi = {
-  async getBuyerLeads(buyerId: string): Promise<BuyerLead[]> {
+  async getBuyerLeads(buyerId: string, params?: PaginationParams): Promise<BuyerLeadsResponse> {
     return apiCall(async () => {
-      const response = await apiClient.get<{ success: boolean; total: number; leads: BuyerLead[] }>(
-        `/api/leads/buyer/${buyerId}`
+      const response = await apiClient.get<BuyerLeadsResponse>(
+        `/api/leads/buyer/${buyerId}`,
+        { params }
       );
-      return response.data.leads;
+      return response.data;
     });
   },
 
-  async getAgentLeads(agentId: string): Promise<AgentLead[]> {
+  async getAgentLeads(agentId: string, params?: PaginationParams): Promise<AgentLeadsResponse> {
     return apiCall(async () => {
-      const response = await apiClient.get<{ success: boolean; total: number; leads: AgentLead[] }>(
-        `/api/leads/agent/${agentId}`
+      const response = await apiClient.get<AgentLeadsResponse>(
+        `/api/leads/agent/${agentId}`,
+        { params }
       );
-      return response.data.leads;
+      return response.data;
     });
   },
 
@@ -36,12 +42,13 @@ export const leadsApi = {
     });
   },
 
-  async getSavedListings(): Promise<Listing[]> {
+  async getSavedListings(params?: PaginationParams): Promise<SavedListingsResponse> {
     return apiCall(async () => {
-      const response = await apiClient.get<{ success: boolean; total: number; listings: Listing[] }>(
-        '/api/leads/saved'
+      const response = await apiClient.get<SavedListingsResponse>(
+        '/api/leads/saved',
+        { params }
       );
-      return response.data.listings;
+      return response.data;
     });
   },
 

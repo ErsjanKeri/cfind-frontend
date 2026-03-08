@@ -3,34 +3,39 @@ import type {
   BuyerDemand,
   CreateDemandRequest,
   DemandFilters,
+  BuyerDemandsResponse,
+  AgentDemandsResponse,
+  PaginationParams,
 } from './types';
 
 export const demandsApi = {
-  async getDemands(filters?: DemandFilters): Promise<BuyerDemand[]> {
+  async getDemands(filters?: DemandFilters): Promise<BuyerDemandsResponse> {
     return apiCall(async () => {
-      const response = await apiClient.get<{ success: boolean; total: number; demands: BuyerDemand[] }>(
+      const response = await apiClient.get<BuyerDemandsResponse>(
         '/api/demands',
         { params: filters }
       );
-      return response.data.demands;
+      return response.data;
     });
   },
 
-  async getBuyerDemands(buyerId: string): Promise<BuyerDemand[]> {
+  async getBuyerDemands(buyerId: string, params?: PaginationParams): Promise<BuyerDemandsResponse> {
     return apiCall(async () => {
-      const response = await apiClient.get<{ success: boolean; total: number; demands: BuyerDemand[] }>(
-        `/api/demands/buyer/${buyerId}`
+      const response = await apiClient.get<BuyerDemandsResponse>(
+        `/api/demands/buyer/${buyerId}`,
+        { params }
       );
-      return response.data.demands;
+      return response.data;
     });
   },
 
-  async getAgentDemands(agentId: string): Promise<BuyerDemand[]> {
+  async getAgentDemands(agentId: string, params?: PaginationParams): Promise<AgentDemandsResponse> {
     return apiCall(async () => {
-      const response = await apiClient.get<{ success: boolean; total: number; demands: BuyerDemand[] }>(
-        `/api/demands/agent/${agentId}`
+      const response = await apiClient.get<AgentDemandsResponse>(
+        `/api/demands/agent/${agentId}`,
+        { params }
       );
-      return response.data.demands;
+      return response.data;
     });
   },
 

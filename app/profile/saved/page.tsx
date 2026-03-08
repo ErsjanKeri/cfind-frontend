@@ -20,7 +20,8 @@ export default function SavedListingsPage() {
   const isAuthenticated = !!user // Derived
 
   // Use React Query hook instead of deprecated action
-  const { data: savedListings = [], isLoading: loading } = useSavedListings()
+  const { data: savedData, isLoading: loading } = useSavedListings()
+  const savedListings = savedData?.listings ?? []
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -52,7 +53,7 @@ export default function SavedListingsPage() {
             <div>
               <h1 className="text-2xl font-bold text-foreground">Saved Listings</h1>
               <p className="text-muted-foreground mt-1">
-                {savedListings.length} businesses saved
+                {savedData?.total ?? savedListings.length} businesses saved
               </p>
             </div>
           </div>

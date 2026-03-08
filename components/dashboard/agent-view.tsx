@@ -28,8 +28,11 @@ export function AgentView() {
     const [showPromoteDialog, setShowPromoteDialog] = useState(false)
     const [promotingListing, setPromotingListing] = useState<Listing | null>(null)
 
-    const { data: listings = [], isLoading: isLoadingListings, refetch: refetchListings } = useAgentListings(user?.id || '')
-    const { data: leads = [], isLoading: isLoadingLeads } = useAgentLeads(user?.id)
+    const { data: listingsData, isLoading: isLoadingListings, refetch: refetchListings } = useAgentListings(user?.id || '')
+    const { data: leadsData, isLoading: isLoadingLeads } = useAgentLeads(user?.id)
+
+    const listings = listingsData?.listings ?? []
+    const leads = leadsData?.leads ?? []
 
     const agentProfile = user?.agent_profile
     const isLoading = isLoadingListings || isLoadingLeads

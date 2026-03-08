@@ -2,29 +2,30 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import type { PaginationParams } from '@/lib/api/types';
 
-export function useBuyerLeads(buyerId?: string) {
+export function useBuyerLeads(buyerId?: string, params?: PaginationParams) {
   return useQuery({
-    queryKey: ['leads', 'buyer', buyerId],
-    queryFn: () => api.leads.getBuyerLeads(buyerId!),
+    queryKey: ['leads', 'buyer', buyerId, params],
+    queryFn: () => api.leads.getBuyerLeads(buyerId!, params),
     enabled: !!buyerId,
     staleTime: 5 * 60 * 1000,
   });
 }
 
-export function useAgentLeads(agentId?: string) {
+export function useAgentLeads(agentId?: string, params?: PaginationParams) {
   return useQuery({
-    queryKey: ['leads', 'agent', agentId],
-    queryFn: () => api.leads.getAgentLeads(agentId!),
+    queryKey: ['leads', 'agent', agentId, params],
+    queryFn: () => api.leads.getAgentLeads(agentId!, params),
     enabled: !!agentId,
     staleTime: 5 * 60 * 1000,
   });
 }
 
-export function useSavedListings() {
+export function useSavedListings(params?: PaginationParams) {
   return useQuery({
-    queryKey: ['leads', 'saved'],
-    queryFn: () => api.leads.getSavedListings(),
+    queryKey: ['leads', 'saved', params],
+    queryFn: () => api.leads.getSavedListings(params),
     staleTime: 5 * 60 * 1000,
   });
 }

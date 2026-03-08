@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import type { DemandFilters } from '@/lib/api/types';
+import type { DemandFilters, PaginationParams } from '@/lib/api/types';
 
 export function useDemands(filters?: DemandFilters) {
   return useQuery({
@@ -12,19 +12,19 @@ export function useDemands(filters?: DemandFilters) {
   });
 }
 
-export function useBuyerDemands(buyerId?: string) {
+export function useBuyerDemands(buyerId?: string, params?: PaginationParams) {
   return useQuery({
-    queryKey: ['demands', 'buyer', buyerId],
-    queryFn: () => api.demands.getBuyerDemands(buyerId!),
+    queryKey: ['demands', 'buyer', buyerId, params],
+    queryFn: () => api.demands.getBuyerDemands(buyerId!, params),
     enabled: !!buyerId,
     staleTime: 5 * 60 * 1000,
   });
 }
 
-export function useAgentDemands(agentId?: string) {
+export function useAgentDemands(agentId?: string, params?: PaginationParams) {
   return useQuery({
-    queryKey: ['demands', 'agent', agentId],
-    queryFn: () => api.demands.getAgentDemands(agentId!),
+    queryKey: ['demands', 'agent', agentId, params],
+    queryFn: () => api.demands.getAgentDemands(agentId!, params),
     enabled: !!agentId,
     staleTime: 5 * 60 * 1000,
   });

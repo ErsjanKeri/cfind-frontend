@@ -4,13 +4,13 @@ import { toast } from "sonner"
 import { getErrorMessage } from "@/lib/utils"
 
 export function useSavedListing(listingId: string | undefined) {
-    const { data: savedListings } = useSavedListings()
+    const { data: savedData } = useSavedListings()
     const toggleMutation = useToggleSavedListing()
 
     const isSaved = useMemo(() => {
-        if (!listingId || !savedListings) return false
-        return savedListings.some((saved) => saved.id === listingId)
-    }, [savedListings, listingId])
+        if (!listingId || !savedData?.listings) return false
+        return savedData.listings.some((saved) => saved.id === listingId)
+    }, [savedData, listingId])
 
     const toggleSave = async () => {
         if (!listingId) return

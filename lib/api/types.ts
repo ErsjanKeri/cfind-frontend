@@ -223,6 +223,24 @@ export interface ListingsResponse {
   listings: Listing[];
 }
 
+export interface AgentListingsResponse {
+  success: boolean;
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+  listings: Listing[];
+}
+
+export interface SavedListingsResponse {
+  success: boolean;
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+  listings: Listing[];
+}
+
 // ============================================================================
 // LEAD TYPES
 // ============================================================================
@@ -265,6 +283,24 @@ export type Lead = BuyerLead | AgentLead;
 export interface CreateLeadRequest {
   listing_id: string;
   interaction_type: InteractionType;
+}
+
+export interface AgentLeadsResponse {
+  success: boolean;
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+  leads: AgentLead[];
+}
+
+export interface BuyerLeadsResponse {
+  success: boolean;
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+  leads: BuyerLead[];
 }
 
 // ============================================================================
@@ -313,6 +349,24 @@ export interface CreateDemandRequest {
   budget_min_eur: number;
   budget_max_eur: number;
   demand_type: DemandType;
+}
+
+export interface BuyerDemandsResponse {
+  success: boolean;
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+  demands: BuyerDemand[];
+}
+
+export interface AgentDemandsResponse {
+  success: boolean;
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+  demands: BuyerDemand[];
 }
 
 // ============================================================================

@@ -2,8 +2,10 @@ import { apiClient, apiCall } from './client';
 import type {
   Listing,
   ListingsResponse,
+  AgentListingsResponse,
   CreateListingRequest,
   ListingFilters,
+  PaginationParams,
 } from './types';
 
 export const listingsApi = {
@@ -45,12 +47,13 @@ export const listingsApi = {
     });
   },
 
-  async getAgentListings(agentId: string): Promise<Listing[]> {
+  async getAgentListings(agentId: string, params?: PaginationParams): Promise<AgentListingsResponse> {
     return apiCall(async () => {
-      const response = await apiClient.get<{ success: boolean; total: number; listings: Listing[] }>(
-        `/api/listings/agent/${agentId}`
+      const response = await apiClient.get<AgentListingsResponse>(
+        `/api/listings/agent/${agentId}`,
+        { params }
       );
-      return response.data.listings;
+      return response.data;
     });
   },
 };

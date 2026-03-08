@@ -24,9 +24,13 @@ export function BuyerView() {
     const [showDemandDialog, setShowDemandDialog] = useState(false)
 
     // React Query hooks - automatically fetch and cache data
-    const { data: savedListings = [], isLoading: isLoadingSaved } = useSavedListings()
-    const { data: contactHistory = [], isLoading: isLoadingContacts } = useBuyerLeads(user?.id)
-    const { data: demands = [], isLoading: isLoadingDemands, refetch: refetchDemands } = useBuyerDemands(user?.id)
+    const { data: savedData, isLoading: isLoadingSaved } = useSavedListings()
+    const { data: contactsData, isLoading: isLoadingContacts } = useBuyerLeads(user?.id)
+    const { data: demandsData, isLoading: isLoadingDemands, refetch: refetchDemands } = useBuyerDemands(user?.id)
+
+    const savedListings = savedData?.listings ?? []
+    const contactHistory = contactsData?.leads ?? []
+    const demands = demandsData?.demands ?? []
 
     // Mutation hooks for demand operations
     const updateDemandStatus = useUpdateDemandStatus()
@@ -82,19 +86,19 @@ export function BuyerView() {
                 <StatCard
                     icon={Heart}
                     label="Saved Listings"
-                    value={savedListings.length}
+                    value={savedData?.total ?? savedListings.length}
                     variant="purple"
                 />
                 <StatCard
                     icon={MessageCircle}
                     label="Contacts Made"
-                    value={contactHistory.length}
+                    value={contactsData?.total ?? contactHistory.length}
                     variant="blue"
                 />
                 <StatCard
                     icon={Tag}
                     label="My Demands"
-                    value={demands.length}
+                    value={demandsData?.total ?? demands.length}
                     variant="green"
                 />
                 <StatCard
@@ -114,7 +118,7 @@ export function BuyerView() {
                             <h3 className="font-semibold text-foreground">Saved Listings</h3>
                             <p className="text-sm text-muted-foreground mt-1">View and manage your saved business listings</p>
                             <div className="mt-4 flex items-center text-sm text-primary">
-                                {savedListings.length} saved
+                                {savedData?.total ?? savedListings.length} saved
                                 <ArrowRight className="ml-2 h-4 w-4" />
                             </div>
                         </CardContent>
@@ -128,7 +132,7 @@ export function BuyerView() {
                             <h3 className="font-semibold text-foreground">Contact History</h3>
                             <p className="text-sm text-muted-foreground mt-1">Review agents you've contacted</p>
                             <div className="mt-4 flex items-center text-sm text-primary">
-                                {contactHistory.length} contacts
+                                {contactsData?.total ?? contactHistory.length} contacts
                                 <ArrowRight className="ml-2 h-4 w-4" />
                             </div>
                         </CardContent>

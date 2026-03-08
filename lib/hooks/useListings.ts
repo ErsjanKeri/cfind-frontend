@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import type { ListingFilters, CreateListingRequest } from '@/lib/api/types';
+import type { ListingFilters, CreateListingRequest, PaginationParams } from '@/lib/api/types';
 
 export function useListings(filters?: ListingFilters) {
   return useQuery({
@@ -21,10 +21,10 @@ export function useListing(id: string) {
   });
 }
 
-export function useAgentListings(agentId: string) {
+export function useAgentListings(agentId: string, params?: PaginationParams) {
   return useQuery({
-    queryKey: ['listings', 'agent', agentId],
-    queryFn: () => api.listings.getAgentListings(agentId),
+    queryKey: ['listings', 'agent', agentId, params],
+    queryFn: () => api.listings.getAgentListings(agentId, params),
     enabled: !!agentId,
     staleTime: 60 * 1000,
   });
