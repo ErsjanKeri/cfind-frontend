@@ -9,7 +9,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { LogOut, LayoutDashboard, Settings, Heart } from "lucide-react"
+import { LogOut, LayoutDashboard, Settings, Heart, Sparkles } from "lucide-react"
 import { getInitials } from "@/lib/utils"
 import type { ReactNode } from "react"
 
@@ -18,11 +18,12 @@ interface UserMenuProps {
     userEmail: string
     userImage?: string | null
     isBuyer: boolean
+    country: string
     roleBadge: ReactNode
     onLogout: () => void
 }
 
-export function UserMenu({ userName, userEmail, userImage, isBuyer, roleBadge, onLogout }: UserMenuProps) {
+export function UserMenu({ userName, userEmail, userImage, isBuyer, country, roleBadge, onLogout }: UserMenuProps) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -54,12 +55,20 @@ export function UserMenu({ userName, userEmail, userImage, isBuyer, roleBadge, o
                     </Link>
                 </DropdownMenuItem>
                 {isBuyer && (
-                    <DropdownMenuItem asChild>
-                        <Link href="/profile/saved" className="flex items-center cursor-pointer">
-                            <Heart className="mr-2 h-4 w-4" />
-                            Saved Listings
-                        </Link>
-                    </DropdownMenuItem>
+                    <>
+                        <DropdownMenuItem asChild>
+                            <Link href="/profile/saved" className="flex items-center cursor-pointer">
+                                <Heart className="mr-2 h-4 w-4" />
+                                Saved Listings
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href={`/${country}/ai-recommendations`} className="flex items-center cursor-pointer">
+                                <Sparkles className="mr-2 h-4 w-4" />
+                                AI Recommendations
+                            </Link>
+                        </DropdownMenuItem>
+                    </>
                 )}
                 <DropdownMenuItem asChild>
                     <Link href="/settings" className="flex items-center cursor-pointer">

@@ -476,6 +476,44 @@ export interface AdminStats {
 }
 
 // ============================================================================
+// AI CHAT TYPES
+// ============================================================================
+
+export interface ChatMessageRequest {
+  message: string;
+  conversation_id?: string | null;
+  language?: string;
+}
+
+export interface ChatMessageResponse {
+  conversation_id: string;
+  message_id: string;
+  content: string;
+  tool_calls: Array<{ name: string; args: Record<string, unknown> }> | null;
+}
+
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'model';
+  content: string;
+  tool_calls: Array<{ name: string; args: Record<string, unknown> }> | null;
+  created_at: string;
+}
+
+export interface Conversation {
+  id: string;
+  title: string | null;
+  language: string;
+  message_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ConversationDetail extends Conversation {
+  messages: ChatMessage[];
+}
+
+// ============================================================================
 // FILE UPLOAD TYPES - Simplified (backend handles all S3 uploads)
 // ============================================================================
 

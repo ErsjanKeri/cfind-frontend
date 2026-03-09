@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { useAuth, useUser } from "@/lib/hooks/useAuth"
 import { useRole } from "@/lib/hooks/useRole"
 import { Button } from "@/components/ui/button"
-import { Building2, Menu, X, Plus } from "lucide-react"
+import { Building2, Menu, X, Plus, Sparkles } from "lucide-react"
 import { DemandDialog } from "@/components/demands/demand-dialog"
 import { CountryPicker } from "@/components/header/country-picker"
 import { UserMenu } from "@/components/header/user-menu"
@@ -104,16 +104,25 @@ export function Header() {
             >
               How It Works
             </Link>
-            {/* Buyer CTA - Post Demand */}
+            {/* Buyer Actions */}
             {isAuthenticated && isBuyer && (
-              <Button
-                size="sm"
-                onClick={() => setShowDemandDialog(true)}
-                className="ml-2"
-              >
-                <Plus className="h-4 w-4 mr-1" />
-                Post New Demand
-              </Button>
+              <>
+                <Link
+                  href={`/${currentCountry}/ai-recommendations`}
+                  className={`text-sm font-medium transition-colors hover:text-primary flex items-center gap-1 ${isActive(`/${currentCountry}/ai-recommendations`) ? "text-primary" : "text-muted-foreground"}`}
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  AI Recs
+                </Link>
+                <Button
+                  size="sm"
+                  onClick={() => setShowDemandDialog(true)}
+                  className="ml-2"
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Post New Demand
+                </Button>
+              </>
             )}
           </nav>
 
@@ -130,6 +139,7 @@ export function Header() {
                 userEmail={user.email}
                 userImage={user.image}
                 isBuyer={isBuyer}
+                country={currentCountry}
                 roleBadge={getRoleBadge()}
                 onLogout={logout}
               />
@@ -179,18 +189,26 @@ export function Header() {
                   </Button>
                 </Link>
               )}
-              {/* Mobile Buyer CTA */}
+              {/* Mobile Buyer Actions */}
               {isAuthenticated && isBuyer && (
-                <Button
-                  className="w-full mt-2"
-                  onClick={() => {
-                    setMobileMenuOpen(false)
-                    setShowDemandDialog(true)
-                  }}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Post New Demand
-                </Button>
+                <>
+                  <Link href={`/${currentCountry}/ai-recommendations`} onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start text-muted-foreground">
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      AI Recommendations
+                    </Button>
+                  </Link>
+                  <Button
+                    className="w-full mt-2"
+                    onClick={() => {
+                      setMobileMenuOpen(false)
+                      setShowDemandDialog(true)
+                    }}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Post New Demand
+                  </Button>
+                </>
               )}
             </nav>
           </div>
