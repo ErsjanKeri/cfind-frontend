@@ -51,3 +51,9 @@ export const BuyerDemandSchema = z.object({
     message: "Maximum budget must be greater than or equal to minimum budget",
     path: ["budget_max_eur"],
 })
+
+export const ChatMessageSchema = z.object({
+    message: z.string().min(1, "Message is required").max(2000, "Message is too long"),
+    conversation_id: z.string().nullable().optional(),
+    language: z.string().max(10).default("en"),
+})

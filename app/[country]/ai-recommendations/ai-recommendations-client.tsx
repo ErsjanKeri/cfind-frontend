@@ -12,7 +12,7 @@ import {
   useDeleteConversation,
 } from "@/lib/hooks/useChat"
 import type { CountryCode } from "@/lib/constants"
-import type { ChatMessage } from "@/lib/api/types"
+import type { ChatMessage, ToolCallListing, ToolCallResult } from "@/lib/api/types"
 import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -23,11 +23,14 @@ import {
   Plus,
   MessageSquare,
   Trash2,
-  ArrowLeft,
   Loader2,
   Search,
   Menu,
   X,
+  MapPin,
+  TrendingUp,
+  Building2,
+  ExternalLink,
 } from "lucide-react"
 
 export function AIRecommendationsClient({ country }: { country: CountryCode }) {
@@ -384,6 +387,9 @@ function MessageBubble({
 }) {
   const isUser = message.role === "user"
 
+  // Extract listings from tool call results
+  const listings = extractListings(message.tool_calls)
+
   return (
     <div className={`flex gap-3 ${isUser ? "justify-end" : ""}`}>
       {!isUser && (
@@ -391,19 +397,27 @@ function MessageBubble({
           <Sparkles className="h-3.5 w-3.5 text-primary" />
         </div>
       )}
-      <div
-        className={`
-          max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed
-          ${isUser
-            ? "bg-primary text-primary-foreground"
-            : "bg-muted"
-          }
-        `}
-      >
-        {isUser ? (
-          <p className="whitespace-pre-wrap">{message.content}</p>
-        ) : (
-          <AIMessageContent content={message.content} country={country} />
+      <div className={`${isUser ? "max-w-[85%]" : "max-w-[90%] min-w-0"}`}>
+        <div
+          className={`
+            rounded-2xl px-4 py-2.5 text-sm leading-relaxed
+            ${isUser ? "bg-primary text-primary-foreground" : "bg-muted"}
+          `}
+        >
+          {isUser ? (
+            <p className="whitespace-pre-wrap">{message.content}</p>
+          ) : (
+            <AIMessageContent content={message.content} />
+          )}
+        </div>
+
+        {/* Listing cards below AI message */}
+        {!isUser && listings.length > 0 && (
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {listings.map((listing) => (
+              <ListingCard key={listing.id} listing={listing} country={country} />
+            ))}
+          </div>
         )}
       </div>
       {isUser && (
@@ -415,8 +429,117 @@ function MessageBubble({
   )
 }
 
-function AIMessageContent({ content, country }: { content: string; country: CountryCode }) {
-  // Simple markdown-ish rendering: bold, listing links, line breaks
+function extractListings(toolCalls: ToolCallResult[] | null): ToolCallListing[] {
+  if (!toolCalls) return []
+  const listings: ToolCallListing[] = []
+  const seen = new Set<string>()
+
+  for (const tc of toolCalls) {
+    if (tc.name === "search_listings" && tc.result?.listings) {
+      for (const l of tc.result.listings) {
+        if (!seen.has(l.id)) {
+          seen.add(l.id)
+          listings.push(l)
+        }
+      }
+    }
+    if (tc.name === "get_listing_detail" && tc.result?.id) {
+      const r = tc.result as unknown as ToolCallListing
+      if (!seen.has(r.id)) {
+        seen.add(r.id)
+        listings.push(r)
+      }
+    }
+  }
+  return listings
+}
+
+function ListingCard({
+  listing,
+  country,
+}: {
+  listing: ToolCallListing
+  country: CountryCode
+}) {
+  const cc = listing.country_code || country
+
+  const formatPrice = (price: number | null) => {
+    if (!price) return null
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "EUR",
+      maximumFractionDigits: 0,
+    }).format(price)
+  }
+
+  return (
+    <Link
+      href={`/${cc}/listings/${listing.id}`}
+      className="group block rounded-xl border border-border bg-background overflow-hidden hover:border-primary/50 hover:shadow-md transition-all"
+    >
+      {/* Image */}
+      <div className="relative h-32 bg-muted overflow-hidden">
+        {listing.image_url ? (
+          <img
+            src={listing.image_url}
+            alt={listing.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <Building2 className="h-8 w-8 text-muted-foreground/40" />
+          </div>
+        )}
+        {listing.promotion_tier && listing.promotion_tier !== "standard" && (
+          <span className={`
+            absolute top-2 left-2 text-[10px] font-semibold px-2 py-0.5 rounded-full
+            ${listing.promotion_tier === "premium"
+              ? "bg-amber-500 text-white"
+              : "bg-blue-500 text-white"
+            }
+          `}>
+            {listing.promotion_tier === "premium" ? "Premium" : "Featured"}
+          </span>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="p-3">
+        <h4 className="text-sm font-medium truncate group-hover:text-primary transition-colors">
+          {listing.title}
+        </h4>
+
+        <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+          <MapPin className="h-3 w-3 shrink-0" />
+          <span className="truncate">{listing.city}{listing.area ? `, ${listing.area}` : ""}</span>
+        </div>
+
+        <div className="flex items-center justify-between mt-2">
+          {listing.asking_price_eur && (
+            <span className="text-sm font-semibold text-primary">
+              {formatPrice(listing.asking_price_eur)}
+            </span>
+          )}
+          {listing.roi != null && (
+            <span className="flex items-center gap-0.5 text-xs text-emerald-600 font-medium">
+              <TrendingUp className="h-3 w-3" />
+              {listing.roi.toFixed(1)}% ROI
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between mt-1.5">
+          <span className="text-[10px] text-muted-foreground capitalize bg-muted px-1.5 py-0.5 rounded">
+            {listing.category}
+          </span>
+          <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+        </div>
+      </div>
+    </Link>
+  )
+}
+
+function AIMessageContent({ content }: { content: string }) {
   const parts = content.split(/(\*\*[^*]+\*\*)/g)
 
   return (

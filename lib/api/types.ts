@@ -485,18 +485,50 @@ export interface ChatMessageRequest {
   language?: string;
 }
 
+export interface ToolCallResult {
+  name: string;
+  args: Record<string, unknown>;
+  result?: {
+    total?: number;
+    listings?: ToolCallListing[];
+    // get_listing_detail returns a single listing object directly
+    id?: string;
+    title?: string;
+    [key: string]: unknown;
+  };
+}
+
+export interface ToolCallListing {
+  id: string;
+  title: string;
+  category: string;
+  city: string;
+  area: string | null;
+  country_code: string;
+  asking_price_eur: number | null;
+  monthly_revenue_eur: number | null;
+  roi: number | null;
+  employee_count: number | null;
+  years_in_operation: number | null;
+  promotion_tier: string;
+  image_url: string | null;
+  agent_name: string;
+  agent_agency: string | null;
+  url: string;
+}
+
 export interface ChatMessageResponse {
   conversation_id: string;
   message_id: string;
   content: string;
-  tool_calls: Array<{ name: string; args: Record<string, unknown> }> | null;
+  tool_calls: ToolCallResult[] | null;
 }
 
 export interface ChatMessage {
   id: string;
   role: 'user' | 'model';
   content: string;
-  tool_calls: Array<{ name: string; args: Record<string, unknown> }> | null;
+  tool_calls: ToolCallResult[] | null;
   created_at: string;
 }
 
