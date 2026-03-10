@@ -79,7 +79,7 @@ await api.promotions.promoteListing(listingId, { tier: 'featured' });
 await api.upload.uploadFile(file, 'listing');
 ```
 
-Modules: `auth.ts`, `user.ts`, `listings.ts`, `leads.ts`, `demands.ts`, `promotions.ts`, `admin.ts`, `upload.ts`
+Modules: `auth.ts`, `user.ts`, `listings.ts`, `leads.ts`, `demands.ts`, `promotions.ts`, `admin.ts`, `upload.ts`, `chat.ts`
 
 ### React Query Hooks (`lib/hooks/`)
 
@@ -97,18 +97,20 @@ Every API module has a corresponding hooks file with `useQuery`/`useMutation` wr
 | `useDemands()` | Buyer demand CRUD |
 | `usePromotions()` | Credit/promotion operations |
 | `useAdmin()` | Admin operations |
+| `useConversations()` | List AI chat conversations |
+| `useSendMessage()` | Send message to AI agent (optimistic updates) |
 
 ### Types (`lib/api/types.ts`)
 
 All TypeScript types mirror backend Pydantic schemas using **snake_case** (not camelCase). Keep in sync with backend.
 
-Key types: `User`, `UserWithProfile`, `AgentProfile`, `Listing`, `BuyerDemand`, `Lead`, `CreditPackage`, `PromotionTierConfig`
+Key types: `User`, `UserWithProfile`, `AgentProfile`, `Listing`, `BuyerDemand`, `Lead`, `CreditPackage`, `PromotionTierConfig`, `ChatMessageResponse`, `ToolCallResult`, `ToolCallListing`, `Conversation`
 
 ### Three User Roles
 
 | Role | Capabilities |
 |------|-------------|
-| `buyer` | Browse listings, save listings, contact agents, create demands |
+| `buyer` | Browse listings, save listings, contact agents, create demands, AI recommendations |
 | `agent` | All buyer actions + create/manage listings, claim demands (requires `verification_status: "approved"`) |
 | `admin` | Everything: user management, agent verification, credit adjustment, listing moderation |
 
@@ -143,6 +145,7 @@ Agent documents (license, company, ID) are uploaded via `api.user.updateAgentPro
 Uses `react-hook-form` + `zod`. Schemas defined in `lib/schemas.ts`:
 - `ListingSchema` — Multi-step listing creation form
 - `BuyerDemandSchema` — Buyer demand creation
+- `ChatMessageSchema` — AI chat message validation (1-2000 chars)
 
 ### Currency
 
@@ -165,6 +168,19 @@ Dual display: EUR and ALL (Albanian Lek). All API amounts are in EUR; conversion
 | `components/ui/` | shadcn/ui primitives |
 | `components/listing-form/` | Multi-step listing creation form |
 | `components/dashboard/` | Role-based dashboard views (agent, buyer, admin) |
+| `lib/api/chat.ts` | AI chat API module (send message, conversations CRUD) |
+| `lib/hooks/useChat.ts` | React Query hooks for AI chat |
+| `app/[country]/ai-recommendations/` | AI Recommendations page (buyer-only) |
+
+## AI Recommendations
+
+The AI Recommendations page (`/{country}/ai-recommendations`) lets buyers chat with a Gemini-powered assistant that searches listings and provides personalized recommendations.
+
+- **Buyer-only**: Page shows auth gate for non-buyers. Backend restricts to `buyer`/`admin` roles.
+- **Conversation sidebar**: Lists previous conversations; collapsible on mobile.
+- **Listing cards from tool calls**: AI responses include `tool_calls` with listing data. The `extractListings()` helper parses these to render clickable `ListingCard` components with image, price, ROI, and category badge.
+- **Optimistic updates**: User messages appear immediately; rolled back on error.
+- **User context**: Backend injects buyer's country preference and saved listing titles into the AI system prompt.
 
 ## Important Constraints
 
