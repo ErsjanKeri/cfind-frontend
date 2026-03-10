@@ -40,8 +40,9 @@ export function useDeleteConversation() {
 
   return useMutation({
     mutationFn: (id: string) => api.chat.deleteConversation(id),
-    onSuccess: () => {
+    onSuccess: (_data, id) => {
       queryClient.invalidateQueries({ queryKey: ['chat', 'conversations'] });
+      queryClient.removeQueries({ queryKey: ['chat', 'conversation', id] });
     },
   });
 }

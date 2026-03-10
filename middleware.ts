@@ -30,7 +30,11 @@ export function middleware(request: NextRequest) {
   // --- Auth checks ---
   const hasAccessToken = request.cookies.has('access_token');
 
-  if (protectedRoutes.some(route => pathname.startsWith(route))) {
+  const isProtected =
+    protectedRoutes.some(route => pathname.startsWith(route)) ||
+    pathname.endsWith('/ai-recommendations');
+
+  if (isProtected) {
     if (!hasAccessToken) {
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('redirect', pathname);
@@ -55,5 +59,6 @@ export const config = {
     '/credits/:path*',
     '/login',
     '/register',
+    '/:country/ai-recommendations',
   ],
 };

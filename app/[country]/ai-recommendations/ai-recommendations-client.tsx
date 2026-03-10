@@ -464,7 +464,7 @@ function ListingCard({
   const cc = listing.country_code || country
 
   const formatPrice = (price: number | null) => {
-    if (!price) return null
+    if (price == null) return null
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "EUR",
