@@ -124,6 +124,16 @@ export function Header() {
                 </Button>
               </>
             )}
+            {/* Agent Actions */}
+            {isAuthenticated && isAgent && (
+              <Link
+                href={`/${currentCountry}/ai-matching`}
+                className={`text-sm font-medium transition-colors hover:text-primary flex items-center gap-1 ${isActive(`/${currentCountry}/ai-matching`) ? "text-primary" : "text-muted-foreground"}`}
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                AI Matching
+              </Link>
+            )}
           </nav>
 
           {/* Right Side Actions */}
@@ -139,6 +149,7 @@ export function Header() {
                 userEmail={user.email}
                 userImage={user.image}
                 isBuyer={isBuyer}
+                isAgent={isAgent}
                 country={currentCountry}
                 roleBadge={getRoleBadge()}
                 onLogout={logout}

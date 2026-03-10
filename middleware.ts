@@ -32,7 +32,8 @@ export function middleware(request: NextRequest) {
 
   const isProtected =
     protectedRoutes.some(route => pathname.startsWith(route)) ||
-    pathname.endsWith('/ai-recommendations');
+    pathname.endsWith('/ai-recommendations') ||
+    pathname.endsWith('/ai-matching');
 
   if (isProtected) {
     if (!hasAccessToken) {
@@ -60,5 +61,6 @@ export const config = {
     '/login',
     '/register',
     '/:country/ai-recommendations',
+    '/:country/ai-matching',
   ],
 };

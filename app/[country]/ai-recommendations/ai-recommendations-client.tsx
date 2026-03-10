@@ -33,10 +33,17 @@ import {
   ExternalLink,
 } from "lucide-react"
 
-export function AIRecommendationsClient({ country }: { country: CountryCode }) {
+export function AIRecommendationsClient({
+  country,
+  mode = "buyer",
+}: {
+  country: CountryCode
+  mode?: "buyer" | "agent"
+}) {
   const router = useRouter()
   const { user, isLoading: userLoading } = useUser()
-  const { isBuyer, isAdmin } = useRole()
+  const { isBuyer, isAgent, isAdmin } = useRole()
+  const isAgentMode = mode === "agent"
 
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([])
@@ -74,16 +81,25 @@ export function AIRecommendationsClient({ country }: { country: CountryCode }) {
     )
   }
 
-  if (!user || (!isBuyer && !isAdmin)) {
+  const hasAccess = isAgentMode
+    ? (isAgent || isAdmin)
+    : (isBuyer || isAdmin)
+
+  if (!user || !hasAccess) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center max-w-md px-4">
             <Sparkles className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            <h2 className="text-xl font-semibold mb-2">AI Recommendations</h2>
+            <h2 className="text-xl font-semibold mb-2">
+              {isAgentMode ? "AI Demand Matching" : "AI Recommendations"}
+            </h2>
             <p className="text-muted-foreground mb-6">
-              Sign in as a buyer to get personalized business recommendations powered by AI.
+              {isAgentMode
+                ? "Sign in as an agent to find buyer demands that match your listings."
+                : "Sign in as a buyer to get personalized business recommendations powered by AI."
+              }
             </p>
             <Button onClick={() => router.push("/login")}>Sign In</Button>
           </div>
@@ -113,6 +129,7 @@ export function AIRecommendationsClient({ country }: { country: CountryCode }) {
         message,
         conversation_id: activeConversationId,
         language: "en",
+        mode,
       })
 
       // If this was a new conversation, set the active ID
@@ -261,13 +278,15 @@ export function AIRecommendationsClient({ country }: { country: CountryCode }) {
               <Menu className="h-4 w-4" />
             </Button>
             <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">AI Recommendations</span>
+            <span className="text-sm font-medium">
+              {isAgentMode ? "AI Demand Matching" : "AI Recommendations"}
+            </span>
           </div>
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto">
             {localMessages.length === 0 ? (
-              <EmptyState country={country} onSuggestion={(text) => {
+              <EmptyState country={country} mode={mode} onSuggestion={(text) => {
                 setInput(text)
                 textareaRef.current?.focus()
               }} />
@@ -283,7 +302,7 @@ export function AIRecommendationsClient({ country }: { country: CountryCode }) {
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Search className="h-3.5 w-3.5 animate-pulse" />
-                      Searching for recommendations...
+                      {isAgentMode ? "Searching for matches..." : "Searching for recommendations..."}
                     </div>
                   </div>
                 )}
@@ -303,7 +322,7 @@ export function AIRecommendationsClient({ country }: { country: CountryCode }) {
               <div className="flex gap-2 items-end">
                 <Textarea
                   ref={textareaRef}
-                  placeholder="Ask about businesses for sale..."
+                  placeholder={isAgentMode ? "Ask about buyer demands..." : "Ask about businesses for sale..."}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
@@ -337,19 +356,31 @@ export function AIRecommendationsClient({ country }: { country: CountryCode }) {
 
 function EmptyState({
   country,
+  mode = "buyer",
   onSuggestion,
 }: {
   country: CountryCode
+  mode?: "buyer" | "agent"
   onSuggestion: (text: string) => void
 }) {
   const countryName = country === "al" ? "Albania" : "UAE"
+  const cityName = country === "al" ? "Tirana" : "Dubai"
 
-  const suggestions = [
+  const buyerSuggestions = [
     `Show me restaurants for sale in ${countryName}`,
     `What businesses are available under €50,000?`,
-    `Find me high-ROI businesses in ${country === "al" ? "Tirana" : "Dubai"}`,
+    `Find me high-ROI businesses in ${cityName}`,
     `Compare cafes and bars available in ${countryName}`,
   ]
+
+  const agentSuggestions = [
+    `Show me active buyer demands in ${countryName}`,
+    `Are there any demands for restaurants in ${cityName}?`,
+    `Find demands with budgets over €100,000`,
+    `Which of my listings match current demands?`,
+  ]
+
+  const suggestions = mode === "agent" ? agentSuggestions : buyerSuggestions
 
   return (
     <div className="flex-1 flex items-center justify-center p-4">
@@ -357,10 +388,14 @@ function EmptyState({
         <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
           <Sparkles className="h-7 w-7 text-primary" />
         </div>
-        <h2 className="text-xl font-semibold mb-2">AI Business Recommendations</h2>
+        <h2 className="text-xl font-semibold mb-2">
+          {mode === "agent" ? "AI Demand Matching" : "AI Business Recommendations"}
+        </h2>
         <p className="text-muted-foreground mb-8">
-          Ask me about businesses for sale in {countryName}. I can search, compare,
-          and recommend businesses based on your preferences.
+          {mode === "agent"
+            ? `Find buyer demands that match your listings in ${countryName}. I can search demands, compare them to your listings, and suggest the best matches.`
+            : `Ask me about businesses for sale in ${countryName}. I can search, compare, and recommend businesses based on your preferences.`
+          }
         </p>
         <div className="grid gap-2 sm:grid-cols-2">
           {suggestions.map((text) => (

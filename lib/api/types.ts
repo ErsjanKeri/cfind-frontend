@@ -483,6 +483,7 @@ export interface ChatMessageRequest {
   message: string;
   conversation_id?: string | null;
   language?: string;
+  mode?: "buyer" | "agent";
 }
 
 export interface ToolCallResult {

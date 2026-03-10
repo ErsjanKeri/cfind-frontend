@@ -18,12 +18,13 @@ interface UserMenuProps {
     userEmail: string
     userImage?: string | null
     isBuyer: boolean
+    isAgent?: boolean
     country: string
     roleBadge: ReactNode
     onLogout: () => void
 }
 
-export function UserMenu({ userName, userEmail, userImage, isBuyer, country, roleBadge, onLogout }: UserMenuProps) {
+export function UserMenu({ userName, userEmail, userImage, isBuyer, isAgent, country, roleBadge, onLogout }: UserMenuProps) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -69,6 +70,14 @@ export function UserMenu({ userName, userEmail, userImage, isBuyer, country, rol
                             </Link>
                         </DropdownMenuItem>
                     </>
+                )}
+                {isAgent && (
+                    <DropdownMenuItem asChild>
+                        <Link href={`/${country}/ai-matching`} className="flex items-center cursor-pointer">
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            AI Demand Matching
+                        </Link>
+                    </DropdownMenuItem>
                 )}
                 <DropdownMenuItem asChild>
                     <Link href="/settings" className="flex items-center cursor-pointer">
