@@ -216,14 +216,13 @@ export function RegisterForm() {
             </FormFieldWrapper>
 
             {role === "buyer" && (
-                <FormFieldWrapper label="Company Name" htmlFor="companyName" required>
+                <FormFieldWrapper label="Company Name" htmlFor="companyName">
                     <Input
                         id="companyName"
                         name="companyName"
-                        placeholder="Your Company Name"
+                        placeholder="Your Company Name (optional)"
                         value={companyName}
                         onChange={(e) => setCompanyName(e.target.value)}
-                        required={role === "buyer"}
                         disabled={isLoading}
                     />
                 </FormFieldWrapper>
