@@ -8,6 +8,7 @@ import {
     useDeleteUser,
     useToggleEmailVerification,
 } from "@/lib/hooks/useAdmin"
+import { useDemands, useDeleteDemand } from "@/lib/hooks/useDemands"
 import { CreateAgentDialog } from "@/components/admin/create-agent-dialog"
 import { CreateBuyerDialog } from "@/components/admin/create-buyer-dialog"
 import { RejectAgentDialog } from "@/components/admin/reject-agent-dialog"
@@ -15,23 +16,49 @@ import { AgentVerificationDialog } from "@/components/admin/agent-verification-d
 import { AdminAgentList } from "@/components/admin/admin-agent-list"
 import { AdminBuyerList } from "@/components/admin/admin-buyer-list"
 import { ListingDialog } from "@/components/listings/listing-dialog"
+import { DemandCard } from "@/components/demands/demand-card"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { StatCard } from "@/components/shared/stat-card"
+import { EmptyState } from "@/components/shared/empty-state"
 import { AvatarWithInitials } from "@/components/shared/avatar-with-initials"
+import { LoadingSpinner } from "@/components/shared/loading-spinner"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Users, FileText, AlertTriangle, Plus } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Users, FileText, AlertTriangle, Plus, Tag, MapPin, Trash2, Pencil, Check, X } from "lucide-react"
 import { getErrorMessage } from "@/lib/utils"
-import type { UserWithProfile } from "@/lib/api/types"
+import { getCountryOrDefault } from "@/lib/country"
+import { businessCategories, type CountryCode } from "@/lib/constants"
+import { Input } from "@/components/ui/input"
+import {
+    useCities, useNeighbourhoods,
+    useAdminCreateCity, useAdminUpdateCity, useAdminDeleteCity,
+    useAdminCreateNeighbourhood, useAdminDeleteNeighbourhood,
+} from "@/lib/hooks/useGeography"
+import { getDemandStatusBadge } from "@/lib/badge-utils"
+import type { UserWithProfile, DemandFilters } from "@/lib/api/types"
 import { getVerificationStatusBadge } from "@/lib/badge-utils"
 
 export function AdminView() {
     const [activeTab, setActiveTab] = useState("overview")
+    const country = getCountryOrDefault()
+    const [demandCategoryFilter, setDemandCategoryFilter] = useState<string>("all")
+    const [demandStatusFilter, setDemandStatusFilter] = useState<string>("all")
 
     const { data: stats } = useAdminStats()
     const { data: allUsers } = useAllUsers()
+
+    const demandFilters: DemandFilters = {
+        country_code: country,
+        ...(demandStatusFilter !== "all" && { status: demandStatusFilter as DemandFilters["status"] }),
+        ...(demandCategoryFilter !== "all" && { category: demandCategoryFilter as DemandFilters["category"] }),
+    }
+    const { data: demandsData, isLoading: isLoadingDemands } = useDemands(demandFilters)
+    const deleteDemand = useDeleteDemand()
+
+    const demands = demandsData?.demands ?? []
 
     const verifyAgent = useVerifyAgent()
     const deleteUser = useDeleteUser()
@@ -52,6 +79,86 @@ export function AdminView() {
         agentId: string
         agentName: string
     }>({ open: false, agentId: "", agentName: "" })
+
+    // Geography management state
+    const [geoCountry, setGeoCountry] = useState<CountryCode>("al")
+    const [selectedCityId, setSelectedCityId] = useState<number | null>(null)
+    const [newCityName, setNewCityName] = useState("")
+    const [newNeighbourhoodName, setNewNeighbourhoodName] = useState("")
+    const [editingCityId, setEditingCityId] = useState<number | null>(null)
+    const [editCityName, setEditCityName] = useState("")
+
+    const { data: geoCitiesData } = useCities(geoCountry)
+    const geoCities = geoCitiesData?.cities ?? []
+    const { data: geoNeighbourhoodsData } = useNeighbourhoods(selectedCityId ?? undefined)
+    const geoNeighbourhoods = geoNeighbourhoodsData?.neighbourhoods ?? []
+    const selectedCity = geoCities.find((c) => c.id === selectedCityId)
+
+    const createCity = useAdminCreateCity(geoCountry)
+    const updateCity = useAdminUpdateCity(geoCountry)
+    const deleteCity = useAdminDeleteCity(geoCountry)
+    const createNeighbourhood = useAdminCreateNeighbourhood(selectedCityId ?? 0)
+    const deleteNeighbourhood = useAdminDeleteNeighbourhood(selectedCityId ?? 0)
+
+    const handleCreateCity = async () => {
+        const name = newCityName.trim()
+        if (!name) return
+        try {
+            await createCity.mutateAsync(name)
+            setNewCityName("")
+            toast.success(`City "${name}" added`)
+        } catch (error: unknown) {
+            toast.error(getErrorMessage(error, "Failed to add city"))
+        }
+    }
+
+    const handleUpdateCity = async (cityId: number) => {
+        const name = editCityName.trim()
+        if (!name) return
+        try {
+            await updateCity.mutateAsync({ cityId, name })
+            setEditingCityId(null)
+            toast.success(`City renamed to "${name}"`)
+        } catch (error: unknown) {
+            toast.error(getErrorMessage(error, "Failed to rename city"))
+        }
+    }
+
+    const handleDeleteCity = async (cityId: number, cityName: string) => {
+        const hasNeighbourhoods = selectedCityId === cityId && geoNeighbourhoods.length > 0
+        const message = hasNeighbourhoods
+            ? `Delete "${cityName}" and its ${geoNeighbourhoods.length} neighbourhood(s)?`
+            : `Delete city "${cityName}"?`
+        if (!window.confirm(message)) return
+        try {
+            await deleteCity.mutateAsync(cityId)
+            if (selectedCityId === cityId) setSelectedCityId(null)
+            toast.success(`City "${cityName}" deleted`)
+        } catch (error: unknown) {
+            toast.error(getErrorMessage(error, "Failed to delete city"))
+        }
+    }
+
+    const handleCreateNeighbourhood = async () => {
+        const name = newNeighbourhoodName.trim()
+        if (!name || !selectedCityId) return
+        try {
+            await createNeighbourhood.mutateAsync(name)
+            setNewNeighbourhoodName("")
+            toast.success(`Neighbourhood "${name}" added`)
+        } catch (error: unknown) {
+            toast.error(getErrorMessage(error, "Failed to add neighbourhood"))
+        }
+    }
+
+    const handleDeleteNeighbourhood = async (neighbourhoodId: number, name: string) => {
+        try {
+            await deleteNeighbourhood.mutateAsync(neighbourhoodId)
+            toast.success(`Neighbourhood "${name}" deleted`)
+        } catch (error: unknown) {
+            toast.error(getErrorMessage(error, "Failed to delete neighbourhood"))
+        }
+    }
 
     const verifiedAgents = agents.filter((a) => a.verification_status === "approved")
     const pendingAgents = agents.filter((a) => a.verification_status === "pending")
@@ -90,6 +197,15 @@ export function AdminView() {
             toast.success(newVerifiedStatus ? "Email marked as verified" : "Email marked as unverified")
         } catch (error: unknown) {
             toast.error(getErrorMessage(error, "Failed to update email verification"))
+        }
+    }
+
+    const handleDeleteDemand = async (demandId: string) => {
+        try {
+            await deleteDemand.mutateAsync(demandId)
+            toast.success("Demand deleted")
+        } catch (error: unknown) {
+            toast.error(getErrorMessage(error, "Failed to delete demand"))
         }
     }
 
@@ -187,6 +303,15 @@ export function AdminView() {
                         )}
                     </TabsTrigger>
                     <TabsTrigger value="buyers" className="px-6 py-2">Buyers</TabsTrigger>
+                    <TabsTrigger value="demands" className="px-6 py-2 gap-2">
+                        Demands
+                        {(stats?.total_demands ?? 0) > 0 && (
+                            <Badge variant="secondary" className="h-5 min-w-5 text-xs">
+                                {stats?.total_demands}
+                            </Badge>
+                        )}
+                    </TabsTrigger>
+                    <TabsTrigger value="geography" className="px-6 py-2">Geography</TabsTrigger>
                 </TabsList>
 
                 {/* Overview Tab */}
@@ -240,6 +365,250 @@ export function AdminView() {
                         onToggleEmail={handleToggleEmailVerification}
                         onCreateBuyer={() => setShowCreateBuyerDialog(true)}
                     />
+                </TabsContent>
+
+                <TabsContent value="demands" className="space-y-6">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h3 className="text-xl font-semibold tracking-tight">All Demands</h3>
+                            <p className="text-sm text-muted-foreground mt-1">View and manage buyer demands across the platform</p>
+                        </div>
+                        <div className="flex gap-3">
+                            <Select value={demandStatusFilter} onValueChange={setDemandStatusFilter}>
+                                <SelectTrigger className="w-[150px]">
+                                    <SelectValue placeholder="All Statuses" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Statuses</SelectItem>
+                                    <SelectItem value="active">Active</SelectItem>
+                                    <SelectItem value="assigned">Assigned</SelectItem>
+                                    <SelectItem value="fulfilled">Fulfilled</SelectItem>
+                                    <SelectItem value="closed">Closed</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Select value={demandCategoryFilter} onValueChange={setDemandCategoryFilter}>
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="All Categories" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Categories</SelectItem>
+                                    {businessCategories.map((cat) => (
+                                        <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    {/* Status Summary Pills */}
+                    {(stats?.total_demands ?? 0) > 0 && (
+                        <div className="flex flex-wrap gap-3 text-sm">
+                            <span className={`px-3 py-1 rounded-full ${getDemandStatusBadge("active").className}`}>
+                                {stats?.active_demands || 0} {getDemandStatusBadge("active").label}
+                            </span>
+                            <span className={`px-3 py-1 rounded-full ${getDemandStatusBadge("assigned").className}`}>
+                                {stats?.assigned_demands || 0} {getDemandStatusBadge("assigned").label}
+                            </span>
+                            <span className={`px-3 py-1 rounded-full ${getDemandStatusBadge("fulfilled").className}`}>
+                                {stats?.fulfilled_demands || 0} {getDemandStatusBadge("fulfilled").label}
+                            </span>
+                        </div>
+                    )}
+
+                    <Card className="border-border/60 shadow-sm">
+                        <CardContent className="p-6">
+                            {isLoadingDemands ? (
+                                <div className="flex items-center justify-center py-8">
+                                    <LoadingSpinner />
+                                </div>
+                            ) : demands.length > 0 ? (
+                                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                    {demands.map((demand) => (
+                                        <DemandCard
+                                            key={demand.id}
+                                            demand={demand}
+                                            variant="buyer"
+                                            onDelete={() => handleDeleteDemand(demand.id)}
+                                        />
+                                    ))}
+                                </div>
+                            ) : (
+                                <EmptyState
+                                    icon={Tag}
+                                    title="No demands found"
+                                    description="No demands match the selected filters"
+                                    size="lg"
+                                />
+                            )}
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                <TabsContent value="geography" className="space-y-6">
+                    <div>
+                        <h3 className="text-xl font-semibold tracking-tight">Geography</h3>
+                        <p className="text-sm text-muted-foreground mt-1">Manage cities and neighbourhoods per country</p>
+                    </div>
+
+                    {/* Country selector */}
+                    <Select value={geoCountry} onValueChange={(v) => { setGeoCountry(v as CountryCode); setSelectedCityId(null); setEditingCityId(null); setNewCityName(""); setNewNeighbourhoodName("") }}>
+                        <SelectTrigger className="w-[200px]">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="al">Albania</SelectItem>
+                            <SelectItem value="ae">UAE</SelectItem>
+                        </SelectContent>
+                    </Select>
+
+                    <div className="grid gap-6 lg:grid-cols-2">
+                        {/* Cities panel */}
+                        <Card>
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-base flex items-center gap-2">
+                                    <MapPin className="h-4 w-4" />
+                                    Cities
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                {geoCities.length === 0 ? (
+                                    <p className="text-sm text-muted-foreground">No cities yet.</p>
+                                ) : (
+                                    <div className="space-y-1">
+                                        {geoCities.map((city) => (
+                                            <div key={city.id}>
+                                                {editingCityId === city.id ? (
+                                                    <div className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-muted/60">
+                                                        <Input
+                                                            autoFocus
+                                                            value={editCityName}
+                                                            onChange={(e) => setEditCityName(e.target.value)}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === "Enter") handleUpdateCity(city.id)
+                                                                if (e.key === "Escape") setEditingCityId(null)
+                                                            }}
+                                                            className="h-7 text-sm"
+                                                        />
+                                                        <button
+                                                            onClick={() => handleUpdateCity(city.id)}
+                                                            disabled={!editCityName.trim() || updateCity.isPending}
+                                                            className="text-muted-foreground hover:text-primary transition-colors p-1"
+                                                        >
+                                                            <Check className="h-3.5 w-3.5" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setEditingCityId(null)}
+                                                            className="text-muted-foreground hover:text-destructive transition-colors p-1"
+                                                        >
+                                                            <X className="h-3.5 w-3.5" />
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <div
+                                                        onClick={() => setSelectedCityId(city.id === selectedCityId ? null : city.id)}
+                                                        className={`flex items-center justify-between px-3 py-2 rounded-md cursor-pointer transition-colors ${
+                                                            city.id === selectedCityId
+                                                                ? "bg-primary/10 text-primary"
+                                                                : "hover:bg-muted/60"
+                                                        }`}
+                                                    >
+                                                        <span className="text-sm font-medium">{city.name}</span>
+                                                        <div className="flex items-center gap-0.5">
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation()
+                                                                    setEditingCityId(city.id)
+                                                                    setEditCityName(city.name)
+                                                                }}
+                                                                className="text-muted-foreground hover:text-foreground transition-colors p-1"
+                                                            >
+                                                                <Pencil className="h-3.5 w-3.5" />
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleDeleteCity(city.id, city.name) }}
+                                                                className="text-muted-foreground hover:text-destructive transition-colors p-1"
+                                                                disabled={deleteCity.isPending}
+                                                            >
+                                                                <Trash2 className="h-3.5 w-3.5" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Add city */}
+                                <div className="flex gap-2 pt-2 border-t">
+                                    <Input
+                                        placeholder="City name"
+                                        value={newCityName}
+                                        onChange={(e) => setNewCityName(e.target.value)}
+                                        onKeyDown={(e) => e.key === "Enter" && handleCreateCity()}
+                                        className="h-8 text-sm"
+                                    />
+                                    <Button
+                                        size="sm"
+                                        onClick={handleCreateCity}
+                                        disabled={!newCityName.trim() || createCity.isPending}
+                                    >
+                                        <Plus className="h-3.5 w-3.5" />
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Neighbourhoods panel */}
+                        <Card>
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-base">
+                                    {selectedCity ? `Neighbourhoods — ${selectedCity.name}` : "Neighbourhoods"}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                {!selectedCity ? (
+                                    <p className="text-sm text-muted-foreground">Select a city to manage its neighbourhoods.</p>
+                                ) : geoNeighbourhoods.length === 0 ? (
+                                    <p className="text-sm text-muted-foreground">No neighbourhoods yet.</p>
+                                ) : (
+                                    <div className="space-y-1">
+                                        {geoNeighbourhoods.map((n) => (
+                                            <div key={n.id} className="flex items-center justify-between px-3 py-2 rounded-md hover:bg-muted/60">
+                                                <span className="text-sm">{n.name}</span>
+                                                <button
+                                                    onClick={() => handleDeleteNeighbourhood(n.id, n.name)}
+                                                    className="text-muted-foreground hover:text-destructive transition-colors p-1"
+                                                    disabled={deleteNeighbourhood.isPending}
+                                                >
+                                                    <Trash2 className="h-3.5 w-3.5" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {selectedCity && (
+                                    <div className="flex gap-2 pt-2 border-t">
+                                        <Input
+                                            placeholder="Neighbourhood name"
+                                            value={newNeighbourhoodName}
+                                            onChange={(e) => setNewNeighbourhoodName(e.target.value)}
+                                            onKeyDown={(e) => e.key === "Enter" && handleCreateNeighbourhood()}
+                                            className="h-8 text-sm"
+                                        />
+                                        <Button
+                                            size="sm"
+                                            onClick={handleCreateNeighbourhood}
+                                            disabled={!newNeighbourhoodName.trim() || createNeighbourhood.isPending}
+                                        >
+                                            <Plus className="h-3.5 w-3.5" />
+                                        </Button>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    </div>
                 </TabsContent>
             </Tabs>
 

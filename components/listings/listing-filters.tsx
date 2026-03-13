@@ -22,8 +22,9 @@ import {
 } from "@/components/ui/sheet"
 import { MapPin, SlidersHorizontal, X } from "lucide-react"
 import { SearchInput } from "@/components/shared/search-input"
-import { businessCategories, getCategoryLabel, getCountryCities, MAX_LISTING_PRICE } from "@/lib/constants"
+import { businessCategories, getCategoryLabel, MAX_LISTING_PRICE } from "@/lib/constants"
 import type { CountryCode } from "@/lib/constants"
+import { useCityNames } from "@/lib/hooks/useGeography"
 import { formatCurrency } from "@/lib/currency"
 import { useState } from "react"
 
@@ -58,6 +59,7 @@ interface ListingFiltersProps {
 
 export function ListingFilters({ country, filters, setters }: ListingFiltersProps) {
     const [isFilterOpen, setIsFilterOpen] = useState(false)
+    const { data: cities } = useCityNames(country)
 
     const activeFiltersList = []
     if (filters.category) {
@@ -130,7 +132,7 @@ export function ListingFilters({ country, filters, setters }: ListingFiltersProp
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">All Cities</SelectItem>
-                            {getCountryCities(country).map((c) => (
+                            {cities.map((c) => (
                                 <SelectItem key={c} value={c}>
                                     {c}
                                 </SelectItem>

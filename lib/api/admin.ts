@@ -5,6 +5,8 @@ import type {
   UserRole,
   CreateAgentRequest,
   CreateBuyerRequest,
+  City,
+  Neighbourhood,
 } from './types';
 
 export const adminApi = {
@@ -38,7 +40,7 @@ export const adminApi = {
     return apiCall(async () => {
       const response = await apiClient.post<{ message: string }>(
         `/api/admin/agents/${agentId}/reject`,
-        { reason }
+        { rejection_reason: reason }
       );
       return response.data;
     });
@@ -88,6 +90,48 @@ export const adminApi = {
     return apiCall(async () => {
       const response = await apiClient.post<UserWithProfile>('/api/admin/buyers', data);
       return response.data;
+    });
+  },
+
+  async createCity(countryCode: string, name: string): Promise<City> {
+    return apiCall(async () => {
+      const response = await apiClient.post<{ city: City }>(
+        `/api/admin/geography/${countryCode}/cities`,
+        { name }
+      );
+      return response.data.city;
+    });
+  },
+
+  async updateCity(cityId: number, name: string): Promise<City> {
+    return apiCall(async () => {
+      const response = await apiClient.put<{ city: City }>(
+        `/api/admin/geography/cities/${cityId}`,
+        { name }
+      );
+      return response.data.city;
+    });
+  },
+
+  async deleteCity(cityId: number): Promise<void> {
+    return apiCall(async () => {
+      await apiClient.delete(`/api/admin/geography/cities/${cityId}`);
+    });
+  },
+
+  async createNeighbourhood(cityId: number, name: string): Promise<Neighbourhood> {
+    return apiCall(async () => {
+      const response = await apiClient.post<{ neighbourhood: Neighbourhood }>(
+        `/api/admin/geography/cities/${cityId}/neighbourhoods`,
+        { name }
+      );
+      return response.data.neighbourhood;
+    });
+  },
+
+  async deleteNeighbourhood(neighbourhoodId: number): Promise<void> {
+    return apiCall(async () => {
+      await apiClient.delete(`/api/admin/geography/neighbourhoods/${neighbourhoodId}`);
     });
   },
 };

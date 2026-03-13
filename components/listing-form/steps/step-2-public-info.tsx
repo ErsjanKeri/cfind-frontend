@@ -11,7 +11,8 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { FormFieldWrapper } from "@/components/shared/form-field-wrapper"
-import { getCountryCities, getCityAreas, isValidCountryCode } from "@/lib/constants"
+import { isValidCountryCode } from "@/lib/constants"
+import { useCities, useNeighbourhoodNames } from "@/lib/hooks/useGeography"
 import type { ListingFormData, ListingFormErrors } from "../use-listing-form"
 
 interface Step2Props {
@@ -22,10 +23,10 @@ interface Step2Props {
 
 export function Step2PublicInfo({ data, updateData, errors }: Step2Props) {
     const countryCode = isValidCountryCode(data.country_code) ? data.country_code : undefined
-    const cities = countryCode ? getCountryCities(countryCode) : []
-    const areas = countryCode && data.public_location_city_en
-        ? getCityAreas(countryCode, data.public_location_city_en)
-        : []
+    const { data: citiesData } = useCities(countryCode)
+    const cities = citiesData?.cities ?? []
+    const selectedCityId = cities.find((c) => c.name === data.public_location_city_en)?.id
+    const { data: neighbourhoodNames } = useNeighbourhoodNames(selectedCityId)
 
     const handleCityChange = (city: string) => {
         updateData("public_location_city_en", city)
@@ -93,7 +94,7 @@ export function Step2PublicInfo({ data, updateData, errors }: Step2Props) {
                         </SelectTrigger>
                         <SelectContent>
                             {cities.map((city) => (
-                                <SelectItem key={city} value={city}>{city}</SelectItem>
+                                <SelectItem key={city.id} value={city.name}>{city.name}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
@@ -107,14 +108,14 @@ export function Step2PublicInfo({ data, updateData, errors }: Step2Props) {
                     <Select
                         value={data.public_location_area}
                         onValueChange={(val) => updateData("public_location_area", val)}
-                        disabled={areas.length === 0}
+                        disabled={neighbourhoodNames.length === 0}
                     >
                         <SelectTrigger className={`w-full ${errors?.public_location_area ? "border-red-500" : ""}`}>
-                            <SelectValue placeholder={areas.length === 0 ? "Select city first" : "Select area"} />
+                            <SelectValue placeholder={neighbourhoodNames.length === 0 ? "Select city first" : "Select area"} />
                         </SelectTrigger>
                         <SelectContent>
-                            {areas.map((area) => (
-                                <SelectItem key={area} value={area}>{area}</SelectItem>
+                            {neighbourhoodNames.map((name) => (
+                                <SelectItem key={name} value={name}>{name}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>

@@ -61,7 +61,7 @@ Cookie-based JWT managed entirely by the backend:
 The app supports multiple countries (`al` = Albania, `ae` = UAE). Listings and demands are scoped by country:
 - URL pattern: `/{country}/listings`, `/{country}/listings/{id}`
 - Middleware redirects `/` to `/{country}` if a `country` cookie exists
-- Country data (cities, areas) lives in `lib/constants.ts`
+- Country codes and flags defined in `lib/constants.ts`; cities and neighbourhoods are DB-driven via `lib/api/geography.ts` and `lib/hooks/useGeography.ts`
 
 ### API Client Layer (`lib/api/`)
 
@@ -79,7 +79,7 @@ await api.promotions.promoteListing(listingId, { tier: 'featured' });
 await api.upload.uploadFile(file, 'listing');
 ```
 
-Modules: `auth.ts`, `user.ts`, `listings.ts`, `leads.ts`, `demands.ts`, `promotions.ts`, `admin.ts`, `upload.ts`, `chat.ts`
+Modules: `auth.ts`, `user.ts`, `listings.ts`, `leads.ts`, `demands.ts`, `promotions.ts`, `admin.ts`, `upload.ts`, `chat.ts`, `geography.ts`
 
 ### React Query Hooks (`lib/hooks/`)
 
@@ -99,12 +99,16 @@ Every API module has a corresponding hooks file with `useQuery`/`useMutation` wr
 | `useAdmin()` | Admin operations |
 | `useConversations()` | List AI chat conversations |
 | `useSendMessage()` | Send message to AI agent (optimistic updates) |
+| `useCityNames(countryCode?)` | City names for a country (from geography API) |
+| `useNeighbourhoodNames(cityId?)` | Neighbourhood names for a city (from geography API) |
+| `useAdminCreateCity()` | Admin mutation to create a city |
+| `useAdminCreateNeighbourhood()` | Admin mutation to create a neighbourhood |
 
 ### Types (`lib/api/types.ts`)
 
 All TypeScript types mirror backend Pydantic schemas using **snake_case** (not camelCase). Keep in sync with backend.
 
-Key types: `User`, `UserWithProfile`, `AgentProfile`, `Listing`, `BuyerDemand`, `Lead`, `CreditPackage`, `PromotionTierConfig`, `ChatMessageResponse`, `ToolCallResult`, `ToolCallListing`, `Conversation`
+Key types: `User`, `UserWithProfile`, `AgentProfile`, `Listing`, `BuyerDemand`, `Lead`, `CreditPackage`, `PromotionTierConfig`, `ChatMessageResponse`, `ToolCallResult`, `ToolCallListing`, `ToolCallDemand`, `Conversation`, `City`, `Neighbourhood`, `Country`
 
 ### Three User Roles
 
@@ -149,7 +153,7 @@ Uses `react-hook-form` + `zod`. Schemas defined in `lib/schemas.ts`:
 
 ### Currency
 
-Dual display: EUR and ALL (Albanian Lek). All API amounts are in EUR; conversion is display-only. Use `formatCurrency(amount, currency)` from `lib/currency.ts` and `useCurrency()` hook from `lib/contexts/currency-context`.
+All API amounts are in EUR. `formatCurrency(amount, currency)` from `lib/currency.ts` supports EUR and ALL (Albanian Lek) display with a hardcoded conversion rate. Currently all components hardcode `"EUR"` — there is no currency context or toggle UI.
 
 ## Key Files
 
@@ -169,7 +173,10 @@ Dual display: EUR and ALL (Albanian Lek). All API amounts are in EUR; conversion
 | `components/listing-form/` | Multi-step listing creation form |
 | `components/dashboard/` | Role-based dashboard views (agent, buyer, admin) |
 | `lib/api/chat.ts` | AI chat API module (send message, conversations CRUD) |
+| `lib/api/geography.ts` | Geography API module (countries, cities, neighbourhoods) |
 | `lib/hooks/useChat.ts` | React Query hooks for AI chat |
+| `lib/hooks/useGeography.ts` | Geography hooks (cities, neighbourhoods, admin CRUD) |
+| `lib/hooks/use-listing-filters.ts` | Client-side listing filter/sort with URL sync |
 | `app/[country]/ai-recommendations/` | AI Recommendations page (buyer-only) |
 
 ## AI Recommendations
@@ -193,6 +200,10 @@ The AI Recommendations page (`/{country}/ai-recommendations`) lets buyers chat w
 7. **Buyer demand deletion**: Only `"active"` demands can be deleted (assigned/fulfilled/closed are kept for history)
 8. **Agent verification required** for: creating listings, claiming demands
 
-## Stale `.claude/rules/` Warning
+## Known Bugs
 
-The files in `.claude/rules/` (`auth.md`, `listings.md`, `components.md`) reference the **old full-stack architecture** (Prisma, NextAuth, server actions, `auth()`, `prisma.*`). These patterns do NOT exist in this frontend-only codebase. The backend (FastAPI) handles all of that. Ignore Prisma/NextAuth/server-action code patterns in those rule files; follow the API client patterns described above instead.
+1. **SearchBar sends `category=all` to API** (`components/home/search-bar.tsx:34-36`) — When "All Categories" or "All Cities" is selected, the value `"all"` is truthy and gets included in URL params. The `use-listing-filters.ts` hook correctly normalizes this, but the SearchBar bypasses that hook.
+2. **AI chat optimistic update has no rollback in hook** (`lib/hooks/useChat.ts`) — `useSendMessage()` has no `onError`. Rollback only happens in the component's local try/catch. Concurrent messages can cause inconsistent state.
+3. **`agent_agency_name` vs `agent_agency` naming split** (`lib/api/types.ts`) — `Listing` and `BuyerLead` use `agent_agency_name` (matching backend schemas). `ToolCallListing` uses `agent_agency` (matching backend `agent_service.py` tool output). This is intentional — different backend endpoints use different field names.
+4. **Three identical paginated response types** (`lib/api/types.ts:217-242`) — `ListingsResponse`, `AgentListingsResponse`, `SavedListingsResponse` have identical structure.
+

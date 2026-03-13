@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useUser } from "@/lib/hooks/useAuth"
@@ -12,7 +13,9 @@ import {
   useDeleteConversation,
 } from "@/lib/hooks/useChat"
 import type { CountryCode } from "@/lib/constants"
-import type { ChatMessage, ToolCallListing, ToolCallResult } from "@/lib/api/types"
+import { formatCurrency } from "@/lib/currency"
+import { getErrorMessage } from "@/lib/utils"
+import type { ChatMessage, ToolCallListing, ToolCallDemand, ToolCallResult } from "@/lib/api/types"
 import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -31,6 +34,8 @@ import {
   TrendingUp,
   Building2,
   ExternalLink,
+  DollarSign,
+  User as UserIcon,
 } from "lucide-react"
 
 export function AIRecommendationsClient({
@@ -146,9 +151,9 @@ export function AIRecommendationsClient({
         created_at: new Date().toISOString(),
       }
       setLocalMessages((prev) => [...prev, aiMsg])
-    } catch {
-      // Remove optimistic message on error
+    } catch (error) {
       setLocalMessages((prev) => prev.filter((m) => m.id !== tempUserMsg.id))
+      toast.error(getErrorMessage(error, "Failed to send message. Please try again."))
     }
   }
 
@@ -422,8 +427,9 @@ function MessageBubble({
 }) {
   const isUser = message.role === "user"
 
-  // Extract listings from tool call results
+  // Extract listings and demands from tool call results
   const listings = extractListings(message.tool_calls)
+  const demands = extractDemands(message.tool_calls)
 
   return (
     <div className={`flex gap-3 ${isUser ? "justify-end" : ""}`}>
@@ -454,6 +460,15 @@ function MessageBubble({
             ))}
           </div>
         )}
+
+        {/* Demand cards below AI message */}
+        {!isUser && demands.length > 0 && (
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {demands.map((demand) => (
+              <DemandCard key={demand.id} demand={demand} />
+            ))}
+          </div>
+        )}
       </div>
       {isUser && (
         <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center shrink-0 mt-0.5">
@@ -470,7 +485,7 @@ function extractListings(toolCalls: ToolCallResult[] | null): ToolCallListing[] 
   const seen = new Set<string>()
 
   for (const tc of toolCalls) {
-    if (tc.name === "search_listings" && tc.result?.listings) {
+    if ((tc.name === "search_listings" || tc.name === "search_my_listings") && tc.result?.listings) {
       for (const l of tc.result.listings) {
         if (!seen.has(l.id)) {
           seen.add(l.id)
@@ -489,6 +504,31 @@ function extractListings(toolCalls: ToolCallResult[] | null): ToolCallListing[] 
   return listings
 }
 
+function extractDemands(toolCalls: ToolCallResult[] | null): ToolCallDemand[] {
+  if (!toolCalls) return []
+  const demands: ToolCallDemand[] = []
+  const seen = new Set<string>()
+
+  for (const tc of toolCalls) {
+    if (tc.name === "search_demands" && tc.result?.demands) {
+      for (const d of tc.result.demands as unknown as ToolCallDemand[]) {
+        if (!seen.has(d.id)) {
+          seen.add(d.id)
+          demands.push(d)
+        }
+      }
+    }
+    if (tc.name === "get_demand_detail" && tc.result?.id) {
+      const r = tc.result as unknown as ToolCallDemand
+      if (!seen.has(r.id)) {
+        seen.add(r.id)
+        demands.push(r)
+      }
+    }
+  }
+  return demands
+}
+
 function ListingCard({
   listing,
   country,
@@ -497,15 +537,6 @@ function ListingCard({
   country: CountryCode
 }) {
   const cc = listing.country_code || country
-
-  const formatPrice = (price: number | null) => {
-    if (price == null) return null
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "EUR",
-      maximumFractionDigits: 0,
-    }).format(price)
-  }
 
   return (
     <Link
@@ -550,9 +581,9 @@ function ListingCard({
         </div>
 
         <div className="flex items-center justify-between mt-2">
-          {listing.asking_price_eur && (
+          {listing.asking_price_eur != null && (
             <span className="text-sm font-semibold text-primary">
-              {formatPrice(listing.asking_price_eur)}
+              {formatCurrency(listing.asking_price_eur)}
             </span>
           )}
           {listing.roi != null && (
@@ -571,6 +602,40 @@ function ListingCard({
         </div>
       </div>
     </Link>
+  )
+}
+
+function DemandCard({ demand }: { demand: ToolCallDemand }) {
+  return (
+    <div className="rounded-xl border border-border bg-background overflow-hidden">
+      <div className="p-3">
+        <div className="flex items-center gap-1.5 mb-1.5">
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-violet-100 text-violet-700 capitalize">
+            {demand.demand_type === "seeking_funding" ? "Seeking Funding" : "Investor"}
+          </span>
+          <span className="text-[10px] text-muted-foreground capitalize bg-muted px-1.5 py-0.5 rounded">
+            {demand.category}
+          </span>
+        </div>
+
+        <p className="text-sm line-clamp-2 mb-2">{demand.description}</p>
+
+        <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1.5">
+          <MapPin className="h-3 w-3 shrink-0" />
+          <span className="truncate">{demand.city}{demand.area ? `, ${demand.area}` : ""}</span>
+        </div>
+
+        <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
+          <UserIcon className="h-3 w-3 shrink-0" />
+          <span>{demand.buyer_name}</span>
+        </div>
+
+        <div className="flex items-center gap-1 text-sm font-semibold text-primary">
+          <DollarSign className="h-3.5 w-3.5" />
+          {formatCurrency(demand.budget_min_eur)} – {formatCurrency(demand.budget_max_eur)}
+        </div>
+      </div>
+    </div>
   )
 }
 

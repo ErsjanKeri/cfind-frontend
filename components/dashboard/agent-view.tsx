@@ -4,35 +4,56 @@ import { useState } from "react"
 import { useUser } from "@/lib/hooks/useAuth"
 import { useAgentListings } from "@/lib/hooks/useListings"
 import { useAgentLeads } from "@/lib/hooks/useLeads"
+import { useDemands, useAgentDemands, useClaimDemand } from "@/lib/hooks/useDemands"
 import { Button } from "@/components/ui/button"
 import { formatCurrency } from "@/lib/currency"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { StatCard } from "@/components/shared/stat-card"
 import { EmptyState } from "@/components/shared/empty-state"
-import { Building2, Plus, Eye, TrendingUp, MessageSquare } from "lucide-react"
+import { Building2, Plus, Eye, TrendingUp, MessageSquare, Tag, HandHelping } from "lucide-react"
 import { LoadingSpinner } from "@/components/shared/loading-spinner"
 import { ListingDialog } from "@/components/listings/listing-dialog"
 import { CreditBalanceWidget } from "@/components/dashboard/credit-balance-widget"
 import { PromoteListingDialog } from "@/components/listings/promote-listing-dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { AgentAlerts } from "@/components/dashboard/agent-alerts"
 import { AgentListingsTable } from "@/components/dashboard/agent-listings-table"
 import { RecentContactsCard } from "@/components/dashboard/recent-contacts-card"
-import type { Listing } from "@/lib/api/types"
+import { DemandCard } from "@/components/demands/demand-card"
+import { Badge } from "@/components/ui/badge"
+import { toast } from "sonner"
+import { getErrorMessage } from "@/lib/utils"
+import { getCountryOrDefault } from "@/lib/country"
+import { businessCategories } from "@/lib/constants"
+import type { Listing, DemandFilters } from "@/lib/api/types"
 
 export function AgentView() {
     const { user } = useUser()
+    const country = getCountryOrDefault()
     const [showListingDialog, setShowListingDialog] = useState(false)
     const [editingListing, setEditingListing] = useState<Listing | null>(null)
     const [dialogMode, setDialogMode] = useState<"create" | "edit">("create")
     const [showPromoteDialog, setShowPromoteDialog] = useState(false)
     const [promotingListing, setPromotingListing] = useState<Listing | null>(null)
+    const [categoryFilter, setCategoryFilter] = useState<string>("all")
 
     const { data: listingsData, isLoading: isLoadingListings, refetch: refetchListings } = useAgentListings(user?.id || '')
     const { data: leadsData, isLoading: isLoadingLeads } = useAgentLeads(user?.id)
 
+    const demandFilters: DemandFilters = {
+        country_code: country,
+        status: "active",
+        ...(categoryFilter !== "all" && { category: categoryFilter as DemandFilters["category"] }),
+    }
+    const { data: availableDemandsData, isLoading: isLoadingDemands } = useDemands(demandFilters)
+    const { data: claimedDemandsData, isLoading: isLoadingClaimed } = useAgentDemands(user?.id)
+    const claimDemand = useClaimDemand()
+
     const listings = listingsData?.listings ?? []
     const leads = leadsData?.leads ?? []
+    const availableDemands = availableDemandsData?.demands ?? []
+    const claimedDemands = claimedDemandsData?.demands ?? []
 
     const agentProfile = user?.agent_profile
     const isLoading = isLoadingListings || isLoadingLeads
@@ -44,6 +65,15 @@ export function AgentView() {
     const activeListings = listings.filter((l) => l.status === "active")
     const totalViews = listings.reduce((acc, l) => acc + (l.view_count || 0), 0)
     const totalValue = listings.reduce((acc, l) => acc + (l.asking_price_eur || 0), 0)
+
+    const handleClaimDemand = async (demandId: string) => {
+        try {
+            await claimDemand.mutateAsync(demandId)
+            toast.success("Demand claimed successfully")
+        } catch (error: unknown) {
+            toast.error(getErrorMessage(error, "Failed to claim demand"))
+        }
+    }
 
     if (isLoading) {
         return (
@@ -71,6 +101,14 @@ export function AgentView() {
                     <TabsList className="bg-muted/60 p-1 h-auto">
                         <TabsTrigger value="overview" className="px-6 py-2">Overview</TabsTrigger>
                         <TabsTrigger value="listings" className="px-6 py-2">Listings</TabsTrigger>
+                        <TabsTrigger value="demands" className="px-6 py-2 gap-2">
+                            Demands
+                            {availableDemandsData?.total ? (
+                                <Badge variant="secondary" className="h-5 min-w-5 text-xs">
+                                    {availableDemandsData.total}
+                                </Badge>
+                            ) : null}
+                        </TabsTrigger>
                     </TabsList>
                 </div>
 
@@ -166,6 +204,93 @@ export function AgentView() {
                                         icon: Plus,
                                         variant: "outline"
                                     } : undefined}
+                                />
+                            )}
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                <TabsContent value="demands" className="space-y-6">
+                    {/* Available Demands */}
+                    <Card className="border-border/60 shadow-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                            <div>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Tag className="h-5 w-5" />
+                                    Available Demands
+                                </CardTitle>
+                                <CardDescription>Browse active buyer demands and claim ones you can fulfill</CardDescription>
+                            </div>
+                            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="All Categories" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Categories</SelectItem>
+                                    {businessCategories.map((cat) => (
+                                        <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </CardHeader>
+                        <CardContent>
+                            {isLoadingDemands ? (
+                                <div className="flex items-center justify-center py-8">
+                                    <LoadingSpinner />
+                                </div>
+                            ) : availableDemands.length > 0 ? (
+                                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                    {availableDemands.map((demand) => (
+                                        <DemandCard
+                                            key={demand.id}
+                                            demand={demand}
+                                            variant="agent"
+                                            onClaim={() => handleClaimDemand(demand.id)}
+                                            isClaimLoading={claimDemand.isPending}
+                                        />
+                                    ))}
+                                </div>
+                            ) : (
+                                <EmptyState
+                                    icon={Tag}
+                                    title="No available demands"
+                                    description="There are no active buyer demands in this category right now"
+                                    size="sm"
+                                />
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    {/* My Claimed Demands */}
+                    <Card className="border-border/60 shadow-sm">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <HandHelping className="h-5 w-5" />
+                                My Claimed Demands
+                            </CardTitle>
+                            <CardDescription>Demands you have claimed from buyers</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {isLoadingClaimed ? (
+                                <div className="flex items-center justify-center py-8">
+                                    <LoadingSpinner />
+                                </div>
+                            ) : claimedDemands.length > 0 ? (
+                                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                    {claimedDemands.map((demand) => (
+                                        <DemandCard
+                                            key={demand.id}
+                                            demand={demand}
+                                            variant="agent-claimed"
+                                        />
+                                    ))}
+                                </div>
+                            ) : (
+                                <EmptyState
+                                    icon={HandHelping}
+                                    title="No claimed demands yet"
+                                    description="Claim a buyer demand above to get started"
+                                    size="sm"
                                 />
                             )}
                         </CardContent>

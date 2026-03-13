@@ -223,23 +223,6 @@ export interface ListingsResponse {
   listings: Listing[];
 }
 
-export interface AgentListingsResponse {
-  success: boolean;
-  total: number;
-  page: number;
-  limit: number;
-  total_pages: number;
-  listings: Listing[];
-}
-
-export interface SavedListingsResponse {
-  success: boolean;
-  total: number;
-  page: number;
-  limit: number;
-  total_pages: number;
-  listings: Listing[];
-}
 
 // ============================================================================
 // LEAD TYPES
@@ -255,7 +238,7 @@ export interface BuyerLead {
   listing_asking_price_eur: number;
   agent_id: string;
   agent_name: string;
-  agent_agency: string | null;
+  agent_agency_name: string | null;
   agent_email: string;
   agent_phone: string | null;
   agent_whatsapp: string | null;
@@ -352,15 +335,6 @@ export interface CreateDemandRequest {
 }
 
 export interface BuyerDemandsResponse {
-  success: boolean;
-  total: number;
-  page: number;
-  limit: number;
-  total_pages: number;
-  demands: BuyerDemand[];
-}
-
-export interface AgentDemandsResponse {
   success: boolean;
   total: number;
   page: number;
@@ -492,11 +466,26 @@ export interface ToolCallResult {
   result?: {
     total?: number;
     listings?: ToolCallListing[];
-    // get_listing_detail returns a single listing object directly
+    demands?: ToolCallDemand[];
+    // get_listing_detail / get_demand_detail return a single object directly
     id?: string;
     title?: string;
     [key: string]: unknown;
   };
+}
+
+export interface ToolCallDemand {
+  id: string;
+  category: string;
+  city: string;
+  area: string | null;
+  country_code: string;
+  budget_min_eur: number;
+  budget_max_eur: number;
+  demand_type: string;
+  description: string;
+  buyer_name: string;
+  created_at: string | null;
 }
 
 export interface ToolCallListing {
@@ -582,21 +571,40 @@ export interface DemandFilters extends PaginationParams {
   status?: DemandStatus;
 }
 
+
 // ============================================================================
-// API RESPONSE WRAPPERS
+// GEOGRAPHY TYPES
 // ============================================================================
 
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  message?: string;
+export interface City {
+  id: number;
+  country_code: string;
+  name: string;
 }
 
-export interface PaginatedResponse<T> {
+export interface Neighbourhood {
+  id: number;
+  city_id: number;
+  name: string;
+}
+
+export interface Country {
+  code: string;
+  name: string;
+  cities: City[];
+}
+
+export interface CountryListResponse {
   success: boolean;
-  total: number;
-  page: number;
-  limit: number;
-  total_pages: number;
-  items: T[];
+  countries: Country[];
+}
+
+export interface CitiesListResponse {
+  success: boolean;
+  cities: City[];
+}
+
+export interface NeighbourhoodsListResponse {
+  success: boolean;
+  neighbourhoods: Neighbourhood[];
 }

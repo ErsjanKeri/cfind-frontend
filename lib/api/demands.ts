@@ -4,7 +4,6 @@ import type {
   CreateDemandRequest,
   DemandFilters,
   BuyerDemandsResponse,
-  AgentDemandsResponse,
   PaginationParams,
 } from './types';
 
@@ -29,9 +28,9 @@ export const demandsApi = {
     });
   },
 
-  async getAgentDemands(agentId: string, params?: PaginationParams): Promise<AgentDemandsResponse> {
+  async getAgentDemands(agentId: string, params?: PaginationParams): Promise<BuyerDemandsResponse> {
     return apiCall(async () => {
-      const response = await apiClient.get<AgentDemandsResponse>(
+      const response = await apiClient.get<BuyerDemandsResponse>(
         `/api/demands/agent/${agentId}`,
         { params }
       );

@@ -24,7 +24,8 @@ import {
 } from "@/components/ui/select"
 import { FormError } from "@/components/shared/form-error"
 import { useCreateDemand } from "@/lib/hooks/useDemands"
-import { businessCategories, getCountryCities, getCityAreas, type CountryCode } from "@/lib/constants"
+import { businessCategories, type CountryCode } from "@/lib/constants"
+import { useCities, useNeighbourhoodNames } from "@/lib/hooks/useGeography"
 import { getCountryOrDefault } from "@/lib/country"
 
 interface DemandDialogProps {
@@ -48,6 +49,10 @@ export function DemandDialog({ open, onOpenChange, onSuccess, country }: DemandD
     })
     const [errors, setErrors] = useState<Record<string, string>>({})
     const [formError, setFormError] = useState<string | null>(null)
+    const { data: citiesData } = useCities(resolvedCountry)
+    const cities = citiesData?.cities ?? []
+    const selectedCityId = cities.find((c) => c.name === formData.preferred_city_en)?.id
+    const { data: neighbourhoodNames } = useNeighbourhoodNames(selectedCityId)
 
     const updateField = (field: string, value: string) => {
         setFormData(prev => ({ ...prev, [field]: value }))
@@ -64,9 +69,6 @@ export function DemandDialog({ open, onOpenChange, onSuccess, country }: DemandD
         }))
     }
 
-    const areas = formData.preferred_city_en
-        ? getCityAreas(resolvedCountry, formData.preferred_city_en)
-        : []
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -210,9 +212,9 @@ export function DemandDialog({ open, onOpenChange, onSuccess, country }: DemandD
                                 <SelectValue placeholder="Select a city" />
                             </SelectTrigger>
                             <SelectContent>
-                                {getCountryCities(resolvedCountry).map((city) => (
-                                    <SelectItem key={city} value={city}>
-                                        {city}
+                                {cities.map((city) => (
+                                    <SelectItem key={city.id} value={city.name}>
+                                        {city.name}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -228,14 +230,14 @@ export function DemandDialog({ open, onOpenChange, onSuccess, country }: DemandD
                         <Select
                             value={formData.preferred_area}
                             onValueChange={(val) => updateField("preferred_area", val)}
-                            disabled={areas.length === 0}
+                            disabled={neighbourhoodNames.length === 0}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder={areas.length === 0 ? "Select city first" : "Select area"} />
+                                <SelectValue placeholder={neighbourhoodNames.length === 0 ? "Select city first" : "Select area"} />
                             </SelectTrigger>
                             <SelectContent>
-                                {areas.map((area) => (
-                                    <SelectItem key={area} value={area}>{area}</SelectItem>
+                                {neighbourhoodNames.map((name) => (
+                                    <SelectItem key={name} value={name}>{name}</SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>

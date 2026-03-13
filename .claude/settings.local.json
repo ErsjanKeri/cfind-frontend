@@ -53,7 +53,15 @@
       "Bash(sed:*)",
       "Bash(cp:*)",
       "mcp__digitalocean__apps-list",
-      "mcp__digitalocean__apps-get-deployment-status"
+      "mcp__digitalocean__apps-get-deployment-status",
+      "Bash(node -e \"const qs = require\\('qs'\\); const obj = {country_code: 'al', category: undefined}; console.log\\('With undefined:', qs.stringify\\(obj\\)\\); const clean = Object.fromEntries\\(Object.entries\\(obj\\).filter\\(\\([_, v]\\) => v !== undefined\\)\\); console.log\\('Without undefined:', qs.stringify\\(clean\\)\\);\")",
+      "Bash(node -e \"const qs = require\\('qs'\\); const obj = {country_code: 'al', category: undefined}; console.log\\('With undefined:', qs.stringify\\(obj\\)\\);\")",
+      "Bash(git stash:*)",
+      "Bash(find /Users/ersibesi/Projects/company-finder-platform/cfind-frontend -path \"*/node_modules\" -prune -o -type f \\\\\\( -name \"*context*\" -o -name \"*Context*\" \\\\\\) -print 2>/dev/null | head -20)",
+      "Bash(grep -n \"Promise<.*\\\\[\\\\]\" /Users/ersibesi/Projects/company-finder-platform/cfind-frontend/lib/api/*.ts)",
+      "Bash(npm uninstall:*)",
+      "Bash(head -100 /Users/ersibesi/Projects/company-finder-platform/cfind-frontend/app/[country]/ai-recommendations/ai-recommendations-client.tsx | grep -E \"^import|^from\")",
+      "Bash(npx eslint:*)"
     ],
     "deny": [],
     "ask": []

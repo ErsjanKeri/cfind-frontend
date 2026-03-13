@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, MapPin, Building } from "lucide-react"
 import { SearchInput } from "@/components/shared/search-input"
-import { businessCategories, getCountryCities, type CountryCode } from "@/lib/constants"
+import { businessCategories, type CountryCode } from "@/lib/constants"
+import { useCityNames } from "@/lib/hooks/useGeography"
 
 interface SearchBarProps {
   country: CountryCode
@@ -26,6 +27,7 @@ export function SearchBar({ country, variant = "hero", initialValues }: SearchBa
   const [query, setQuery] = useState(initialValues?.query ?? "")
   const [category, setCategory] = useState(initialValues?.category ?? "")
   const [city, setCity] = useState(initialValues?.city ?? "")
+  const { data: cities } = useCityNames(country)
 
   const handleSearch = () => {
     const params = new URLSearchParams()
@@ -52,7 +54,7 @@ export function SearchBar({ country, variant = "hero", initialValues }: SearchBa
           onKeyDown={handleKeyDown}
           wrapperClassName="flex-1"
         />
-        <Select value={category} onValueChange={setCategory}>
+        <Select value={category || "all"} onValueChange={(v) => setCategory(v === "all" ? "" : v)}>
           <SelectTrigger className="w-[140px]">
             <SelectValue placeholder="Category" />
           </SelectTrigger>
@@ -89,7 +91,7 @@ export function SearchBar({ country, variant = "hero", initialValues }: SearchBa
           {/* Divider */}
           <div className="hidden md:block w-px h-8 bg-border" />
 
-          <Select value={category} onValueChange={setCategory}>
+          <Select value={category || "all"} onValueChange={(v) => setCategory(v === "all" ? "" : v)}>
             <SelectTrigger className="h-14 w-full md:w-[180px] border-0 bg-transparent focus:ring-0 focus:ring-offset-0 pl-4 gap-2">
               <Building className="h-5 w-5 text-muted-foreground flex-shrink-0" />
               <SelectValue placeholder="Category" />
@@ -108,14 +110,14 @@ export function SearchBar({ country, variant = "hero", initialValues }: SearchBa
           <div className="hidden md:block w-px h-8 bg-border" />
 
           {/* City Select */}
-          <Select value={city} onValueChange={setCity}>
+          <Select value={city || "all"} onValueChange={(v) => setCity(v === "all" ? "" : v)}>
             <SelectTrigger className="h-14 w-full md:w-[160px] border-0 bg-transparent focus:ring-0 focus:ring-offset-0 pl-4 gap-2">
               <MapPin className="h-5 w-5 text-muted-foreground flex-shrink-0" />
               <SelectValue placeholder="City" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Cities</SelectItem>
-              {getCountryCities(country).map((c) => (
+              {cities.map((c) => (
                 <SelectItem key={c} value={c}>
                   {c}
                 </SelectItem>

@@ -1,6 +1,5 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Analytics } from "@vercel/analytics/next"
 import { QueryProvider } from "@/lib/providers/query-provider"
 import { CookieConsent } from "@/components/shared/cookie-consent"
 import "./globals.css"
@@ -50,7 +49,6 @@ export default function RootLayout({
           {children}
           <CookieConsent />
         </QueryProvider>
-        <Analytics />
       </body>
     </html>
   )

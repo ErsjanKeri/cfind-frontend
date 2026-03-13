@@ -1,7 +1,7 @@
 import { apiClient, apiCall } from './client';
 import type {
-  BuyerLead, AgentLead, Listing, CreateLeadRequest,
-  BuyerLeadsResponse, AgentLeadsResponse, SavedListingsResponse,
+  CreateLeadRequest,
+  BuyerLeadsResponse, AgentLeadsResponse, ListingsResponse,
   PaginationParams,
 } from './types';
 
@@ -42,9 +42,9 @@ export const leadsApi = {
     });
   },
 
-  async getSavedListings(params?: PaginationParams): Promise<SavedListingsResponse> {
+  async getSavedListings(params?: PaginationParams): Promise<ListingsResponse> {
     return apiCall(async () => {
-      const response = await apiClient.get<SavedListingsResponse>(
+      const response = await apiClient.get<ListingsResponse>(
         '/api/leads/saved',
         { params }
       );

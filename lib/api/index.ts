@@ -18,6 +18,7 @@ export * from './promotions';
 export * from './admin';
 export * from './upload';
 export * from './chat';
+export * from './geography';
 
 // Import individual APIs
 import { authApi } from './auth';
@@ -29,6 +30,7 @@ import { promotionsApi } from './promotions';
 import { adminApi } from './admin';
 import { uploadApi } from './upload';
 import { chatApi } from './chat';
+import { geographyApi } from './geography';
 
 /**
  * Unified API object
@@ -48,6 +50,7 @@ export const api = {
   admin: adminApi,
   upload: uploadApi,
   chat: chatApi,
+  geography: geographyApi,
 };
 
 export default api;

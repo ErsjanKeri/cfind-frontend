@@ -2,7 +2,6 @@ import { apiClient, apiCall } from './client';
 import type {
   Listing,
   ListingsResponse,
-  AgentListingsResponse,
   CreateListingRequest,
   ListingFilters,
   PaginationParams,
@@ -47,9 +46,9 @@ export const listingsApi = {
     });
   },
 
-  async getAgentListings(agentId: string, params?: PaginationParams): Promise<AgentListingsResponse> {
+  async getAgentListings(agentId: string, params?: PaginationParams): Promise<ListingsResponse> {
     return apiCall(async () => {
-      const response = await apiClient.get<AgentListingsResponse>(
+      const response = await apiClient.get<ListingsResponse>(
         `/api/listings/agent/${agentId}`,
         { params }
       );
