@@ -64,7 +64,7 @@ export function useListingForm({ listing, mode, isAdmin, agentCountry, onSuccess
     monthly_revenue_eur: listing?.monthly_revenue_eur || "",
     employee_count: listing?.employee_count || "",
     years_in_operation: listing?.years_in_operation || "",
-    is_physically_verified: mode === "edit",
+    is_physically_verified: listing?.is_physically_verified ?? false,
   })
 
   const [imageFiles, setImageFiles] = useState<File[]>([])

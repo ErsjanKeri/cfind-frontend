@@ -23,7 +23,6 @@ export const uploadApi = {
       }>(
         `/api/upload/direct/image?folder=${folder}`,
         formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
       );
 
       const fileUrl = response.data.url || response.data.public_url;

@@ -17,7 +17,7 @@ export default async function HomePage({ params }: { params: Promise<{ country: 
 
   let listings: Listing[] = []
   try {
-    const response = await api.listings.getListings({ country_code: countryCode, page: 1, page_size: 20 })
+    const response = await api.listings.getListings({ country_code: countryCode, page: 1, limit: 20 })
     listings = response.listings || []
   } catch {
     listings = []

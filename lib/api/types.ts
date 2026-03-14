@@ -214,12 +214,15 @@ export interface CreateListingRequest {
   status?: 'draft' | 'active' | 'sold' | 'inactive';
 }
 
-export interface ListingsResponse {
+export interface PaginatedResponse {
   success: boolean;
   total: number;
   page: number;
   limit: number;
   total_pages: number;
+}
+
+export interface ListingsResponse extends PaginatedResponse {
   listings: Listing[];
 }
 
@@ -268,21 +271,11 @@ export interface CreateLeadRequest {
   interaction_type: InteractionType;
 }
 
-export interface AgentLeadsResponse {
-  success: boolean;
-  total: number;
-  page: number;
-  limit: number;
-  total_pages: number;
+export interface AgentLeadsResponse extends PaginatedResponse {
   leads: AgentLead[];
 }
 
-export interface BuyerLeadsResponse {
-  success: boolean;
-  total: number;
-  page: number;
-  limit: number;
-  total_pages: number;
+export interface BuyerLeadsResponse extends PaginatedResponse {
   leads: BuyerLead[];
 }
 
@@ -334,12 +327,7 @@ export interface CreateDemandRequest {
   demand_type: DemandType;
 }
 
-export interface BuyerDemandsResponse {
-  success: boolean;
-  total: number;
-  page: number;
-  limit: number;
-  total_pages: number;
+export interface BuyerDemandsResponse extends PaginatedResponse {
   demands: BuyerDemand[];
 }
 
@@ -548,6 +536,7 @@ export interface ConversationDetail extends Conversation {
 
 export interface PaginationParams {
   page?: number;
+  limit?: number;
   page_size?: number;
 }
 
@@ -560,7 +549,7 @@ export interface ListingFilters extends PaginationParams {
   max_price_eur?: number;
   promotion_tier?: PromotionTier;
   search?: string;
-  sort_by?: 'price_asc' | 'price_desc' | 'created_desc' | 'created_asc' | 'roi_desc';
+  sort_by?: 'newest' | 'price_low' | 'price_high' | 'roi_high' | 'roi_low' | 'most_viewed';
 }
 
 export interface DemandFilters extends PaginationParams {

@@ -36,9 +36,9 @@ export const leadsApi = {
     });
   },
 
-  async deleteLead(leadId: string): Promise<void> {
+  async deleteLead(id: string): Promise<void> {
     return apiCall(async () => {
-      await apiClient.delete(`/api/leads/${leadId}`);
+      await apiClient.delete(`/api/leads/${id}`);
     });
   },
 

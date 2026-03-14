@@ -23,7 +23,6 @@ export const authApi = {
       const response = await apiClient.post<RegisterResponse>(
         '/api/auth/register',
         formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
       );
       return response.data;
     });
@@ -39,8 +38,8 @@ export const authApi = {
   async logout(): Promise<void> {
     try {
       await apiClient.post('/api/auth/logout');
-    } catch {
-      // Ignore — user is logging out anyway
+    } catch (error) {
+      console.warn('Logout request failed:', error);
     }
   },
 

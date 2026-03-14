@@ -113,12 +113,6 @@ export const adminApi = {
     });
   },
 
-  async deleteCity(cityId: number): Promise<void> {
-    return apiCall(async () => {
-      await apiClient.delete(`/api/admin/geography/cities/${cityId}`);
-    });
-  },
-
   async createNeighbourhood(cityId: number, name: string): Promise<Neighbourhood> {
     return apiCall(async () => {
       const response = await apiClient.post<{ neighbourhood: Neighbourhood }>(
@@ -126,12 +120,6 @@ export const adminApi = {
         { name }
       );
       return response.data.neighbourhood;
-    });
-  },
-
-  async deleteNeighbourhood(neighbourhoodId: number): Promise<void> {
-    return apiCall(async () => {
-      await apiClient.delete(`/api/admin/geography/neighbourhoods/${neighbourhoodId}`);
     });
   },
 };

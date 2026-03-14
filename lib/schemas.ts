@@ -15,7 +15,7 @@ export const ListingSchema = z.object({
 
     // Currency fields (EUR only)
     asking_price_eur: z.coerce.number().positive("Asking price is required"),
-    monthly_revenue_eur: z.coerce.number().positive().optional(),
+    monthly_revenue_eur: z.coerce.number().nonnegative().optional(),
 
     // Business details
     employee_count: z.coerce.number().optional(),

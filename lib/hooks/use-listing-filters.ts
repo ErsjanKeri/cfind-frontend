@@ -1,22 +1,22 @@
 "use client"
 
-import { useState, useMemo, useCallback } from "react"
+import { useState, useCallback } from "react"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { businessCategories, MAX_LISTING_PRICE } from "@/lib/constants"
-import type { Listing } from "@/lib/api/types"
+import type { ListingFilters } from "@/lib/api/types"
 
 interface UseListingFiltersOptions {
-    initialData: Listing[]
-    enableUrlSync?: boolean
+    country: string
 }
 
-export function useListingFilters({ initialData, enableUrlSync = true }: UseListingFiltersOptions) {
+const PAGE_SIZE = 20
+
+export function useListingFilters({ country }: UseListingFiltersOptions) {
     const searchParams = useSearchParams()
     const router = useRouter()
     const pathname = usePathname()
 
     const getInitialCategory = () => {
-        if (!enableUrlSync) return ""
         const param = searchParams.get("category") || ""
         if (!param) return ""
         const directMatch = businessCategories.find((c) => c.value === param)
@@ -28,83 +28,99 @@ export function useListingFilters({ initialData, enableUrlSync = true }: UseList
     }
 
     // State
-    const [query, setQuery] = useState(enableUrlSync ? searchParams.get("q") || "" : "")
+    const [query, setQuery] = useState(searchParams.get("q") || "")
     const [category, setCategory] = useState<string>(getInitialCategory())
-    const [city, setCity] = useState<string>(enableUrlSync ? searchParams.get("city") || "" : "")
+    const [city, setCity] = useState<string>(searchParams.get("city") || "")
 
-    // Init Advanced State from URL
-    const initialMinPrice = enableUrlSync && searchParams.get("minPrice") ? Number(searchParams.get("minPrice")) : 0
-    const initialMaxPrice = enableUrlSync && searchParams.get("maxPrice") ? Number(searchParams.get("maxPrice")) : MAX_LISTING_PRICE
+    const initialMinPrice = searchParams.get("minPrice") ? Number(searchParams.get("minPrice")) : 0
+    const initialMaxPrice = searchParams.get("maxPrice") ? Number(searchParams.get("maxPrice")) : MAX_LISTING_PRICE
     const [priceRange, setPriceRange] = useState<[number, number]>([initialMinPrice, initialMaxPrice])
 
-    const [minRoi, setMinRoi] = useState<number>(enableUrlSync && searchParams.get("minRoi") ? Number(searchParams.get("minRoi")) : 0)
-    const [sortBy, setSortBy] = useState<string>(enableUrlSync && searchParams.get("sortBy") ? searchParams.get("sortBy") || "newest" : "newest")
-    const [listingStatus, setListingStatus] = useState<string>("active") // 'active', 'all', etc.
+    const [minRoi, setMinRoi] = useState<number>(searchParams.get("minRoi") ? Number(searchParams.get("minRoi")) : 0)
+    const [sortBy, setSortBy] = useState<string>(searchParams.get("sortBy") || "newest")
+    const [page, setPage] = useState<number>(searchParams.get("page") ? Number(searchParams.get("page")) : 1)
 
-    // URL Sync
-    const updateURL = useCallback(
-        (newCategory: string, newCity: string, newQuery: string, newPriceRange: [number, number], newMinRoi: number, newSortBy: string) => {
-            if (!enableUrlSync) return
+    // Build current URL params from state
+    const buildUrlParams = useCallback(
+        (overrides: Record<string, string | number | undefined> = {}) => {
+            const state: Record<string, string | number | undefined> = {
+                category: category || undefined,
+                city: city || undefined,
+                q: query || undefined,
+                minPrice: priceRange[0] > 0 ? priceRange[0] : undefined,
+                maxPrice: priceRange[1] < MAX_LISTING_PRICE ? priceRange[1] : undefined,
+                minRoi: minRoi > 0 ? minRoi : undefined,
+                sortBy: sortBy !== "newest" ? sortBy : undefined,
+                ...overrides,
+            }
 
-            const params = new URLSearchParams(searchParams.toString())
+            const params = new URLSearchParams()
+            for (const [key, value] of Object.entries(state)) {
+                if (value !== undefined && value !== "") {
+                    params.set(key, String(value))
+                }
+            }
+            return params
+        },
+        [category, city, query, priceRange, minRoi, sortBy],
+    )
 
-            if (newCategory) params.set("category", newCategory)
-            else params.delete("category")
-
-            if (newCity) params.set("city", newCity)
-            else params.delete("city")
-
-            if (newQuery) params.set("q", newQuery)
-            else params.delete("q")
-
-            if (newPriceRange[0] > 0) params.set("minPrice", newPriceRange[0].toString())
-            else params.delete("minPrice")
-
-            if (newPriceRange[1] < MAX_LISTING_PRICE) params.set("maxPrice", newPriceRange[1].toString())
-            else params.delete("maxPrice")
-
-            if (newMinRoi > 0) params.set("minRoi", newMinRoi.toString())
-            else params.delete("minRoi")
-
-            if (newSortBy && newSortBy !== "newest") params.set("sortBy", newSortBy)
-            else params.delete("sortBy")
-
+    const replaceUrl = useCallback(
+        (params: URLSearchParams) => {
             const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname
             router.replace(newUrl, { scroll: false })
         },
-        [enableUrlSync, pathname, router, searchParams],
+        [pathname, router],
     )
 
+    // All filter changes reset to page 1
     const handleCategoryChange = (value: string) => {
         const newCategory = value === "all" ? "" : value
         setCategory(newCategory)
-        updateURL(newCategory, city, query, priceRange, minRoi, sortBy)
+        setPage(1)
+        replaceUrl(buildUrlParams({ category: newCategory || undefined }))
     }
 
     const handleCityChange = (value: string) => {
         const newCity = value === "all" ? "" : value
         setCity(newCity)
-        updateURL(category, newCity, query, priceRange, minRoi, sortBy)
+        setPage(1)
+        replaceUrl(buildUrlParams({ city: newCity || undefined }))
     }
 
     const handleQueryChange = (value: string) => {
         setQuery(value)
-        updateURL(category, city, value, priceRange, minRoi, sortBy)
+        setPage(1)
+        replaceUrl(buildUrlParams({ q: value || undefined }))
     }
 
     const handlePriceRangeChange = (value: [number, number]) => {
         setPriceRange(value)
-        updateURL(category, city, query, value, minRoi, sortBy)
+        setPage(1)
+        replaceUrl(buildUrlParams({
+            minPrice: value[0] > 0 ? value[0] : undefined,
+            maxPrice: value[1] < MAX_LISTING_PRICE ? value[1] : undefined,
+        }))
     }
 
     const handleMinRoiChange = (value: number) => {
         setMinRoi(value)
-        updateURL(category, city, query, priceRange, value, sortBy)
+        setPage(1)
+        replaceUrl(buildUrlParams({ minRoi: value > 0 ? value : undefined }))
     }
 
     const handleSortByChange = (value: string) => {
         setSortBy(value)
-        updateURL(category, city, query, priceRange, minRoi, value)
+        setPage(1)
+        replaceUrl(buildUrlParams({ sortBy: value !== "newest" ? value : undefined }))
+    }
+
+    const handlePageChange = (newPage: number) => {
+        setPage(newPage)
+        const params = buildUrlParams()
+        if (newPage > 1) params.set("page", String(newPage))
+        replaceUrl(params)
+        window.scrollTo({ top: 0, behavior: "smooth" })
     }
 
     const clearAllFilters = () => {
@@ -114,77 +130,29 @@ export function useListingFilters({ initialData, enableUrlSync = true }: UseList
         setPriceRange([0, MAX_LISTING_PRICE])
         setMinRoi(0)
         setSortBy("newest")
-        if (enableUrlSync) {
-            router.replace(pathname, { scroll: false })
-        }
+        setPage(1)
+        router.replace(pathname, { scroll: false })
     }
-
-    const filteredListings = useMemo(() => {
-        let results = listingStatus !== "all"
-            ? initialData.filter((listing) => listing.status === listingStatus)
-            : [...initialData]
-
-        // Apply category filter
-        if (category) {
-            results = results.filter((listing) => listing.category === category)
-        }
-
-        // Apply city filter
-        if (city) {
-            results = results.filter((listing) => listing.public_location_city_en === city)
-        }
-
-        // Apply search query filter
-        if (query) {
-            const q = query.toLowerCase()
-            results = results.filter((listing) =>
-                listing.public_title_en.toLowerCase().includes(q) ||
-                listing.public_description_en.toLowerCase().includes(q) ||
-                listing.category.toLowerCase().includes(q) ||
-                (listing.public_location_area?.toLowerCase().includes(q))
-            )
-        }
-
-        // Apply price range filter
-        if (priceRange[0] > 0 || priceRange[1] < MAX_LISTING_PRICE) {
-            results = results.filter((listing) =>
-                listing.asking_price_eur >= priceRange[0] && listing.asking_price_eur <= priceRange[1]
-            )
-        }
-
-        // Apply minimum ROI filter
-        if (minRoi > 0) {
-            results = results.filter((listing) => (listing.roi || 0) >= minRoi)
-        }
-
-        // Sort: promotion tier first, then by selected sort
-        const tierOrder = { premium: 0, featured: 1, standard: 2 }
-        results.sort((a, b) => {
-            const tierA = tierOrder[a.promotion_tier as keyof typeof tierOrder] ?? 2
-            const tierB = tierOrder[b.promotion_tier as keyof typeof tierOrder] ?? 2
-            if (tierA !== tierB) return tierA - tierB
-
-            switch (sortBy) {
-                case "price-low":
-                    return a.asking_price_eur - b.asking_price_eur
-                case "price-high":
-                    return b.asking_price_eur - a.asking_price_eur
-                case "roi":
-                    return (b.roi || 0) - (a.roi || 0)
-                case "newest":
-                default:
-                    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-            }
-        })
-
-        return results
-    }, [initialData, sortBy, listingStatus, category, city, query, priceRange, minRoi])
 
     const activeFiltersCount =
         (category ? 1 : 0) +
         (city ? 1 : 0) +
         (priceRange[0] > 0 || priceRange[1] < MAX_LISTING_PRICE ? 1 : 0) +
         (minRoi > 0 ? 1 : 0)
+
+    // Build API filter params for server-side filtering
+    const apiFilters: ListingFilters = {
+        country_code: country,
+        page,
+        limit: PAGE_SIZE,
+        sort_by: sortBy as ListingFilters["sort_by"],
+        ...(category && { category: category as ListingFilters["category"] }),
+        ...(city && { city }),
+        ...(query && { search: query }),
+        ...(priceRange[0] > 0 && { min_price_eur: priceRange[0] }),
+        ...(priceRange[1] < MAX_LISTING_PRICE && { max_price_eur: priceRange[1] }),
+        ...(minRoi > 0 && { min_roi: minRoi }),
+    }
 
     return {
         filters: {
@@ -194,7 +162,7 @@ export function useListingFilters({ initialData, enableUrlSync = true }: UseList
             priceRange,
             minRoi,
             sortBy,
-            activeFiltersCount
+            activeFiltersCount,
         },
         setters: {
             setQuery: handleQueryChange,
@@ -204,8 +172,9 @@ export function useListingFilters({ initialData, enableUrlSync = true }: UseList
             setMinRoi: handleMinRoiChange,
             setSortBy: handleSortByChange,
             clearAllFilters,
-            setListingStatus,
         },
-        filteredListings,
+        page,
+        setPage: handlePageChange,
+        apiFilters,
     }
 }

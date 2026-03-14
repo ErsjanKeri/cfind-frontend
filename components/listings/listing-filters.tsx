@@ -30,9 +30,10 @@ import { useState } from "react"
 
 const SORT_OPTIONS = [
     { value: "newest", label: "Newest First" },
-    { value: "price-low", label: "Price: Low to High" },
-    { value: "price-high", label: "Price: High to Low" },
-    { value: "roi", label: "Highest ROI" },
+    { value: "price_low", label: "Price: Low to High" },
+    { value: "price_high", label: "Price: High to Low" },
+    { value: "roi_high", label: "Highest ROI" },
+    { value: "most_viewed", label: "Most Viewed" },
 ] as const
 
 interface ListingFiltersProps {

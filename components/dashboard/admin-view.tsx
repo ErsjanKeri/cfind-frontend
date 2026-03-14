@@ -27,15 +27,15 @@ import { LoadingSpinner } from "@/components/shared/loading-spinner"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Users, FileText, AlertTriangle, Plus, Tag, MapPin, Trash2, Pencil, Check, X } from "lucide-react"
+import { Users, FileText, AlertTriangle, Plus, Tag, MapPin, Pencil, Check, X } from "lucide-react"
 import { getErrorMessage } from "@/lib/utils"
 import { getCountryOrDefault } from "@/lib/country"
 import { businessCategories, type CountryCode } from "@/lib/constants"
 import { Input } from "@/components/ui/input"
 import {
     useCities, useNeighbourhoods,
-    useAdminCreateCity, useAdminUpdateCity, useAdminDeleteCity,
-    useAdminCreateNeighbourhood, useAdminDeleteNeighbourhood,
+    useAdminCreateCity, useAdminUpdateCity,
+    useAdminCreateNeighbourhood,
 } from "@/lib/hooks/useGeography"
 import { getDemandStatusBadge } from "@/lib/badge-utils"
 import type { UserWithProfile, DemandFilters } from "@/lib/api/types"
@@ -96,9 +96,7 @@ export function AdminView() {
 
     const createCity = useAdminCreateCity(geoCountry)
     const updateCity = useAdminUpdateCity(geoCountry)
-    const deleteCity = useAdminDeleteCity(geoCountry)
     const createNeighbourhood = useAdminCreateNeighbourhood(selectedCityId ?? 0)
-    const deleteNeighbourhood = useAdminDeleteNeighbourhood(selectedCityId ?? 0)
 
     const handleCreateCity = async () => {
         const name = newCityName.trim()
@@ -124,21 +122,6 @@ export function AdminView() {
         }
     }
 
-    const handleDeleteCity = async (cityId: number, cityName: string) => {
-        const hasNeighbourhoods = selectedCityId === cityId && geoNeighbourhoods.length > 0
-        const message = hasNeighbourhoods
-            ? `Delete "${cityName}" and its ${geoNeighbourhoods.length} neighbourhood(s)?`
-            : `Delete city "${cityName}"?`
-        if (!window.confirm(message)) return
-        try {
-            await deleteCity.mutateAsync(cityId)
-            if (selectedCityId === cityId) setSelectedCityId(null)
-            toast.success(`City "${cityName}" deleted`)
-        } catch (error: unknown) {
-            toast.error(getErrorMessage(error, "Failed to delete city"))
-        }
-    }
-
     const handleCreateNeighbourhood = async () => {
         const name = newNeighbourhoodName.trim()
         if (!name || !selectedCityId) return
@@ -148,15 +131,6 @@ export function AdminView() {
             toast.success(`Neighbourhood "${name}" added`)
         } catch (error: unknown) {
             toast.error(getErrorMessage(error, "Failed to add neighbourhood"))
-        }
-    }
-
-    const handleDeleteNeighbourhood = async (neighbourhoodId: number, name: string) => {
-        try {
-            await deleteNeighbourhood.mutateAsync(neighbourhoodId)
-            toast.success(`Neighbourhood "${name}" deleted`)
-        } catch (error: unknown) {
-            toast.error(getErrorMessage(error, "Failed to delete neighbourhood"))
         }
     }
 
@@ -513,25 +487,16 @@ export function AdminView() {
                                                         }`}
                                                     >
                                                         <span className="text-sm font-medium">{city.name}</span>
-                                                        <div className="flex items-center gap-0.5">
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation()
-                                                                    setEditingCityId(city.id)
-                                                                    setEditCityName(city.name)
-                                                                }}
-                                                                className="text-muted-foreground hover:text-foreground transition-colors p-1"
-                                                            >
-                                                                <Pencil className="h-3.5 w-3.5" />
-                                                            </button>
-                                                            <button
-                                                                onClick={(e) => { e.stopPropagation(); handleDeleteCity(city.id, city.name) }}
-                                                                className="text-muted-foreground hover:text-destructive transition-colors p-1"
-                                                                disabled={deleteCity.isPending}
-                                                            >
-                                                                <Trash2 className="h-3.5 w-3.5" />
-                                                            </button>
-                                                        </div>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                setEditingCityId(city.id)
+                                                                setEditCityName(city.name)
+                                                            }}
+                                                            className="text-muted-foreground hover:text-foreground transition-colors p-1"
+                                                        >
+                                                            <Pencil className="h-3.5 w-3.5" />
+                                                        </button>
                                                     </div>
                                                 )}
                                             </div>
@@ -574,15 +539,8 @@ export function AdminView() {
                                 ) : (
                                     <div className="space-y-1">
                                         {geoNeighbourhoods.map((n) => (
-                                            <div key={n.id} className="flex items-center justify-between px-3 py-2 rounded-md hover:bg-muted/60">
+                                            <div key={n.id} className="px-3 py-2 rounded-md hover:bg-muted/60">
                                                 <span className="text-sm">{n.name}</span>
-                                                <button
-                                                    onClick={() => handleDeleteNeighbourhood(n.id, n.name)}
-                                                    className="text-muted-foreground hover:text-destructive transition-colors p-1"
-                                                    disabled={deleteNeighbourhood.isPending}
-                                                >
-                                                    <Trash2 className="h-3.5 w-3.5" />
-                                                </button>
                                             </div>
                                         ))}
                                     </div>

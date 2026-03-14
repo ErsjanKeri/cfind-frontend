@@ -106,17 +106,6 @@ export function Step1PrivateInfo({ data, updateData, errors, showCountry = true 
                     className={errors?.real_location_address ? "border-red-500" : ""}
                 />
             </FormFieldWrapper>
-
-            {/* <div className="space-y-2">
-                <Label htmlFor="realDescription">Private Description (Optional)</Label>
-                <Textarea
-                    id="realDescription"
-                    value={data.realDescription}
-                    onChange={(e) => updateData("realDescription", e.target.value)}
-                    placeholder="Internal notes about the business..."
-                    className={errors?.realDescription ? "border-red-500" : ""}
-                />
-            </div> */}
         </div>
     )
 }

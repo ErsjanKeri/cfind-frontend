@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { countries, type CountryCode, VALID_COUNTRY_CODES } from "@/lib/constants"
-import { getCountryCookie } from "@/lib/country"
+import { getCountryCookie, setCountryCookie } from "@/lib/country"
 
 export default function SplashPage() {
   const router = useRouter()
@@ -19,7 +19,7 @@ export default function SplashPage() {
   }, [router])
 
   const handleSelect = (code: CountryCode) => {
-    document.cookie = `country=${code};path=/;max-age=${60 * 60 * 24 * 365};samesite=lax`
+    setCountryCookie(code)
     router.replace(`/${code}`)
   }
 

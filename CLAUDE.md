@@ -202,8 +202,5 @@ The AI Recommendations page (`/{country}/ai-recommendations`) lets buyers chat w
 
 ## Known Bugs
 
-1. **SearchBar sends `category=all` to API** (`components/home/search-bar.tsx:34-36`) — When "All Categories" or "All Cities" is selected, the value `"all"` is truthy and gets included in URL params. The `use-listing-filters.ts` hook correctly normalizes this, but the SearchBar bypasses that hook.
-2. **AI chat optimistic update has no rollback in hook** (`lib/hooks/useChat.ts`) — `useSendMessage()` has no `onError`. Rollback only happens in the component's local try/catch. Concurrent messages can cause inconsistent state.
-3. **`agent_agency_name` vs `agent_agency` naming split** (`lib/api/types.ts`) — `Listing` and `BuyerLead` use `agent_agency_name` (matching backend schemas). `ToolCallListing` uses `agent_agency` (matching backend `agent_service.py` tool output). This is intentional — different backend endpoints use different field names.
-4. **Three identical paginated response types** (`lib/api/types.ts:217-242`) — `ListingsResponse`, `AgentListingsResponse`, `SavedListingsResponse` have identical structure.
+1. **`agent_agency_name` vs `agent_agency` naming split** (`lib/api/types.ts`) — `Listing` and `BuyerLead` use `agent_agency_name` (matching backend schemas). `ToolCallListing` uses `agent_agency` (matching backend `agent_service.py` tool output). This is intentional — different backend endpoints use different field names.
 

@@ -66,7 +66,6 @@ export function useAuth() {
   };
 
   const logout = async () => {
-    queryClient.setQueryData(USER_QUERY_KEY, null);
     queryClient.removeQueries({ queryKey: USER_QUERY_KEY });
     try {
       await api.auth.logout();

@@ -104,7 +104,7 @@ export async function apiCall<T>(fn: () => Promise<T>): Promise<T> {
   }
 }
 
-const getErrorMessage = (error: unknown): string => {
+export const getErrorMessage = (error: unknown, fallback = 'An unexpected error occurred'): string => {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data;
     if (data?.detail && typeof data.detail === 'string') return data.detail;
@@ -121,5 +121,6 @@ const getErrorMessage = (error: unknown): string => {
     return error.message;
   }
   if (error instanceof Error) return error.message;
-  return 'An unexpected error occurred';
+  if (typeof error === 'string') return error;
+  return fallback;
 };

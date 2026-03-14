@@ -38,7 +38,6 @@ export const userApi = {
       const response = await apiClient.put<UserWithProfile>(
         '/api/users/me/agent-profile',
         formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
       );
       return response.data;
     });
@@ -52,7 +51,6 @@ export const userApi = {
       const response = await apiClient.post<{ avatar_url: string }>(
         '/api/users/upload-avatar',
         formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
       );
       return response.data;
     });

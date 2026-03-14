@@ -69,30 +69,10 @@ export function useAdminUpdateCity(countryCode: string) {
   });
 }
 
-export function useAdminDeleteCity(countryCode: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (cityId: number) => api.admin.deleteCity(cityId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cities', countryCode] });
-    },
-  });
-}
-
 export function useAdminCreateNeighbourhood(cityId: number) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (name: string) => api.admin.createNeighbourhood(cityId, name),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['neighbourhoods', cityId] });
-    },
-  });
-}
-
-export function useAdminDeleteNeighbourhood(cityId: number) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (neighbourhoodId: number) => api.admin.deleteNeighbourhood(neighbourhoodId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['neighbourhoods', cityId] });
     },

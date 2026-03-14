@@ -6,7 +6,7 @@ import "./globals.css"
 
 // Updated metadata for Company Finder
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://companyfinder.al"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://www.cfind.ai"),
   title: "CompanyFinder - Business Acquisition Marketplace in Albania",
   description:
     "The secure, agent-driven marketplace for business acquisitions. Verified agents, vetted buyers, confidential listings.",

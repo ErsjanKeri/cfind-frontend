@@ -1,8 +1,6 @@
 "use client"
 
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
 import { FormFieldWrapper } from "@/components/shared/form-field-wrapper"
 import type { ListingFormData, ListingFormErrors } from "../use-listing-form"
@@ -103,18 +101,6 @@ export function Step3Financials({ data, updateData, errors }: Step3Props) {
                         placeholder="e.g. 3"
                     />
                 </FormFieldWrapper>
-            </div>
-
-            {/* Physically Verified */}
-            <div className="flex items-center space-x-2 pt-2">
-                <Switch
-                    id="is_physically_verified"
-                    checked={data.is_physically_verified}
-                    onCheckedChange={(checked) => updateData("is_physically_verified", checked)}
-                />
-                <Label htmlFor="is_physically_verified" className="cursor-pointer">
-                    Physically Verified Listing
-                </Label>
             </div>
         </div>
     )

@@ -12,7 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     for (const countryCode of VALID_COUNTRY_CODES) {
         try {
-            const response = await api.listings.getListings({ country_code: countryCode, page: 1, page_size: 1000 })
+            const response = await api.listings.getListings({ country_code: countryCode, page: 1, limit: 100 })
             const listings = response.listings || []
 
             const countryListingUrls = listings
