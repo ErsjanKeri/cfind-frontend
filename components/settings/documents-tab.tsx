@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -10,7 +11,10 @@ import {
   Building2,
   CheckCircle,
   AlertTriangle,
+  Loader2,
 } from "lucide-react"
+import { api } from "@/lib/api"
+import { toast } from "sonner"
 
 interface DocumentsTabProps {
   licenseDocumentUrl: string
@@ -115,6 +119,19 @@ function DocumentDisplayCard({
   downloadName: string
 }) {
   const Icon = icon === "building" ? Building2 : FileText
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleViewDocument = async () => {
+    setIsLoading(true)
+    try {
+      const signedUrl = await api.upload.getDocumentViewUrl(url)
+      window.open(signedUrl, '_blank')
+    } catch {
+      toast.error("Failed to load document")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className="space-y-3">
@@ -138,28 +155,19 @@ function DocumentDisplayCard({
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-foreground mb-1">{label}</p>
                 <p className="text-sm text-muted-foreground mb-3">{description}</p>
-                <div className="flex gap-2">
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={() => window.open(url, '_blank')}
-                  >
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={handleViewDocument}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
                     <Icon className="h-4 w-4 mr-2" />
-                    View Document
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      const a = document.createElement('a')
-                      a.href = url
-                      a.download = downloadName
-                      a.click()
-                    }}
-                  >
-                    Download
-                  </Button>
-                </div>
+                  )}
+                  View Document
+                </Button>
               </div>
             </div>
           </CardContent>

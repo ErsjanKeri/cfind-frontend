@@ -1,8 +1,11 @@
 "use client"
 
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Eye } from "lucide-react"
+import { Eye, Loader2 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
+import { api } from "@/lib/api"
+import { toast } from "sonner"
 
 interface DocumentViewerProps {
     label: string
@@ -14,6 +17,20 @@ interface DocumentViewerProps {
 
 export function DocumentViewer({ label, description, notUploadedText = "Not uploaded yet", url, icon: Icon }: DocumentViewerProps) {
     const hasDocument = !!url
+    const [isLoading, setIsLoading] = useState(false)
+
+    const handleView = async () => {
+        if (!url) return
+        setIsLoading(true)
+        try {
+            const signedUrl = await api.upload.getDocumentViewUrl(url)
+            window.open(signedUrl, '_blank')
+        } catch {
+            toast.error("Failed to load document")
+        } finally {
+            setIsLoading(false)
+        }
+    }
 
     return (
         <div className={`p-4 rounded-lg border ${hasDocument ? 'border-green-200 bg-green-50/30' : 'border-amber-200 bg-amber-50/30'}`}>
@@ -33,10 +50,15 @@ export function DocumentViewer({ label, description, notUploadedText = "Not uplo
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => window.open(url, '_blank')}
+                        onClick={handleView}
+                        disabled={isLoading}
                         className="h-8 px-3 flex-shrink-0"
                     >
-                        <Eye className="h-3 w-3 mr-1" />
+                        {isLoading ? (
+                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                        ) : (
+                            <Eye className="h-3 w-3 mr-1" />
+                        )}
                         View
                     </Button>
                 )}

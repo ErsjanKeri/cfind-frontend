@@ -32,4 +32,14 @@ export const uploadApi = {
       return fileUrl;
     });
   },
+
+  async getDocumentViewUrl(storedUrl: string): Promise<string> {
+    return apiCall(async () => {
+      const response = await apiClient.get<{ success: boolean; url: string }>(
+        '/api/upload/document-url',
+        { params: { url: storedUrl } }
+      );
+      return response.data.url;
+    });
+  },
 };
