@@ -171,6 +171,7 @@ export function Header() {
             <Button
               variant="ghost"
               size="icon"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
               className="md:hidden h-9 w-9"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >

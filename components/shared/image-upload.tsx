@@ -178,6 +178,7 @@ export function ImageUpload({
                             onClick={() => onRemove(url)}
                             variant="destructive"
                             size="icon"
+                            aria-label="Remove image"
                             className="absolute top-2 right-2 z-10 h-6 w-6"
                         >
                             <X className="h-4 w-4" />
@@ -199,6 +200,7 @@ export function ImageUpload({
                             onClick={() => onRemoveFile(file)}
                             variant="destructive"
                             size="icon"
+                            aria-label="Remove image"
                             className="absolute top-2 right-2 z-30 h-6 w-6"
                         >
                             <X className="h-4 w-4" />

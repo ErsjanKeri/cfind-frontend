@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { EmptyState } from "@/components/shared/empty-state"
 import { MessageSquare, Phone, Mail } from "lucide-react"
 import type { AgentLead } from "@/lib/api/types"
+import { formatDate } from "@/lib/utils"
 
 function getContactIcon(method: string | undefined) {
   if (!method) return <MessageSquare className="h-4 w-4" />
@@ -50,7 +51,7 @@ export function RecentContactsCard({ leads }: RecentContactsCardProps) {
                     {lead.interaction_type?.replace('_', ' ')}
                   </Badge>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {new Date(lead.created_at).toLocaleDateString()}
+                    {formatDate(lead.created_at)}
                   </p>
                 </div>
               </div>

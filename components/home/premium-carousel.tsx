@@ -62,6 +62,7 @@ export function PremiumCarousel({ listings }: PremiumCarouselProps) {
                         <Button
                             variant="outline"
                             size="icon"
+                            aria-label="Scroll left"
                             onClick={() => scroll("left")}
                             disabled={!canScrollLeft}
                             className="h-9 w-9 rounded-full border-amber-300 hover:bg-amber-100 disabled:opacity-50"
@@ -71,6 +72,7 @@ export function PremiumCarousel({ listings }: PremiumCarouselProps) {
                         <Button
                             variant="outline"
                             size="icon"
+                            aria-label="Scroll right"
                             onClick={() => scroll("right")}
                             disabled={!canScrollRight}
                             className="h-9 w-9 rounded-full border-amber-300 hover:bg-amber-100 disabled:opacity-50"
@@ -112,7 +114,7 @@ function PremiumListingCard({ listing }: PremiumListingCardProps) {
                 {/* Image with Premium ribbon */}
                 <div className="relative aspect-[16/9] overflow-hidden">
                     <Image
-                        src={listing.images[0]?.url || "/placeholder.svg?height=300&width=500&query=business"}
+                        src={listing.images?.[0]?.url || "/placeholder.svg?height=300&width=500&query=business"}
                         alt={listing.public_title_en}
                         fill
                         className="object-cover transition-transform duration-500 hover:scale-105"

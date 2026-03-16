@@ -69,6 +69,7 @@ export function AgentListingsTable({ listings, onEdit, onPromote }: AgentListing
                   <Button
                     variant="ghost"
                     size="icon"
+                    aria-label="Promote listing"
                     className="hover:bg-amber-50"
                     onClick={(e) => {
                       e.stopPropagation()
@@ -81,6 +82,7 @@ export function AgentListingsTable({ listings, onEdit, onPromote }: AgentListing
                 <Button
                   variant="ghost"
                   size="icon"
+                  aria-label="Edit listing"
                   className="hover:bg-muted"
                   onClick={(e) => {
                     e.stopPropagation()

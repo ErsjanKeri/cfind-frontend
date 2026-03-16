@@ -146,10 +146,7 @@ Agent documents (license, company, ID) are uploaded via `api.user.updateAgentPro
 
 ### Form Handling
 
-Uses `react-hook-form` + `zod`. Schemas defined in `lib/schemas.ts`:
-- `ListingSchema` — Multi-step listing creation form
-- `BuyerDemandSchema` — Buyer demand creation
-- `ChatMessageSchema` — AI chat message validation (1-2000 chars)
+Uses `react-hook-form` + `zod`. Forms handle validation inline in their respective components.
 
 ### Currency
 
@@ -164,7 +161,6 @@ All API amounts are in EUR. `formatCurrency(amount, currency)` from `lib/currenc
 | `lib/api/index.ts` | Unified `api` object re-exporting all modules |
 | `lib/hooks/useAuth.ts` | `useUser()`, `useAuth()`, `useInvalidateUser()` |
 | `lib/hooks/useRole.ts` | Derived role helpers (`isAgent`, `isVerifiedAgent`, etc.) |
-| `lib/schemas.ts` | Zod validation schemas |
 | `lib/constants.ts` | Business categories, country/city/area data, max price |
 | `lib/currency.ts` | Currency formatting (EUR/ALL) |
 | `lib/providers/query-provider.tsx` | React Query setup (wraps app) |

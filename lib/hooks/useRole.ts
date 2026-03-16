@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useUser } from '@/lib/hooks/useAuth';
 
 export type UserRole = 'agent' | 'buyer' | 'admin';
@@ -27,7 +28,7 @@ export function useRole(): RoleState {
   const verificationStatus =
     (user?.agent_profile?.verification_status as VerificationStatus) ?? null;
 
-  return {
+  return useMemo(() => ({
     role,
     isAgent: role === 'agent',
     isBuyer: role === 'buyer',
@@ -36,5 +37,5 @@ export function useRole(): RoleState {
     isPendingAgent: verificationStatus === 'pending',
     isRejectedAgent: verificationStatus === 'rejected',
     verificationStatus,
-  };
+  }), [role, verificationStatus]);
 }

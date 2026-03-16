@@ -8,6 +8,7 @@ import { MapPin, Banknote, Tag, Phone, Mail, MessageSquare, Trash2, CheckCircle,
 import type { BuyerDemand } from "@/lib/api/types"
 import { getCategoryLabel } from "@/lib/constants"
 import { getDemandStatusBadge, getDemandTypeBadge } from "@/lib/badge-utils"
+import { formatDate, getWhatsAppUrl } from "@/lib/utils"
 
 interface DemandCardProps {
     demand: BuyerDemand
@@ -102,7 +103,7 @@ export function DemandCard({
                         )}
                         {demand.assigned_agent_whatsapp && (
                             <a
-                                href={`https://wa.me/${demand.assigned_agent_whatsapp.replace(/[^0-9]/g, '')}`}
+                                href={getWhatsAppUrl(demand.assigned_agent_whatsapp)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-1 text-sm text-green-600 hover:underline mt-1"
@@ -152,7 +153,7 @@ export function DemandCard({
                                 <XCircle className="h-4 w-4 mr-2" />
                                 Close Demand
                             </Button>
-                            <Button onClick={onDelete} variant="destructive" size="icon">
+                            <Button onClick={onDelete} variant="destructive" size="icon" aria-label="Delete demand">
                                 <Trash2 className="h-4 w-4" />
                             </Button>
                         </>
@@ -161,7 +162,7 @@ export function DemandCard({
 
                 {/* Date */}
                 <p className="text-xs text-muted-foreground">
-                    {new Date(demand.created_at).toLocaleDateString()}
+                    {formatDate(demand.created_at)}
                 </p>
             </CardContent>
         </Card>

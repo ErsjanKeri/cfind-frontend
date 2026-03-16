@@ -467,12 +467,14 @@ export function AdminView() {
                                                             onClick={() => handleUpdateCity(city.id)}
                                                             disabled={!editCityName.trim() || updateCity.isPending}
                                                             className="text-muted-foreground hover:text-primary transition-colors p-1"
+                                                            aria-label="Confirm rename"
                                                         >
                                                             <Check className="h-3.5 w-3.5" />
                                                         </button>
                                                         <button
                                                             onClick={() => setEditingCityId(null)}
                                                             className="text-muted-foreground hover:text-destructive transition-colors p-1"
+                                                            aria-label="Cancel rename"
                                                         >
                                                             <X className="h-3.5 w-3.5" />
                                                         </button>
@@ -494,6 +496,7 @@ export function AdminView() {
                                                                 setEditCityName(city.name)
                                                             }}
                                                             className="text-muted-foreground hover:text-foreground transition-colors p-1"
+                                                            aria-label={`Rename ${city.name}`}
                                                         >
                                                             <Pencil className="h-3.5 w-3.5" />
                                                         </button>
@@ -515,6 +518,7 @@ export function AdminView() {
                                     />
                                     <Button
                                         size="sm"
+                                        aria-label="Add city"
                                         onClick={handleCreateCity}
                                         disabled={!newCityName.trim() || createCity.isPending}
                                     >
@@ -557,6 +561,7 @@ export function AdminView() {
                                         />
                                         <Button
                                             size="sm"
+                                            aria-label="Add neighbourhood"
                                             onClick={handleCreateNeighbourhood}
                                             disabled={!newNeighbourhoodName.trim() || createNeighbourhood.isPending}
                                         >

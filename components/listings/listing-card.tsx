@@ -116,6 +116,7 @@ export function ListingCard({ listing, country }: ListingCardProps) {
           <Button
             variant="ghost"
             size="icon"
+            aria-label={isSaved ? "Remove from saved" : "Save listing"}
             className={`absolute ${promotionTier !== "standard" ? "top-9" : "top-2"} right-2 h-8 w-8 rounded-full bg-card/80 backdrop-blur-sm hover:bg-card ${isSaved ? "text-red-500" : "text-muted-foreground"
               }`}
             onClick={handleSave}

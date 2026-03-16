@@ -15,7 +15,7 @@ import { useListing } from "@/lib/hooks/useListings"
 import { MapPin, Lock, FileText } from "lucide-react"
 import { LoadingSpinner } from "@/components/shared/loading-spinner"
 import { LoginPromptDialog } from "@/components/shared/login-prompt-dialog"
-import { getErrorMessage } from "@/lib/utils"
+import { getErrorMessage, getWhatsAppUrl } from "@/lib/utils"
 import type { CountryCode } from "@/lib/constants"
 import { ListingImageGallery } from "@/components/listings/listing-image-gallery"
 import { FinancialOverviewCard } from "@/components/listings/financial-overview-card"
@@ -73,12 +73,10 @@ export function ListingDetailClient({ listingId, country }: ListingDetailClientP
   }
 
   // Helper functions (after we've confirmed listing exists)
-  const getWhatsAppUrl = () => {
-    const message = encodeURIComponent(
-      `Hi ${listing.agent_name}, I'm interested in your listing: "${listing.public_title_en}" on Company Finder. Can we discuss this opportunity?`,
-    )
-    return `https://wa.me/${listing.agent_whatsapp?.replace(/[^0-9]/g, "")}?text=${message}`
-  }
+  const whatsAppUrl = getWhatsAppUrl(
+    listing.agent_whatsapp || '',
+    `Hi ${listing.agent_name}, I'm interested in your listing: "${listing.public_title_en}" on Company Finder. Can we discuss this opportunity?`,
+  )
 
   const handleContactClick = async (method: "whatsapp" | "phone" | "email") => {
     if (isAuthenticated) {
@@ -96,7 +94,7 @@ export function ListingDetailClient({ listingId, country }: ListingDetailClientP
     }
 
     if (method === "whatsapp") {
-      window.open(getWhatsAppUrl(), "_blank")
+      window.open(whatsAppUrl, "_blank")
     } else if (method === "phone") {
       if (!isAuthenticated) {
         setShowLoginPrompt(true)

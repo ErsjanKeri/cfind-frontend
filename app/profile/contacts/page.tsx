@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, MessageCircle, Phone, Mail, Search, ExternalLink } from "lucide-react"
 import { LoadingSpinner } from "@/components/shared/loading-spinner"
 import { WhatsAppIcon } from "@/components/shared/whatsapp-icon"
-import { getInitials } from "@/lib/utils"
+import { getInitials, formatDate } from "@/lib/utils"
 import type { Lead } from "@/lib/api/types"
 import { getCountryOrDefault } from "@/lib/country"
 
@@ -111,7 +111,7 @@ export default function ContactHistoryPage() {
 
                         <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
                           <span>
-                            Contacted on {new Date(lead.created_at).toLocaleDateString()}
+                            Contacted on {formatDate(lead.created_at)}
                           </span>
                         </div>
                       </div>

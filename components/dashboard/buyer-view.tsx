@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
 import { useUser } from "@/lib/hooks/useAuth"
 import { useBuyerLeads, useSavedListings } from "@/lib/hooks/useLeads"
@@ -14,7 +14,7 @@ import { DemandCard } from "@/components/demands/demand-card"
 import { DemandDialog } from "@/components/demands/demand-dialog"
 import { StatCard } from "@/components/shared/stat-card"
 import { toast } from "sonner"
-import { getErrorMessage } from "@/lib/utils"
+import { getErrorMessage, formatDate } from "@/lib/utils"
 import { getDemandStatusBadge } from "@/lib/badge-utils"
 import { getCountryOrDefault } from "@/lib/country"
 
@@ -66,10 +66,11 @@ export function BuyerView() {
         }
     }
 
-    // Calculate demand stats
-    const activeDemands = demands.filter(d => d.status === "active").length
-    const assignedDemands = demands.filter(d => d.status === "assigned").length
-    const fulfilledDemands = demands.filter(d => d.status === "fulfilled").length
+    const { activeDemands, assignedDemands, fulfilledDemands } = useMemo(() => ({
+        activeDemands: demands.filter(d => d.status === "active").length,
+        assignedDemands: demands.filter(d => d.status === "assigned").length,
+        fulfilledDemands: demands.filter(d => d.status === "fulfilled").length,
+    }), [demands])
 
     if (isLoading) {
         return (
@@ -104,7 +105,7 @@ export function BuyerView() {
                 <StatCard
                     icon={Calendar}
                     label="Member Since"
-                    value={user?.created_at ? new Date(user.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "N/A"}
+                    value={user?.created_at ? formatDate(user.created_at, { month: "short", year: "numeric" }) : "N/A"}
                     variant="amber"
                 />
             </div>
@@ -232,7 +233,7 @@ export function BuyerView() {
                                             </p>
                                         </div>
                                     </div>
-                                    <span className="text-sm text-muted-foreground">{new Date(contact.created_at).toLocaleDateString()}</span>
+                                    <span className="text-sm text-muted-foreground">{formatDate(contact.created_at)}</span>
                                 </div>
                             ))}
                         </div>

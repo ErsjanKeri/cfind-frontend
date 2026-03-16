@@ -218,6 +218,7 @@ export function AIRecommendationsClient({
             <Button
               variant="ghost"
               size="icon"
+              aria-label="Close sidebar"
               className="lg:hidden ml-2 h-8 w-8"
               onClick={() => setSidebarOpen(false)}
             >
@@ -255,6 +256,7 @@ export function AIRecommendationsClient({
                     <Button
                       variant="ghost"
                       size="icon"
+                      aria-label="Delete conversation"
                       className="h-6 w-6 opacity-0 group-hover:opacity-100 shrink-0"
                       onClick={(e) => {
                         e.stopPropagation()
@@ -277,6 +279,7 @@ export function AIRecommendationsClient({
             <Button
               variant="ghost"
               size="icon"
+              aria-label="Open sidebar"
               className="lg:hidden h-8 w-8"
               onClick={() => setSidebarOpen(true)}
             >
@@ -337,6 +340,7 @@ export function AIRecommendationsClient({
                 />
                 <Button
                   size="icon"
+                  aria-label="Send message"
                   className="h-11 w-11 shrink-0"
                   onClick={handleSend}
                   disabled={!input.trim() || sendMessage.isPending}

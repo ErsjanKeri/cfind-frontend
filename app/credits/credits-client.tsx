@@ -18,7 +18,7 @@ import {
     Minus,
 } from "lucide-react"
 import { formatCurrency } from "@/lib/currency"
-import { getErrorMessage } from "@/lib/utils"
+import { getErrorMessage, formatDate } from "@/lib/utils"
 import { usePurchaseCredits, useCreditPackages, useAgentCredits } from "@/lib/hooks/usePromotions"
 import type { CreditPackage, CreditTransaction } from "@/lib/api/types"
 
@@ -245,7 +245,7 @@ export function CreditsPageClient({
                                             <div>
                                                 <p className="font-medium text-sm">{tx.description}</p>
                                                 <p className="text-xs text-muted-foreground">
-                                                    {new Date(tx.created_at).toLocaleDateString("en-US", {
+                                                    {formatDate(tx.created_at, {
                                                         year: "numeric",
                                                         month: "short",
                                                         day: "numeric",

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useUser } from "@/lib/hooks/useAuth"
 import { useAgentListings } from "@/lib/hooks/useListings"
 import { useAgentLeads } from "@/lib/hooks/useLeads"
@@ -62,9 +62,11 @@ export function AgentView() {
         return null
     }
 
-    const activeListings = listings.filter((l) => l.status === "active")
-    const totalViews = listings.reduce((acc, l) => acc + (l.view_count || 0), 0)
-    const totalValue = listings.reduce((acc, l) => acc + (l.asking_price_eur || 0), 0)
+    const { activeListings, totalViews, totalValue } = useMemo(() => ({
+        activeListings: listings.filter((l) => l.status === "active"),
+        totalViews: listings.reduce((acc, l) => acc + (l.view_count || 0), 0),
+        totalValue: listings.reduce((acc, l) => acc + (l.asking_price_eur || 0), 0),
+    }), [listings])
 
     const handleClaimDemand = async (demandId: string) => {
         try {
