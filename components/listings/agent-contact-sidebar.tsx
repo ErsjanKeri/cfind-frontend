@@ -1,6 +1,5 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -57,47 +56,44 @@ export function AgentContactSidebar({
           </div>
 
           <div className="space-y-3">
-            <Button
-              className="w-full h-12 text-base bg-[#25D366] hover:bg-[#20BD5A] text-white"
-              size="lg"
+            <button
+              className="w-full h-12 rounded-lg bg-[#25D366]/10 hover:bg-[#25D366]/20 flex items-center justify-center gap-2.5 text-[#25D366] font-medium transition-colors disabled:opacity-50"
               onClick={() => onContactClick("whatsapp")}
               disabled={isContactingAgent}
             >
               {isContactingAgent ? (
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                <WhatsAppIcon className="mr-2 h-5 w-5" />
+                <WhatsAppIcon className="h-5 w-5" />
               )}
               {isContactingAgent ? "Recording contact..." : "Contact via WhatsApp"}
-            </Button>
+            </button>
 
             <div className="grid grid-cols-2 gap-3">
-              <Button
-                variant="outline"
-                className="h-10 bg-transparent"
+              <button
+                className="h-10 rounded-lg bg-primary/10 hover:bg-primary/15 flex items-center justify-center gap-2 text-sm text-primary font-medium transition-colors disabled:opacity-50"
                 onClick={() => onContactClick("phone")}
                 disabled={isContactingAgent}
               >
                 {isContactingAgent ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <Phone className="mr-2 h-4 w-4" />
+                  <Phone className="h-4 w-4" />
                 )}
                 Call
-              </Button>
-              <Button
-                variant="outline"
-                className="h-10 bg-transparent"
+              </button>
+              <button
+                className="h-10 rounded-lg bg-primary/10 hover:bg-primary/15 flex items-center justify-center gap-2 text-sm text-primary font-medium transition-colors disabled:opacity-50"
                 onClick={() => onContactClick("email")}
                 disabled={isContactingAgent}
               >
                 {isContactingAgent ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <Mail className="mr-2 h-4 w-4" />
+                  <Mail className="h-4 w-4" />
                 )}
                 Email
-              </Button>
+              </button>
             </div>
           </div>
 
