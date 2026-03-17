@@ -22,7 +22,7 @@ export function Footer() {
                 <Building2 className="h-4 w-4 text-primary-foreground" />
               </div>
               <span className="text-lg font-semibold">
-                Company<span className="text-primary">Finder</span>
+                C<span className="text-primary">find</span>
               </span>
             </Link>
             <p className="mt-4 text-sm text-muted-foreground leading-relaxed">The trusted marketplace for business acquisitions in {getCountryName(currentCountry)}. Every listing verified. Every agent licensed.</p>

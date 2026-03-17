@@ -85,7 +85,7 @@ export function Header() {
               <Building2 className="h-4 w-4 text-primary-foreground" />
             </div>
             <span className="text-lg font-semibold text-foreground">
-              Company<span className="text-primary">Finder</span>
+              C<span className="text-primary">find</span>
             </span>
           </Link>
 

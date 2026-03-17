@@ -61,7 +61,9 @@
       "Bash(grep -n \"Promise<.*\\\\[\\\\]\" /Users/ersibesi/Projects/company-finder-platform/cfind-frontend/lib/api/*.ts)",
       "Bash(npm uninstall:*)",
       "Bash(head -100 /Users/ersibesi/Projects/company-finder-platform/cfind-frontend/app/[country]/ai-recommendations/ai-recommendations-client.tsx | grep -E \"^import|^from\")",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(sips:*)",
+      "Bash(cd:*)"
     ],
     "deny": [],
     "ask": []

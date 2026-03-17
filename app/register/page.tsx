@@ -18,7 +18,7 @@ function RegisterPageContent() {
               <Building2 className="h-5 w-5 text-primary-foreground" />
             </div>
             <span className="text-xl font-semibold text-foreground">
-              Company<span className="text-primary">Finder</span>
+              C<span className="text-primary">find</span>
             </span>
           </Link>
         </div>

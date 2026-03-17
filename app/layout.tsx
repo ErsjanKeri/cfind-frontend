@@ -10,24 +10,23 @@ export const metadata: Metadata = {
   title: "Cfind - Business Acquisition Marketplace in Albania",
   description:
     "The secure, agent-driven marketplace for business acquisitions. Verified agents, vetted buyers, confidential listings.",
-  generator: "v0.app",
   keywords: ["business for sale", "albania", "acquisition", "investment", "restaurant", "hotel"],
   icons: {
-    icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
-    ],
+    icon: "/icon-512x512.png",
     apple: "/apple-icon.png",
+  },
+  openGraph: {
+    title: "Cfind - Business Acquisition Marketplace",
+    description: "The secure, agent-driven marketplace for business acquisitions. Verified agents, vetted buyers, confidential listings.",
+    images: ["/cfind-text.png"],
+    siteName: "Cfind",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Cfind - Business Acquisition Marketplace",
+    description: "The secure, agent-driven marketplace for business acquisitions. Verified agents, vetted buyers, confidential listings.",
+    images: ["/cfind-text.png"],
   },
 }
 
