@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Building2 } from "lucide-react"
+import Image from "next/image"
 import { isValidCountryCode, getCountryName, type CountryCode } from "@/lib/constants"
 import { getCountryOrDefault } from "@/lib/country"
 
@@ -18,9 +18,7 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                <Building2 className="h-4 w-4 text-primary-foreground" />
-              </div>
+              <Image src="/cfind-no-background.png" alt="Cfind" width={32} height={32} />
               <span className="text-lg font-semibold">
                 C<span className="text-primary">find</span>
               </span>

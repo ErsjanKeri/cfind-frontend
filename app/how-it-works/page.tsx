@@ -9,6 +9,7 @@ import { Shield, Eye, Users, FileText, Search, Store } from "lucide-react"
 
 import { TrustPillars } from "@/components/how-it-works/trust-pillars"
 import { InvestorJourney } from "@/components/how-it-works/investor-journey"
+import { AiDiscovery } from "@/components/how-it-works/ai-discovery"
 import { SellerJourney } from "@/components/how-it-works/seller-journey"
 import { FaqSection } from "@/components/how-it-works/faq-section"
 import { getCountryOrDefault } from "@/lib/country"
@@ -82,6 +83,7 @@ export default function HowItWorksPage() {
 
         <TrustPillars />
         <InvestorJourney />
+        <AiDiscovery />
         <SellerJourney />
         <FaqSection />
 
