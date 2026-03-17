@@ -6,7 +6,8 @@ import { usePathname, useRouter } from "next/navigation"
 import { useAuth, useUser } from "@/lib/hooks/useAuth"
 import { useRole } from "@/lib/hooks/useRole"
 import { Button } from "@/components/ui/button"
-import { Building2, Menu, X, Plus, Sparkles } from "lucide-react"
+import Image from "next/image"
+import { Menu, X, Plus, Sparkles } from "lucide-react"
 import { DemandDialog } from "@/components/demands/demand-dialog"
 import { CountryPicker } from "@/components/header/country-picker"
 import { UserMenu } from "@/components/header/user-menu"
@@ -81,9 +82,7 @@ export function Header() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <Building2 className="h-4 w-4 text-primary-foreground" />
-            </div>
+            <Image src="/cfind-no-background.png" alt="Cfind" width={32} height={32} />
             <span className="text-lg font-semibold text-foreground">
               C<span className="text-primary">find</span>
             </span>

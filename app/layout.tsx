@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     "The secure, agent-driven marketplace for business acquisitions. Verified agents, vetted buyers, confidential listings.",
   keywords: ["business for sale", "albania", "acquisition", "investment", "restaurant", "hotel"],
   icons: {
-    icon: "/icon-512x512.png",
+    icon: "/cfind.png",
     apple: "/apple-icon.png",
   },
   openGraph: {
