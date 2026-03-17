@@ -90,7 +90,7 @@ export function AdminView() {
     }>({ open: false, agentId: "", agentName: "" })
 
     // Geography management state
-    const [geoCountry, setGeoCountry] = useState<CountryCode>("al")
+    const [geoCountry, setGeoCountry] = useState<CountryCode>("ch")
     const [selectedCityId, setSelectedCityId] = useState<number | null>(null)
     const [newCityName, setNewCityName] = useState("")
     const [newNeighbourhoodName, setNewNeighbourhoodName] = useState("")
