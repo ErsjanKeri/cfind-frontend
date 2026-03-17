@@ -52,7 +52,7 @@ export default function ForgotPasswordPage() {
             <Alert className="border-blue-200 bg-blue-50">
               <Mail className="h-4 w-4 text-blue-600" />
               <AlertDescription className="text-blue-800">
-                Check your inbox for an email from CompanyFinder Albania with a link to reset your password.
+                Check your inbox for an email from Cfind with a link to reset your password.
                 The link will expire in 1 hour.
               </AlertDescription>
             </Alert>

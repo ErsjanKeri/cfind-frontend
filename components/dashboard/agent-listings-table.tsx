@@ -43,14 +43,19 @@ export function AgentListingsTable({ listings, onEdit, onPromote }: AgentListing
               {listing.public_title_en}
             </TableCell>
             <TableCell>
-              {(() => {
-                const badge = getListingStatusBadge(listing.status)
-                return (
-                  <Badge className={`font-normal ${badge.className}`}>
-                    {badge.label ?? listing.status}
-                  </Badge>
-                )
-              })()}
+              <div className="space-y-1">
+                {(() => {
+                  const badge = getListingStatusBadge(listing.status)
+                  return (
+                    <Badge className={`font-normal ${badge.className}`}>
+                      {badge.label ?? listing.status}
+                    </Badge>
+                  )
+                })()}
+                {listing.status === "rejected" && listing.rejection_reason && (
+                  <p className="text-xs text-red-600">{listing.rejection_reason}</p>
+                )}
+              </div>
             </TableCell>
             <TableCell>
               {listing.promotion_tier !== "standard" ? (

@@ -29,7 +29,7 @@ export default function HowItWorksPage() {
                 <span className="font-medium">Trust Through Verification</span>
               </div>
               <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
-                How CompanyFinder Works
+                How Cfind Works
               </h1>
               <p className="mt-6 text-lg text-muted-foreground leading-relaxed text-pretty">
                 We are a secure marketplace where every business is physically verified by licensed agents. Investors can browse freely and contact agents directly. Sellers remain anonymous until they decide otherwise.
@@ -89,7 +89,7 @@ export default function HowItWorksPage() {
         <section className="py-16 sm:py-24 bg-primary">
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-bold text-primary-foreground sm:text-4xl mb-4">Ready to Start?</h2>
-            <p className="text-lg text-primary-foreground/80 mb-8 max-w-2xl mx-auto">Whether you&apos;re looking to buy or sell, CompanyFinder provides the secure, agent-driven process you need.</p>
+            <p className="text-lg text-primary-foreground/80 mb-8 max-w-2xl mx-auto">Whether you&apos;re looking to buy or sell, Cfind provides the secure, agent-driven process you need.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" variant="secondary" className="text-base">
                 <Link href={`/${country}/listings`}>

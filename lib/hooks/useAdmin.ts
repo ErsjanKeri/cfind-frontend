@@ -92,3 +92,38 @@ export function useCreateBuyer() {
     },
   });
 }
+
+export function usePendingListings() {
+  return useQuery({
+    queryKey: ['admin', 'pendingListings'],
+    queryFn: () => api.admin.getPendingListings(),
+    staleTime: 30 * 1000,
+  });
+}
+
+export function useApproveListing() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (listingId: string) => api.admin.approveListing(listingId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'pendingListings'] });
+      queryClient.invalidateQueries({ queryKey: ['adminStats'] });
+      queryClient.invalidateQueries({ queryKey: ['listings'] });
+    },
+  });
+}
+
+export function useRejectListing() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ listingId, reason }: { listingId: string; reason: string }) =>
+      api.admin.rejectListing(listingId, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'pendingListings'] });
+      queryClient.invalidateQueries({ queryKey: ['adminStats'] });
+      queryClient.invalidateQueries({ queryKey: ['listings'] });
+    },
+  });
+}

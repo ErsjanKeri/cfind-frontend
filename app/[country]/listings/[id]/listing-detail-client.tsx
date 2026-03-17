@@ -75,7 +75,7 @@ export function ListingDetailClient({ listingId, country }: ListingDetailClientP
   // Helper functions (after we've confirmed listing exists)
   const whatsAppUrl = getWhatsAppUrl(
     listing.agent_whatsapp || '',
-    `Hi ${listing.agent_name}, I'm interested in your listing: "${listing.public_title_en}" on Company Finder. Can we discuss this opportunity?`,
+    `Hi ${listing.agent_name}, I'm interested in your listing: "${listing.public_title_en}" on Cfind. Can we discuss this opportunity?`,
   )
 
   const handleContactClick = async (method: "whatsapp" | "phone" | "email") => {

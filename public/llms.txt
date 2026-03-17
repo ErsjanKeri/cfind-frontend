@@ -1,7 +1,7 @@
-# Company Finder Platform
+# Cfind Platform
 
 ## About
-Company Finder is the premier marketplace for buying and selling businesses in Albania. We connect business owners with verified investors through trusted agents.
+Cfind is the premier marketplace for buying and selling businesses in Albania. We connect business owners with verified investors through trusted agents.
 
 ## Core Features
 - **Verified Listings**: All businesses are vetted by professional agents.

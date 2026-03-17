@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-CompanyFinder is a business acquisition marketplace. Verified agents list businesses for sale; vetted buyers browse and contact agents. The platform maintains business confidentiality by showing limited public information until buyers engage.
+Cfind is a business acquisition marketplace. Verified agents list businesses for sale; vetted buyers browse and contact agents. The platform maintains business confidentiality by showing limited public information until buyers engage.
 
 This is a **frontend-only** Next.js application. The backend is a separate FastAPI service (repo: `cfind-backend`) that handles database, auth, S3 uploads, and email.
 

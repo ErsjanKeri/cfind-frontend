@@ -7,6 +7,9 @@ import {
     useVerifyAgent,
     useDeleteUser,
     useToggleEmailVerification,
+    usePendingListings,
+    useApproveListing,
+    useRejectListing,
 } from "@/lib/hooks/useAdmin"
 import { useDemands, useDeleteDemand } from "@/lib/hooks/useDemands"
 import { CreateAgentDialog } from "@/components/admin/create-agent-dialog"
@@ -63,6 +66,12 @@ export function AdminView() {
     const verifyAgent = useVerifyAgent()
     const deleteUser = useDeleteUser()
     const toggleEmailVerification = useToggleEmailVerification()
+    const { data: pendingListingsData } = usePendingListings()
+    const approveListing = useApproveListing()
+    const rejectListing = useRejectListing()
+    const pendingListings = pendingListingsData?.listings ?? []
+    const [rejectListingDialog, setRejectListingDialog] = useState<{ open: boolean; listingId: string; title: string }>({ open: false, listingId: "", title: "" })
+    const [rejectListingReason, setRejectListingReason] = useState("")
 
     const agents = allUsers?.filter(u => u.role === 'agent') || []
     const buyers = allUsers?.filter(u => u.role === 'buyer') || []
@@ -285,6 +294,14 @@ export function AdminView() {
                             </Badge>
                         )}
                     </TabsTrigger>
+                    <TabsTrigger value="listings" className="px-6 py-2 gap-2">
+                        Listings
+                        {pendingListings.length > 0 && (
+                            <Badge variant="secondary" className="h-5 min-w-5 text-xs">
+                                {pendingListings.length}
+                            </Badge>
+                        )}
+                    </TabsTrigger>
                     <TabsTrigger value="geography" className="px-6 py-2">Geography</TabsTrigger>
                 </TabsList>
 
@@ -416,6 +433,105 @@ export function AdminView() {
                             )}
                         </CardContent>
                     </Card>
+                </TabsContent>
+
+                {/* Listings Tab */}
+                <TabsContent value="listings" className="space-y-4">
+                    {pendingListings.length === 0 ? (
+                        <EmptyState
+                            icon={FileText}
+                            title="No pending listings"
+                            description="All listings have been reviewed"
+                        />
+                    ) : (
+                        pendingListings.map((listing) => (
+                            <Card key={listing.id}>
+                                <CardContent className="p-4">
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-semibold text-foreground">{listing.public_title_en}</p>
+                                            <p className="text-sm text-muted-foreground mt-1">
+                                                {listing.category} &middot; {listing.public_location_city_en}
+                                                {listing.public_location_area && `, ${listing.public_location_area}`}
+                                            </p>
+                                            <p className="text-sm text-muted-foreground">
+                                                Agent: {listing.agent_name} {listing.agent_agency_name && `(${listing.agent_agency_name})`}
+                                            </p>
+                                            <p className="text-sm font-medium mt-1">
+                                                {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(listing.asking_price_eur)}
+                                            </p>
+                                        </div>
+                                        <div className="flex gap-2 flex-shrink-0">
+                                            <Button
+                                                size="sm"
+                                                onClick={async () => {
+                                                    try {
+                                                        await approveListing.mutateAsync(listing.id)
+                                                        toast.success("Listing approved")
+                                                    } catch (error: unknown) {
+                                                        toast.error(getErrorMessage(error, "Failed to approve"))
+                                                    }
+                                                }}
+                                                disabled={approveListing.isPending}
+                                            >
+                                                <Check className="h-4 w-4 mr-1" />
+                                                Approve
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                variant="destructive"
+                                                onClick={() => setRejectListingDialog({ open: true, listingId: listing.id, title: listing.public_title_en })}
+                                            >
+                                                <X className="h-4 w-4 mr-1" />
+                                                Reject
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))
+                    )}
+
+                    {rejectListingDialog.open && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                            <Card className="w-full max-w-md mx-4">
+                                <CardHeader>
+                                    <CardTitle>Reject Listing</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <p className="text-sm text-muted-foreground">
+                                        Rejecting: <strong>{rejectListingDialog.title}</strong>
+                                    </p>
+                                    <Input
+                                        placeholder="Reason for rejection..."
+                                        value={rejectListingReason}
+                                        onChange={(e) => setRejectListingReason(e.target.value)}
+                                    />
+                                    <div className="flex justify-end gap-2">
+                                        <Button variant="outline" onClick={() => { setRejectListingDialog({ open: false, listingId: "", title: "" }); setRejectListingReason("") }}>
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            variant="destructive"
+                                            disabled={!rejectListingReason.trim() || rejectListing.isPending}
+                                            onClick={async () => {
+                                                try {
+                                                    await rejectListing.mutateAsync({ listingId: rejectListingDialog.listingId, reason: rejectListingReason.trim() })
+                                                    toast.success("Listing rejected")
+                                                    setRejectListingDialog({ open: false, listingId: "", title: "" })
+                                                    setRejectListingReason("")
+                                                } catch (error: unknown) {
+                                                    toast.error(getErrorMessage(error, "Failed to reject"))
+                                                }
+                                            }}
+                                        >
+                                            Reject
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    )}
                 </TabsContent>
 
                 <TabsContent value="geography" className="space-y-6">

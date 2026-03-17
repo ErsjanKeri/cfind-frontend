@@ -117,7 +117,7 @@ export interface LoginResponse {
 // LISTING TYPES
 // ============================================================================
 
-export type ListingStatus = 'draft' | 'active' | 'sold' | 'inactive';
+export type ListingStatus = 'pending' | 'active' | 'rejected' | 'sold' | 'inactive';
 export type PromotionTier = 'standard' | 'featured' | 'premium';
 export type ListingCategory =
   | 'restaurant'
@@ -166,6 +166,8 @@ export interface Listing {
   employee_count: number | null;
   years_in_operation: number | null;
   is_physically_verified: boolean;
+  rejection_reason: string | null;
+  rejected_at: string | null;
   view_count: number;
   created_at: string;
   updated_at: string;

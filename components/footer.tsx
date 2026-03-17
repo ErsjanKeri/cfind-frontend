@@ -96,7 +96,7 @@ export function Footer() {
 
         <div className="mt-12 border-t border-border pt-8">
           <p className="text-sm text-muted-foreground text-center">
-            &copy; {new Date().getFullYear()} CompanyFinder. All rights reserved.
+            &copy; {new Date().getFullYear()} Cfind. All rights reserved.
           </p>
         </div>
       </div>

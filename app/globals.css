@@ -3,7 +3,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* <CHANGE> Company Finder theme - sophisticated slate blue with trust-focused palette */
+/* Cfind theme - sophisticated slate blue with trust-focused palette */
 :root {
   --background: oklch(0.985 0.002 247);
   --foreground: oklch(0.195 0.02 255);
@@ -39,7 +39,7 @@
   --sidebar-border: oklch(0.3 0.02 255);
   --sidebar-ring: oklch(0.55 0.15 175);
 
-  /* Custom tokens for Company Finder */
+  /* Custom tokens for Cfind */
   --success: oklch(0.55 0.15 145);
   --success-foreground: oklch(0.99 0 0);
   --warning: oklch(0.75 0.15 75);

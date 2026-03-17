@@ -29,7 +29,7 @@ export default function SplashPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted/30 p-4">
       <div className="w-full max-w-lg space-y-8 text-center">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Welcome to CompanyFinder</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Welcome to Cfind</h1>
           <p className="text-muted-foreground">Where are you looking to buy or sell a business?</p>
         </div>
 

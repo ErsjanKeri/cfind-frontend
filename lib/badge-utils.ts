@@ -18,9 +18,13 @@ export function getListingStatusBadge(status: ListingStatus): BadgeConfig {
       className: "bg-green-100 text-green-700 hover:bg-green-100",
       label: "Active",
     },
-    draft: {
-      className: "bg-gray-100 text-gray-700 hover:bg-gray-100",
-      label: "Draft",
+    pending: {
+      className: "bg-amber-100 text-amber-700 hover:bg-amber-100",
+      label: "Pending Review",
+    },
+    rejected: {
+      className: "bg-red-100 text-red-700 hover:bg-red-100",
+      label: "Rejected",
     },
     sold: {
       className: "bg-blue-100 text-blue-700 hover:bg-blue-100",

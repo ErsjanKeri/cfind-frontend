@@ -4,10 +4,10 @@ import { QueryProvider } from "@/lib/providers/query-provider"
 import { CookieConsent } from "@/components/shared/cookie-consent"
 import "./globals.css"
 
-// Updated metadata for Company Finder
+// Updated metadata for Cfind
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://www.cfind.ai"),
-  title: "CompanyFinder - Business Acquisition Marketplace in Albania",
+  title: "Cfind - Business Acquisition Marketplace in Albania",
   description:
     "The secure, agent-driven marketplace for business acquisitions. Verified agents, vetted buyers, confidential listings.",
   generator: "v0.app",

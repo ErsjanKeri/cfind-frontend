@@ -7,6 +7,7 @@ import type {
   CreateBuyerRequest,
   City,
   Neighbourhood,
+  Listing,
 } from './types';
 
 export const adminApi = {
@@ -120,6 +121,35 @@ export const adminApi = {
         { name }
       );
       return response.data.neighbourhood;
+    });
+  },
+
+  async getPendingListings(page = 1): Promise<{ listings: Listing[]; total: number; total_pages: number }> {
+    return apiCall(async () => {
+      const response = await apiClient.get<{ listings: Listing[]; total: number; total_pages: number }>(
+        '/api/admin/listings/pending',
+        { params: { page } }
+      );
+      return response.data;
+    });
+  },
+
+  async approveListing(listingId: string): Promise<{ message: string }> {
+    return apiCall(async () => {
+      const response = await apiClient.post<{ message: string }>(
+        `/api/admin/listings/${listingId}/approve`
+      );
+      return response.data;
+    });
+  },
+
+  async rejectListing(listingId: string, reason: string): Promise<{ message: string }> {
+    return apiCall(async () => {
+      const response = await apiClient.post<{ message: string }>(
+        `/api/admin/listings/${listingId}/reject`,
+        { reason }
+      );
+      return response.data;
     });
   },
 };

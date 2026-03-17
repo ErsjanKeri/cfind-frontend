@@ -25,7 +25,7 @@ export function InvestorJourney() {
               <span className="font-medium">For Investors</span>
             </div>
             <h2 className="text-3xl font-bold text-foreground sm:text-4xl mb-6">Your Path to Ownership</h2>
-            <p className="text-lg text-muted-foreground mb-8">Finding and buying a business on CompanyFinder is simple. Browse, contact, negotiate.</p>
+            <p className="text-lg text-muted-foreground mb-8">Finding and buying a business on Cfind is simple. Browse, contact, negotiate.</p>
 
             <div className="space-y-6">
               <div className="flex gap-4">
