@@ -23,7 +23,7 @@ export function middleware(request: NextRequest) {
     if (country && (VALID_COUNTRY_CODES as readonly string[]).includes(country)) {
       return NextResponse.redirect(new URL(`/${country}`, request.url));
     }
-    // No cookie → fall through to splash page
+    // No cookie → let client-side auto-detect handle it (page.tsx)
     return NextResponse.next();
   }
 

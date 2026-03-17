@@ -28,3 +28,28 @@ export function setCountryCookie(code: CountryCode): void {
 export function getCountryOrDefault(): CountryCode {
   return getCountryCookie() ?? DEFAULT_COUNTRY
 }
+
+/**
+ * Detect country from browser timezone and language.
+ * - Middle East timezones or Arabic language → UAE
+ * - Albania timezone → Albania
+ * - Everything else (Europe, English, etc.) → Switzerland
+ */
+export function detectCountryFromBrowser(): CountryCode {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""
+    const lang = (navigator.language || "").toLowerCase()
+
+    // Albania
+    if (tz === "Europe/Tirane") return "al"
+
+    // UAE / Middle East
+    const middleEastTzPrefixes = ["Asia/Dubai", "Asia/Riyadh", "Asia/Qatar", "Asia/Bahrain", "Asia/Kuwait", "Asia/Muscat"]
+    if (middleEastTzPrefixes.some(p => tz.startsWith(p)) || lang.startsWith("ar")) return "ae"
+
+    // Default: Switzerland
+    return "ch"
+  } catch {
+    return DEFAULT_COUNTRY
+  }
+}

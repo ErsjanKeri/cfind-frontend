@@ -27,20 +27,22 @@ export const SUPPORT_EMAIL = "support@cfind.ai"
 // COUNTRY DATA
 // ============================================================================
 
-export type CountryCode = "al" | "ae"
+export type CountryCode = "ch" | "ae" | "al"
 
 interface CountryData {
     name: string
     flag: string
 }
 
+// Ordered: Switzerland first, then UAE, then Albania
 export const countries: Record<CountryCode, CountryData> = {
-    al: { name: "Albania", flag: "🇦🇱" },
+    ch: { name: "Switzerland", flag: "🇨🇭" },
     ae: { name: "United Arab Emirates", flag: "🇦🇪" },
+    al: { name: "Albania", flag: "🇦🇱" },
 }
 
 export const VALID_COUNTRY_CODES: CountryCode[] = Object.keys(countries) as CountryCode[]
-export const DEFAULT_COUNTRY: CountryCode = "al"
+export const DEFAULT_COUNTRY: CountryCode = "ch"
 
 export function isValidCountryCode(code: string): code is CountryCode {
     return code in countries
